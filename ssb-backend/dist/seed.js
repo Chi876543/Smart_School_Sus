@@ -35,11 +35,6 @@ async function seed() {
         ScheduleModel.deleteMany({}),
         TripModel.deleteMany({})
     ]);
-    const admin = await AdminModel.create({
-        username: 'admin',
-        password: 'hashed_123'
-    });
-    console.log('✅ Admin created:', admin.username);
     const [stopA, stopB] = await StopModel.create([
         { name: 'Stop A', lat: 10.76, lng: 106.68, active: true },
         { name: 'Stop B', lat: 10.77, lng: 106.70, active: true }
