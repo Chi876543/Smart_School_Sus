@@ -1,0 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Trip = exports.Schedule = exports.Student = exports.Bus = exports.Driver = exports.Route = exports.Stop = exports.Admin = void 0;
+var admin_schema_1 = require("./admin.schema");
+Object.defineProperty(exports, "Admin", { enumerable: true, get: function () { return admin_schema_1.Admin; } });
+var stop_schema_1 = require("./stop.schema");
+Object.defineProperty(exports, "Stop", { enumerable: true, get: function () { return stop_schema_1.Stop; } });
+var route_schema_1 = require("./route.schema");
+Object.defineProperty(exports, "Route", { enumerable: true, get: function () { return route_schema_1.Route; } });
+var driver_schema_1 = require("./driver.schema");
+Object.defineProperty(exports, "Driver", { enumerable: true, get: function () { return driver_schema_1.Driver; } });
+var bus_schema_1 = require("./bus.schema");
+Object.defineProperty(exports, "Bus", { enumerable: true, get: function () { return bus_schema_1.Bus; } });
+var student_schema_1 = require("./student.schema");
+Object.defineProperty(exports, "Student", { enumerable: true, get: function () { return student_schema_1.Student; } });
+var schedule_schema_1 = require("./schedule.schema");
+Object.defineProperty(exports, "Schedule", { enumerable: true, get: function () { return schedule_schema_1.Schedule; } });
+var trip_schema_1 = require("./trip.schema");
+Object.defineProperty(exports, "Trip", { enumerable: true, get: function () { return trip_schema_1.Trip; } });
+//# sourceMappingURL=index.js.map

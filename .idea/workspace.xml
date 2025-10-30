@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d255b9fe-ef1b-4923-9a59-facb4b265078" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ssb-backend/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ssb-backend/src/config/app.config.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ssb-backend/src/config/database.config.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ssb-backend/src/dto/map/distance.dto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ssb-backend/src/models/admin.schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ssb-backend/src/models/bus.schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ssb-backend/src/models/driver.schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ssb-backend/src/models/route.schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ssb-backend/src/models/schedule.schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ssb-backend/src/models/stop.schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ssb-backend/src/models/student.schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ssb-backend/src/models/trip.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/eslint.config.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/middleware.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/next.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/postcss.config.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/public/file.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/public/globe.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/public/next.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/public/vercel.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/public/window.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/src/app/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/src/app/globals.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/src/app/layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/src/app/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/src/lib/api.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/src/lib/maps.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/src/lib/soket.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-frontend/tsconfig.json" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="34kG75dfx5AB4V3hxfv1T7T1RPb" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/SoftwareEnginger/Smart_School_Sus"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\SoftwareEnginger\Smart_School_Sus\ssb-backend\src\services" />
+      <recent name="D:\SoftwareEnginger\Smart_School_Sus\ssb-backend\src\controllers" />
+      <recent name="D:\SoftwareEnginger\Smart_School_Sus\ssb-backend\src\modules" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Smart_School_Sus" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="Smart_School_Sus" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d255b9fe-ef1b-4923-9a59-facb4b265078" name="Changes" comment="" />
+      <created>1761749987326</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1761749987326</updated>
+    </task>
+    <servers />
+  </component>
+</project>
