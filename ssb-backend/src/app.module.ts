@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './modules/auth.module';
-import { MapModule } from './modules/map.module';
 
 // Import các schema models
 import { Admin, AdminSchema } from './models/admin.schema';
@@ -38,8 +37,6 @@ import { Trip, TripSchema } from './models/trip.schema';
     
     AuthModule,
 
-    // Module riêng của Google Maps API
-    MapModule,
   ],
 })
 export class AppModule {}

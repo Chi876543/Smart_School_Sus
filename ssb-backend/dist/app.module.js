@@ -11,7 +11,6 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
 const auth_module_1 = require("./modules/auth.module");
-const map_module_1 = require("./modules/map.module");
 const admin_schema_1 = require("./models/admin.schema");
 const stop_schema_1 = require("./models/stop.schema");
 const route_schema_1 = require("./models/route.schema");
@@ -39,7 +38,6 @@ exports.AppModule = AppModule = __decorate([
                 { name: trip_schema_1.Trip.name, schema: trip_schema_1.TripSchema },
             ]),
             auth_module_1.AuthModule,
-            map_module_1.MapModule,
         ],
     })
 ], AppModule);

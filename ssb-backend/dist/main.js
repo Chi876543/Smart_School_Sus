@@ -7,5 +7,4 @@ async function bootstrap() {
     await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
-console.log('GOOGLE_MAPS_API_KEY =', process.env.GOOGLE_MAPS_API_KEY);
 //# sourceMappingURL=main.js.map
