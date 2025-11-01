@@ -7,6 +7,7 @@ import { Bus, BusSchema } from './models/bus.schema';
 import { Student, StudentSchema } from './models/student.schema';
 import { Schedule, ScheduleSchema } from './models/schedule.schema';
 import { Trip, TripSchema } from './models/trip.schema';
+import { TimetableSchema } from './models/timetable.schema';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -93,6 +94,23 @@ async function seed() {
       { studentId: stu2._id, status: 'not_pickup' }
     ]
   });
+
+  const TimetableModel = model('Timetable', TimetableSchema);
+
+  const timetables = [
+    { dayOfWeek: 'Monday', pickupTime: '06:30', dropoffTime: '15:00' },
+    { dayOfWeek: 'Tuesday', pickupTime: '06:30', dropoffTime: '15:00' },
+    { dayOfWeek: 'Wednesday', pickupTime: '06:30', dropoffTime: '15:00' },
+    { dayOfWeek: 'Thursday', pickupTime: '06:30', dropoffTime: '15:00' },
+    { dayOfWeek: 'Friday', pickupTime: '06:30', dropoffTime: '15:00' },
+    // Nếu muốn thêm ca chiều hoặc cuối tuần:
+    { dayOfWeek: 'Saturday', pickupTime: '07:00', dropoffTime: '16:00' },
+    // { dayOfWeek: 'Sunday', pickupTime: '08:00', dropoffTime: '12:00' },
+  ];
+
+  await TimetableModel.insertMany(timetables);
+
+
 
   console.log('🎉 Seed completed successfully!');
   process.exit(0);
