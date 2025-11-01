@@ -12,6 +12,7 @@ const bus_schema_1 = require("./models/bus.schema");
 const student_schema_1 = require("./models/student.schema");
 const schedule_schema_1 = require("./models/schedule.schema");
 const trip_schema_1 = require("./models/trip.schema");
+const timetable_schema_1 = require("./models/timetable.schema");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 async function seed() {
@@ -78,6 +79,16 @@ async function seed() {
             { studentId: stu2._id, status: 'not_pickup' }
         ]
     });
+    const TimetableModel = (0, mongoose_1.model)('Timetable', timetable_schema_1.TimetableSchema);
+    const timetables = [
+        { dayOfWeek: 'Monday', pickupTime: '06:30', dropoffTime: '15:00' },
+        { dayOfWeek: 'Tuesday', pickupTime: '06:30', dropoffTime: '15:00' },
+        { dayOfWeek: 'Wednesday', pickupTime: '06:30', dropoffTime: '15:00' },
+        { dayOfWeek: 'Thursday', pickupTime: '06:30', dropoffTime: '15:00' },
+        { dayOfWeek: 'Friday', pickupTime: '06:30', dropoffTime: '15:00' },
+        { dayOfWeek: 'Saturday', pickupTime: '07:00', dropoffTime: '16:00' },
+    ];
+    await TimetableModel.insertMany(timetables);
     console.log('🎉 Seed completed successfully!');
     process.exit(0);
 }
