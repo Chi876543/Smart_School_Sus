@@ -1,4 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { CreateScheduleDTO } from "src/dtos/createSchedule.dto";
+import { UpdateScheduleDTO } from "src/dtos/updateSchedule.dto";
 import { Schedule } from "src/models";
 import { ScheduleService } from "src/services/schedule.service";
 
@@ -8,10 +10,10 @@ export class ScheduleController{
 
     }
 
-    @Post()
-    create(@Body() createDto:Partial<Schedule>){
-        return this.scheduleService.create(createDto);
-    }
+    // @Post()
+    // create(@Body() createDto:CreateScheduleDTO){
+    //     return this.scheduleService.create(createDto);
+    // }
 
     @Get()
     findAll(){
@@ -23,10 +25,10 @@ export class ScheduleController{
         return this.findOne(id);
     }
 
-    @Put(':id')
-    update(@Param('id') id:String, @Body() updateDto:Partial<Schedule>){
-        return this.scheduleService.update(id, updateDto);
-    }
+    // @Put(':id')
+    // update(@Param('id') id:String, @Body() updateDto:UpdateScheduleDTO){
+    //     return this.scheduleService.update(id, updateDto);
+    // }
 
     @Delete(':id')
     remove(@Param(':id') id:String){

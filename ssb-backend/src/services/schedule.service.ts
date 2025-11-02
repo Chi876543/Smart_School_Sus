@@ -1,6 +1,10 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import { plainToInstance } from "class-transformer";
 import { Model, Types } from 'mongoose';
+import { CreateScheduleDTO } from "src/dtos/createSchedule.dto";
+import { ScheduleResponseDTO } from "src/dtos/scheduleResponse.dto";
+import { UpdateScheduleDTO } from "src/dtos/updateSchedule.dto";
 import { Schedule } from "src/models";
 
 @Injectable()
@@ -10,36 +14,53 @@ export class ScheduleService{
         private scheduleModel: Model<Schedule>
     ) {}
 
-    async create(createDto: Partial<Schedule>):Promise<Schedule>{
-        const schedule = new this.scheduleModel(createDto);
-        return schedule.save();
-    }
+    // async create(createDto: CreateScheduleDTO):Promise<ScheduleResponseDTO>{
+    //     const schedule = new this.scheduleModel(createDto);
+    //     const saved = await schedule.save();
+    //     return plainToInstance(ScheduleResponseDTO, {
+    //         id: saved.id.toString(),
+    //         ...saved.toObject()
+    //     });
+    // }
 
-    async findAll():Promise<Schedule[]>{
-        return this.scheduleModel
+    async findAll():Promise<ScheduleResponseDTO[]>{
+        const schedule = await this.scheduleModel
         .find()
         .populate('busID driverId routeId')
         .exec();
+
+        return plainToInstance(ScheduleResponseDTO,
+            schedule.map((s) => ({
+                id: s.id.toString(),
+                ...s.toObject()
+            }))
+        );
     }
 
-    async findOne(id: String):Promise<Schedule>{
+    async findOne(id: String):Promise<ScheduleResponseDTO>{
         const schedule = await this.scheduleModel
         .findById(id)
         .populate('busId driverId routeId')
         .exec();
         
         if(!schedule) throw new NotFoundException(`Schedule ${id} not found`);
-        return schedule;
+        return plainToInstance(ScheduleResponseDTO, {
+            id: schedule.id.toString(),
+            ...schedule.toObject()
+        });
     }
 
-    async update(id: String, updateDto: Partial<Schedule>):Promise<Schedule>{
-        const updated = await this.scheduleModel
-        .findByIdAndUpdate(id, updateDto, {new : true})
-        .exec();
+    // async update(id: String, updateDto: UpdateScheduleDTO):Promise<ScheduleResponseDTO>{
+    //     const updated = await this.scheduleModel
+    //     .findByIdAndUpdate(id, updateDto, {new : true})
+    //     .exec();
 
-        if(!updated) throw new NotFoundException(`Schedule ${id} not found`);
-        return updated;
-    }
+    //     if(!updated) throw new NotFoundException(`Schedule ${id} not found`);
+    //     return plainToInstance(ScheduleResponseDTO, {
+    //         id: updated.id.toString(),
+    //         ...updated.toObject()
+    //     });
+    // }
 
     async remove(id: String):Promise<void>{
         const result = await this.scheduleModel
