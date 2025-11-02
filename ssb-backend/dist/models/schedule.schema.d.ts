@@ -7,6 +7,7 @@ export declare class Schedule extends Document {
     busId: Types.ObjectId;
     driverId: Types.ObjectId;
     routeId: Types.ObjectId;
+    timeTables: Types.ObjectId[];
 }
 export declare const ScheduleSchema: import("mongoose").Schema<Schedule, import("mongoose").Model<Schedule, any, any, any, Document<unknown, any, Schedule, any, {}> & Schedule & Required<{
     _id: unknown;

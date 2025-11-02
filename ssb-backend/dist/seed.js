@@ -66,7 +66,15 @@ async function seed() {
         busId: bus._id,
         driverId: driver._id,
         routeId: route._id,
-        status: 'active'
+        status: 'active',
+        timeTables: [
+            "6906144b25ac67634d9153c6",
+            "6906144b25ac67634d9153c7",
+            "6906144b25ac67634d9153c8",
+            "6906144b25ac67634d9153c9",
+            "6906144b25ac67634d9153ca",
+            "6906144b25ac67634d9153cb"
+        ]
     });
     await TripModel.create({
         scheduleId: schedule._id,

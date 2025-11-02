@@ -1,15 +1,16 @@
 import { Model } from 'mongoose';
+import { JwtService } from '@nestjs/jwt';
 import { Admin } from '../models/admin.schema';
+import { LoginRequestDTO } from 'src/dtos/loginRequest.dto';
+import { LoginResponseDTO } from 'src/dtos/loginResponse.dto';
 export declare class AuthService {
     private userModel;
-    constructor(userModel: Model<Admin>);
+    private jwtService;
+    constructor(userModel: Model<Admin>, jwtService: JwtService);
     register(username: string, password: string): Promise<import("mongoose").Document<unknown, {}, Admin, {}, {}> & Admin & Required<{
         _id: unknown;
     }> & {
         __v: number;
     }>;
-    login(username: string, password: string): Promise<{
-        message: string;
-        userId: unknown;
-    }>;
+    login(dto: LoginRequestDTO): Promise<LoginResponseDTO>;
 }

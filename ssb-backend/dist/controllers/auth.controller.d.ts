@@ -1,4 +1,6 @@
 import { AuthService } from '../services/auth.service';
+import { LoginRequestDTO } from 'src/dtos/loginRequest.dto';
+import { LoginResponseDTO } from 'src/dtos/loginResponse.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -10,11 +12,5 @@ export declare class AuthController {
     }> & {
         __v: number;
     }>;
-    login(body: {
-        username: string;
-        password: string;
-    }): Promise<{
-        message: string;
-        userId: unknown;
-    }>;
+    login(dto: LoginRequestDTO): Promise<LoginResponseDTO>;
 }

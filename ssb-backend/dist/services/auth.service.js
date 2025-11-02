@@ -49,12 +49,15 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcryptjs"));
 const admin_schema_1 = require("../models/admin.schema");
 let AuthService = class AuthService {
     userModel;
-    constructor(userModel) {
+    jwtService;
+    constructor(userModel, jwtService) {
         this.userModel = userModel;
+        this.jwtService = jwtService;
     }
     async register(username, password) {
         const existing = await this.userModel.findOne({ username });
@@ -65,20 +68,25 @@ let AuthService = class AuthService {
         const newUser = new this.userModel({ username, password: hash });
         return newUser.save();
     }
-    async login(username, password) {
-        const user = await this.userModel.findOne({ username });
+    async login(dto) {
+        const user = await this.userModel.findOne({ username: dto.username });
         if (!user)
             throw new Error('Invalid credentials');
-        const match = await bcrypt.compare(password, user.password);
+        const match = await bcrypt.compare(dto.password, user.password);
         if (!match)
             throw new Error('Invalid credentials');
-        return { message: 'Login success', userId: user._id };
+        const token = this.jwtService.sign({ sub: user._id, username: user.username });
+        return {
+            token: token,
+            username: user.username
+        };
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(admin_schema_1.Admin.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

@@ -23,6 +23,9 @@ export class Schedule extends Document {
 
   @Prop({ type: Types.ObjectId, ref: 'Route', required: true })
   routeId: Types.ObjectId;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Timetable' }] })
+  timeTables: Types.ObjectId[];
 }
 
 export const ScheduleSchema = SchemaFactory.createForClass(Schedule);

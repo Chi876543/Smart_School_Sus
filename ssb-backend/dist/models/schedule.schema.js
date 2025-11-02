@@ -20,6 +20,7 @@ let Schedule = class Schedule extends mongoose_2.Document {
     busId;
     driverId;
     routeId;
+    timeTables;
 };
 exports.Schedule = Schedule;
 __decorate([
@@ -50,6 +51,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Route', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Schedule.prototype, "routeId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Types.ObjectId, ref: 'Timetable' }] }),
+    __metadata("design:type", Array)
+], Schedule.prototype, "timeTables", void 0);
 exports.Schedule = Schedule = __decorate([
     (0, mongoose_1.Schema)({ collection: 'schedules' })
 ], Schedule);
