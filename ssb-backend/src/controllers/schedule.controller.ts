@@ -22,7 +22,7 @@ export class ScheduleController{
 
     @Get(':id')
     findOne(@Param('id') id:String){
-        return this.findOne(id);
+        return this.scheduleService.findOne(id);
     }
 
     // @Put(':id')
@@ -31,7 +31,7 @@ export class ScheduleController{
     // }
 
     @Delete(':id')
-    remove(@Param(':id') id:String){
+    remove(@Param('id') id:String){
         return this.scheduleService.remove(id);
     }
 }

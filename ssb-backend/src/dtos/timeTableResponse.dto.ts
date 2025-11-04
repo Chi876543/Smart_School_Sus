@@ -1,14 +1,13 @@
 import { Expose } from "class-transformer";
 
-export class StopResponseDTO{
+export class TimeTableResponseDTO{
     @Expose()
     id: string;
     @Expose()
-    name: string;
+    dayOfWeek: string;
     @Expose()
-    lat: number;
+    pickupTime: string;
     @Expose()
-    lng: number;
-    @Expose()
-    active: boolean
+    dropOffTime: string;
+    
 }

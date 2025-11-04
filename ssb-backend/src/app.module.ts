@@ -13,6 +13,8 @@ import { Bus, BusSchema } from './schema/bus.schema';
 import { Student, StudentSchema } from './schema/student.schema';
 import { Schedule, ScheduleSchema } from './schema/schedule.schema';
 import { Trip, TripSchema } from './schema/trip.schema';
+import { ScheduleModule } from './modules/schedule.module';
+import { Timetable, TimetableSchema } from './schema/timetable.schema';
 
 @Module({
   imports: [
@@ -32,10 +34,11 @@ import { Trip, TripSchema } from './schema/trip.schema';
       { name: Student.name, schema: StudentSchema },
       { name: Schedule.name, schema: ScheduleSchema },
       { name: Trip.name, schema: TripSchema },
+      { name: Timetable.name, schema: TimetableSchema },
     ]),
 
 
-     
+    ScheduleModule,
     AuthModule,
     TrackingModule,
 

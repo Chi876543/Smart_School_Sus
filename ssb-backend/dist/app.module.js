@@ -20,6 +20,8 @@ const bus_schema_1 = require("./schema/bus.schema");
 const student_schema_1 = require("./schema/student.schema");
 const schedule_schema_1 = require("./schema/schedule.schema");
 const trip_schema_1 = require("./schema/trip.schema");
+const schedule_module_1 = require("./modules/schedule.module");
+const timetable_schema_1 = require("./schema/timetable.schema");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -37,7 +39,9 @@ exports.AppModule = AppModule = __decorate([
                 { name: student_schema_1.Student.name, schema: student_schema_1.StudentSchema },
                 { name: schedule_schema_1.Schedule.name, schema: schedule_schema_1.ScheduleSchema },
                 { name: trip_schema_1.Trip.name, schema: trip_schema_1.TripSchema },
+                { name: timetable_schema_1.Timetable.name, schema: timetable_schema_1.TimetableSchema },
             ]),
+            schedule_module_1.ScheduleModule,
             auth_module_1.AuthModule,
             tracking_module_1.TrackingModule,
         ],

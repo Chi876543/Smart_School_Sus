@@ -4,8 +4,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TrackingController } from '../controllers/tracking.controller';
 import { TrackingService } from '../services/tracking.service';
 import { TrackingRepository } from '../repository/tracking.repository';
-
-// 🧱 Import tất cả schema (model)
 import { Bus, BusSchema } from '../schema/bus.schema';
 import { Driver, DriverSchema } from '../schema/driver.schema';
 import { Stop, StopSchema } from '../schema/stop.schema';

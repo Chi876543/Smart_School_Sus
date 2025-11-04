@@ -26,7 +26,17 @@ export class ScheduleService{
     async findAll():Promise<ScheduleResponseDTO[]>{
         const schedule = await this.scheduleModel
         .find()
-        .populate('busID driverId routeId')
+        .populate('busId')
+        .populate('driverId')
+        .populate({
+            path: 'routeId',
+            populate:{
+                path: 'stops.stopId',
+                model: 'Stop'
+            }
+        })
+        
+        .populate('timeTables')
         .exec();
 
         return plainToInstance(ScheduleResponseDTO,
@@ -40,7 +50,17 @@ export class ScheduleService{
     async findOne(id: String):Promise<ScheduleResponseDTO>{
         const schedule = await this.scheduleModel
         .findById(id)
-        .populate('busId driverId routeId')
+        .populate('busId')
+        .populate('driverId')
+        .populate({
+            path: 'routeId',
+            populate:{
+                path: 'stops.stopId',
+                model: 'Stop'
+            }
+        })
+        
+        .populate('timeTables')
         .exec();
         
         if(!schedule) throw new NotFoundException(`Schedule ${id} not found`);

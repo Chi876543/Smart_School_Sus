@@ -106,6 +106,15 @@ async function seed() {
             capacity: 30,
         },
     ]);
+    const timetables = [
+        { dayOfWeek: 'Monday', pickupTime: '06:30', dropoffTime: '15:00' },
+        { dayOfWeek: 'Tuesday', pickupTime: '06:30', dropoffTime: '15:00' },
+        { dayOfWeek: 'Wednesday', pickupTime: '06:30', dropoffTime: '15:00' },
+        { dayOfWeek: 'Thursday', pickupTime: '06:30', dropoffTime: '15:00' },
+        { dayOfWeek: 'Friday', pickupTime: '06:30', dropoffTime: '15:00' },
+        { dayOfWeek: 'Saturday', pickupTime: '07:00', dropoffTime: '16:00' },
+    ];
+    const createTimeTable = await TimetableModel.insertMany(timetables);
     const [stu1, stu2, stu3, stu4, stu5, stu6] = await StudentModel.create([
         { fullName: 'Trần Gia Hân', stopId: stopA._id },
         { fullName: 'Lê Minh Tuấn', stopId: stopB._id },
@@ -123,6 +132,7 @@ async function seed() {
             busId: bus1._id,
             driverId: driver1._id,
             routeId: route1._id,
+            timeTables: createTimeTable.map((t) => t._id)
         },
         {
             name: 'Lịch trình tuyến B',
@@ -179,15 +189,6 @@ async function seed() {
             ],
         },
     ]);
-    const timetables = [
-        { dayOfWeek: 'Monday', pickupTime: '06:30', dropoffTime: '15:00' },
-        { dayOfWeek: 'Tuesday', pickupTime: '06:30', dropoffTime: '15:00' },
-        { dayOfWeek: 'Wednesday', pickupTime: '06:30', dropoffTime: '15:00' },
-        { dayOfWeek: 'Thursday', pickupTime: '06:30', dropoffTime: '15:00' },
-        { dayOfWeek: 'Friday', pickupTime: '06:30', dropoffTime: '15:00' },
-        { dayOfWeek: 'Saturday', pickupTime: '07:00', dropoffTime: '16:00' },
-    ];
-    await TimetableModel.insertMany(timetables);
     console.log('🎉 Seed completed successfully!');
     process.exit(0);
 }
