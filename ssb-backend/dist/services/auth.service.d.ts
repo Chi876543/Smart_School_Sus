@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import { Admin } from '../models/admin.schema';
+import { Admin } from '../schema/admin.schema';
 import { LoginRequestDTO } from 'src/dtos/loginRequest.dto';
 import { LoginResponseDTO } from 'src/dtos/loginResponse.dto';
 export declare class AuthService {

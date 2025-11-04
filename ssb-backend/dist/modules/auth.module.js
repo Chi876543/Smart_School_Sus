@@ -11,7 +11,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const auth_controller_1 = require("../controllers/auth.controller");
 const auth_service_1 = require("../services/auth.service");
-const admin_schema_1 = require("../models/admin.schema");
+const admin_schema_1 = require("../schema/admin.schema");
 const jwt_1 = require("@nestjs/jwt");
 let AuthModule = class AuthModule {
 };

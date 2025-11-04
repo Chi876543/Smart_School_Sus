@@ -2,16 +2,17 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './modules/auth.module';
+import { TrackingModule } from './modules/tracking.module';
 
 // Import các schema models
-import { Admin, AdminSchema } from './models/admin.schema';
-import { Stop, StopSchema } from './models/stop.schema';
-import { Route, RouteSchema } from './models/route.schema';
-import { Driver, DriverSchema } from './models/driver.schema';
-import { Bus, BusSchema } from './models/bus.schema';
-import { Student, StudentSchema } from './models/student.schema';
-import { Schedule, ScheduleSchema } from './models/schedule.schema';
-import { Trip, TripSchema } from './models/trip.schema';
+import { Admin, AdminSchema } from './schema/admin.schema';
+import { Stop, StopSchema } from './schema/stop.schema';
+import { Route, RouteSchema } from './schema/route.schema';
+import { Driver, DriverSchema } from './schema/driver.schema';
+import { Bus, BusSchema } from './schema/bus.schema';
+import { Student, StudentSchema } from './schema/student.schema';
+import { Schedule, ScheduleSchema } from './schema/schedule.schema';
+import { Trip, TripSchema } from './schema/trip.schema';
 
 @Module({
   imports: [
@@ -34,8 +35,9 @@ import { Trip, TripSchema } from './models/trip.schema';
     ]),
 
 
-    
+     
     AuthModule,
+    TrackingModule,
 
   ],
 })

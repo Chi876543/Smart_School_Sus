@@ -5,7 +5,7 @@ import { Model, Types } from 'mongoose';
 import { CreateScheduleDTO } from "src/dtos/createSchedule.dto";
 import { ScheduleResponseDTO } from "src/dtos/scheduleResponse.dto";
 import { UpdateScheduleDTO } from "src/dtos/updateSchedule.dto";
-import { Schedule } from "src/models";
+import { Schedule } from "src/schema";
 
 @Injectable()
 export class ScheduleService{

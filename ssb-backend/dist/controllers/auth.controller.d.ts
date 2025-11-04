@@ -7,7 +7,7 @@ export declare class AuthController {
     register(body: {
         username: string;
         password: string;
-    }): Promise<import("mongoose").Document<unknown, {}, import("../models").Admin, {}, {}> & import("../models").Admin & Required<{
+    }): Promise<import("mongoose").Document<unknown, {}, import("../schema").Admin, {}, {}> & import("../schema").Admin & Required<{
         _id: unknown;
     }> & {
         __v: number;

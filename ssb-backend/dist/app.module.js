@@ -11,14 +11,15 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
 const auth_module_1 = require("./modules/auth.module");
-const admin_schema_1 = require("./models/admin.schema");
-const stop_schema_1 = require("./models/stop.schema");
-const route_schema_1 = require("./models/route.schema");
-const driver_schema_1 = require("./models/driver.schema");
-const bus_schema_1 = require("./models/bus.schema");
-const student_schema_1 = require("./models/student.schema");
-const schedule_schema_1 = require("./models/schedule.schema");
-const trip_schema_1 = require("./models/trip.schema");
+const tracking_module_1 = require("./modules/tracking.module");
+const admin_schema_1 = require("./schema/admin.schema");
+const stop_schema_1 = require("./schema/stop.schema");
+const route_schema_1 = require("./schema/route.schema");
+const driver_schema_1 = require("./schema/driver.schema");
+const bus_schema_1 = require("./schema/bus.schema");
+const student_schema_1 = require("./schema/student.schema");
+const schedule_schema_1 = require("./schema/schedule.schema");
+const trip_schema_1 = require("./schema/trip.schema");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -38,6 +39,7 @@ exports.AppModule = AppModule = __decorate([
                 { name: trip_schema_1.Trip.name, schema: trip_schema_1.TripSchema },
             ]),
             auth_module_1.AuthModule,
+            tracking_module_1.TrackingModule,
         ],
     })
 ], AppModule);
