@@ -10,10 +10,10 @@ export class ScheduleController{
 
     }
 
-    // @Post()
-    // create(@Body() createDto:CreateScheduleDTO){
-    //     return this.scheduleService.create(createDto);
-    // }
+    @Post()
+    create(@Body() createDto:CreateScheduleDTO){
+        return this.scheduleService.create(createDto);
+    }
 
     @Get()
     findAll(){
@@ -25,10 +25,10 @@ export class ScheduleController{
         return this.scheduleService.findOne(id);
     }
 
-    // @Put(':id')
-    // update(@Param('id') id:String, @Body() updateDto:UpdateScheduleDTO){
-    //     return this.scheduleService.update(id, updateDto);
-    // }
+    @Put(':id')
+    update(@Param('id') id:String, @Body() updateDto:UpdateScheduleDTO){
+        return this.scheduleService.update(id, updateDto);
+    }
 
     @Delete(':id')
     remove(@Param('id') id:String){
