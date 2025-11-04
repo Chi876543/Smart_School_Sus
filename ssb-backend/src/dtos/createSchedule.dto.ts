@@ -21,4 +21,7 @@ export class CreateScheduleDTO{
 
     @IsMongoId()
     routeId: string;
+
+    @IsMongoId({ each: true })
+    timeTables?: string[];
 }

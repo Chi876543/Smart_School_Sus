@@ -14,14 +14,14 @@ export class ScheduleService{
         private scheduleModel: Model<Schedule>
     ) {}
 
-    // async create(createDto: CreateScheduleDTO):Promise<ScheduleResponseDTO>{
-    //     const schedule = new this.scheduleModel(createDto);
-    //     const saved = await schedule.save();
-    //     return plainToInstance(ScheduleResponseDTO, {
-    //         id: saved.id.toString(),
-    //         ...saved.toObject()
-    //     });
-    // }
+    async create(createDto: CreateScheduleDTO):Promise<ScheduleResponseDTO>{
+        const schedule = new this.scheduleModel(createDto);
+        const saved = await schedule.save();
+        return plainToInstance(ScheduleResponseDTO, {
+            id: saved.id.toString(),
+            ...saved.toObject()
+        });
+    }
 
     async findAll():Promise<ScheduleResponseDTO[]>{
         const schedule = await this.scheduleModel
@@ -70,17 +70,17 @@ export class ScheduleService{
         });
     }
 
-    // async update(id: String, updateDto: UpdateScheduleDTO):Promise<ScheduleResponseDTO>{
-    //     const updated = await this.scheduleModel
-    //     .findByIdAndUpdate(id, updateDto, {new : true})
-    //     .exec();
+    async update(id: String, updateDto: UpdateScheduleDTO):Promise<ScheduleResponseDTO>{
+        const updated = await this.scheduleModel
+        .findByIdAndUpdate(id, updateDto, {new : true})
+        .exec();
 
-    //     if(!updated) throw new NotFoundException(`Schedule ${id} not found`);
-    //     return plainToInstance(ScheduleResponseDTO, {
-    //         id: updated.id.toString(),
-    //         ...updated.toObject()
-    //     });
-    // }
+        if(!updated) throw new NotFoundException(`Schedule ${id} not found`);
+        return plainToInstance(ScheduleResponseDTO, {
+            id: updated.id.toString(),
+            ...updated.toObject()
+        });
+    }
 
     async remove(id: String):Promise<void>{
         const result = await this.scheduleModel
