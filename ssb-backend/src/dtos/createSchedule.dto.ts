@@ -24,4 +24,7 @@ export class CreateScheduleDTO{
 
     @IsMongoId({ each: true })
     timeTables?: string[];
+
+    @IsMongoId({ each: true })
+    students: string[];
 }

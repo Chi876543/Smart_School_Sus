@@ -1,10 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import * as mongoose from 'mongoose';
 
 @Schema({ collection: 'schedules' })
 export class Schedule extends Document {
-  @Prop({ required: true })
-  status: string; // 'active' | 'inactive'
+  @Prop({
+  type: String,
+  enum: ['unassigned', 'planned', 'active', 'completed', 'suspended', 'cancelled'],
+  default: 'unassigned',
+  })
+  status: string;
+
+  // unassigned Chưa phân công xe, tài xế, tuyến Lúc mới tạo, hoặc khi gỡ phân công
+  // planned	Đã phân công đủ, chờ ngày bắt đầu	Khi busId, driverId, routeId đã có
+  // active	Đang hoạt động	Trong khoảng ngày
+  // completed	Đã hoàn thành	Sau ngày kết thúc
+  // suspended	Tạm dừng	Do lỗi kỹ thuật, bảo trì
+  // cancelled	Hủy bỏ	Khi admin hủy
 
   @Prop({ required: true })
   name: string;
@@ -15,11 +27,11 @@ export class Schedule extends Document {
   @Prop({ required: true, type: Date })
   dateEnd: Date;
 
-  @Prop({ type: Types.ObjectId, ref: 'Bus', required: true })
-  busId: Types.ObjectId;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Bus', required: false, default: null })
+  busId?: mongoose.Schema.Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Driver', required: true })
-  driverId: Types.ObjectId;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: false, default: null })
+  driverId?: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Route', required: true })
   routeId: Types.ObjectId;

@@ -142,6 +142,7 @@ async function seed() {
             busId: bus2._id,
             driverId: driver2._id,
             routeId: route2._id,
+            timeTables: createTimeTable.map((t) => t._id)
         },
         {
             name: 'Lịch trình tuyến C',

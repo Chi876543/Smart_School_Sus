@@ -37,8 +37,12 @@ export class TrackingService {
     if (!schedule) throw new Error('Không tìm thấy Schedule');
 
     const [bus, driver, route] = await Promise.all([
-      this.trackingRepo.findBusById(schedule.busId.toString()),
-      this.trackingRepo.findDriverById(schedule.driverId.toString()),
+      schedule.busId
+        ? this.trackingRepo.findBusById(schedule.busId.toString())
+        : Promise.resolve(null),
+      schedule.driverId
+        ? this.trackingRepo.findDriverById(schedule.driverId.toString())
+        : Promise.resolve(null),
       this.trackingRepo.findRouteById(schedule.routeId.toString()),
     ]);
 

@@ -16,10 +16,10 @@ import { ScheduleService } from 'src/services/schedule.service';
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
-  @Post()
-  create(@Body() createDto: CreateScheduleDTO) {
-    return this.scheduleService.create(createDto);
-  }
+  // @Post()
+  // create(@Body() createDto: CreateScheduleDTO) {
+  //   return this.scheduleService.create(createDto);
+  // }
 
   @Get()
   findAll() {
@@ -40,8 +40,5 @@ export class ScheduleController {
   remove(@Param('id') id: String) {
     return this.scheduleService.remove(id);
   }
-  @Post()
-  async taoLichTrinh(@Body() dto: TaoLichTrinhDTO) {
-    return this.taoLichTrinhService.execute(dto);
-  }
+
 }

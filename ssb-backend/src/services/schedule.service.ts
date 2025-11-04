@@ -89,4 +89,5 @@ export class ScheduleService{
         
         if (!result) throw new NotFoundException(`Schedule ${id} not found`);
     }
+    
 }
