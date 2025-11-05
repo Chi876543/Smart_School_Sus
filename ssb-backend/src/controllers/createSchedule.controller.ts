@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param} from '@nestjs/common';
 import { CreateScheduleService } from '../services/createSchedule.service';
 
 @Controller('schedule')
@@ -8,5 +8,10 @@ export class CreateScheduleController {
   @Post('create')
   async create(@Body() body: any) {
     return await this.createScheduleService.createSchedule(body);
+  }
+
+  @Get(':id/detail')
+  async getScheduleDetail(@Param('id') id: string) {
+    return this.createScheduleService.getScheduleDetail(id);
   }
 }

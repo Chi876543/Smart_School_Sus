@@ -5,6 +5,9 @@ import { Schedule } from '../schema/schedule.schema';
 import { Route } from '../schema/route.schema';
 import { Student } from '../schema/student.schema';
 import { Timetable } from '../schema/timetable.schema';
+import { Driver } from '../schema/driver.schema';
+import { Bus } from '../schema/bus.schema';
+import { Stop } from '../schema/stop.schema';
 import { Trip } from '../schema/trip.schema';
 import { CreateScheduleDTO } from '../dtos/createSchedule.dto';
 
@@ -16,6 +19,9 @@ export class CreateScheduleService {
     @InjectModel(Student.name) private readonly studentModel: Model<Student>,
     @InjectModel(Timetable.name) private readonly timetableModel: Model<Timetable>,
     @InjectModel(Trip.name) private readonly tripModel: Model<Trip>,
+    @InjectModel(Driver.name) private readonly driverModel: Model<Driver>,
+    @InjectModel(Bus.name) private readonly busModel: Model<Bus>,
+    @InjectModel(Stop.name) private readonly stopModel: Model<Stop>,
   ) {}
 
   async createSchedule(data: CreateScheduleDTO) {
@@ -105,4 +111,67 @@ export class CreateScheduleService {
 
     // return 1;
   }
+  // Lấy chi tiết lịch trình bao gồm danh sách học sinh
+  async getScheduleDetail(scheduleId: string) {
+    const schedule = await this.scheduleModel
+      .findById(scheduleId)
+      .populate('routeId')
+      .populate('timeTables')
+      .lean();
+    
+    if (!schedule) throw new BadRequestException('Không tìm thấy lịch trình');
+
+    // Lấy thông tin driver/bus nếu có
+    const driver = schedule.driverId
+      ? await this.driverModel.findById(schedule.driverId).lean()
+      : null;
+    const bus = schedule.busId
+      ? await this.busModel.findById(schedule.busId).lean()
+      : null;
+
+    // ✅ Lấy danh sách học sinh từ Trip
+    const trips = await this.tripModel
+      .find({ scheduleId: new Types.ObjectId(scheduleId) })
+      .populate({
+        path: 'students.studentId',
+        populate: { path: 'stopId' },
+      })
+      .lean();
+
+    // Gom tất cả học sinh unique theo lịch trình
+    const allStudentsMap = new Map();
+    for (const trip of trips) {
+      for (const s of trip.students) {
+        const student = s.studentId as any;
+        if (student && !allStudentsMap.has(student._id.toString())) {
+          allStudentsMap.set(student._id.toString(), {
+            id: student._id,
+            fullName: student.fullName,
+            stopName: student.stopId?.name ?? null,
+          });
+        }
+      }
+    }
+    const students = Array.from(allStudentsMap.values());
+
+    return {
+      scheduleId: schedule._id,
+      name: schedule.name,
+      status: schedule.status,
+      dateStart: schedule.dateStart,
+      dateEnd: schedule.dateEnd,
+      routeName: (schedule.routeId as any)?.name ?? null,
+      driverName: driver?.name ?? null,
+      busPlate: bus?.plateNumber ?? null,
+      timeTables: (schedule.timeTables as any[]).map(t => ({
+        id: t._id,
+        dayOfWeek: t.dayOfWeek,
+        pickupTime: t.pickupTime,
+        dropoffTime: t.dropoffTime,
+      })),
+      students, // ✅ danh sách học sinh lấy từ Trip
+    };
+  }
+
+
 }
