@@ -21,7 +21,6 @@ export class CreateScheduleService {
     @InjectModel(Trip.name) private readonly tripModel: Model<Trip>,
     @InjectModel(Driver.name) private readonly driverModel: Model<Driver>,
     @InjectModel(Bus.name) private readonly busModel: Model<Bus>,
-    @InjectModel(Stop.name) private readonly stopModel: Model<Stop>,
   ) {}
 
   async createSchedule(data: CreateScheduleDTO) {
@@ -59,6 +58,7 @@ export class CreateScheduleService {
       }
       timetableDocs = found.map(t => (t._id as Types.ObjectId).toString());
     }
+    console.log(timetableDocs);
 
     // Tạo Schedule mới (chưa có bus/driver)
     const schedule = await this.scheduleModel.create({
@@ -67,11 +67,12 @@ export class CreateScheduleService {
       dateEnd,
       routeId,
       status: 'unassigned',
-      timetables: timetableDocs,
+      timeTables: timetableDocs,
       students: foundStudents.map(s => s._id),
       busId: null,
       driverId: null,
     });
+    
 
     // Tạo Trip tự động dựa vào timetable và ngày
     const trips: any[] = [];
