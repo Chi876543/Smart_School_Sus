@@ -26,14 +26,14 @@ export class ScheduleController {
     return this.scheduleService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: String) {
-    return this.scheduleService.findOne(id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: String) {
+  //   return this.scheduleService.findOne(id);
+  // }
 
-  @Get(':id/detail')
+  @Get(':id')
   getScheduleDetail(@Param('id') id: string) {
-    return this.scheduleService.getScheduleDetail(id);
+    return this.scheduleService.findOne(id);
   }
 
   @Put(':id')

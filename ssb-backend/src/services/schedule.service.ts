@@ -22,15 +22,6 @@ export class ScheduleService{
         @InjectModel(Bus.name) private readonly busModel: Model<Bus>,
     ) {}
 
-    // async create(createDto: CreateScheduleDTO):Promise<ScheduleResponseDTO>{
-    //     const schedule = new this.scheduleModel(createDto);
-    //     const saved = await schedule.save();
-    //     return plainToInstance(ScheduleResponseDTO, {
-    //         id: saved.id.toString(),
-    //         ...saved.toObject()
-    //     });
-    // }
-
     async create(data: CreateScheduleDTO) {
         const { name, dateStart, dateEnd, routeId, students, timeTables } = data;
     
@@ -117,19 +108,21 @@ export class ScheduleService{
           timetableCount: timetableDocs.length,
           totalTrips: trips.length,
         };
-    
-        // return 1;
       }
     
       // Lấy chi tiết lịch trình bao gồm danh sách học sinh
-      async getScheduleDetail(scheduleId: string) {
+      async findOne(scheduleId: string) {
         const schedule = await this.scheduleModel
           .findById(scheduleId)
-          .populate('routeId')
+        //   .populate('routeId')
           .populate('timeTables')
           .lean();
         
         if (!schedule) throw new BadRequestException('Không tìm thấy lịch trình');
+
+        // const route = schedule.routeId
+        // ? await this.routeModel.findById(schedule.routeId).lean()
+        // : null;
     
         // Lấy thông tin driver/bus nếu có
         const driver = schedule.driverId
@@ -138,6 +131,13 @@ export class ScheduleService{
         const bus = schedule.busId
           ? await this.busModel.findById(schedule.busId).lean()
           : null;
+
+        const route = await this.routeModel
+        .findById(schedule.routeId)
+        .populate({
+                path: 'stops.stopId',
+                model: 'Stop'
+            })
     
         // Lấy danh sách học sinh từ Trip
         const trips = await this.tripModel
@@ -170,7 +170,12 @@ export class ScheduleService{
           status: schedule.status,
           dateStart: schedule.dateStart,
           dateEnd: schedule.dateEnd,
-          routeName: (schedule.routeId as any)?.name ?? null,
+          routeName: route?.name ?? null,
+          stops: (route?.stops as any[]).map(s => ({
+            id: s.stopId._id,
+            order: s.order,
+            name: s.stopId.name
+          })),
           driverName: driver?.name ?? null,
           busPlate: bus?.plateNumber ?? null,
           timeTables: (schedule.timeTables as any[]).map(t => ({
@@ -186,49 +191,41 @@ export class ScheduleService{
     async findAll():Promise<ScheduleResponseDTO[]>{
         const schedule = await this.scheduleModel
         .find()
-        .populate('busId')
-        .populate('driverId')
-        .populate({
-            path: 'routeId',
-            populate:{
-                path: 'stops.stopId',
-                model: 'Stop'
-            }
-        })
-        
-        .populate('timeTables')
         .exec();
 
         return plainToInstance(ScheduleResponseDTO,
             schedule.map((s) => ({
-                id: s.id.toString(),
-                ...s.toObject()
+                id: s.id,
+                status: s.status,
+                name: s.name,
+                dateStart: s.dateStart,
+                dateEnd: s.dateEnd
             }))
         );
     }
 
-    async findOne(id: String):Promise<ScheduleResponseDTO>{
-        const schedule = await this.scheduleModel
-        .findById(id)
-        .populate('busId')
-        .populate('driverId')
-        .populate({
-            path: 'routeId',
-            populate:{
-                path: 'stops.stopId',
-                model: 'Stop'
-            }
-        })
+    // async findOne(id: String):Promise<ScheduleResponseDTO>{
+    //     const schedule = await this.scheduleModel
+    //     .findById(id)
+    //     .populate('busId')
+    //     .populate('driverId')
+    //     .populate({
+    //         path: 'routeId',
+    //         populate:{
+    //             path: 'stops.stopId',
+    //             model: 'Stop'
+    //         }
+    //     })
         
-        .populate('timeTables')
-        .exec();
+    //     .populate('timeTables')
+    //     .exec();
         
-        if(!schedule) throw new NotFoundException(`Schedule ${id} not found`);
-        return plainToInstance(ScheduleResponseDTO, {
-            id: schedule.id.toString(),
-            ...schedule.toObject()
-        });
-    }
+    //     if(!schedule) throw new NotFoundException(`Schedule ${id} not found`);
+    //     return plainToInstance(ScheduleResponseDTO, {
+    //         id: schedule.id.toString(),
+    //         ...schedule.toObject()
+    //     });
+    // }
 
     async update(id: String, updateDto: UpdateScheduleDTO):Promise<ScheduleResponseDTO>{
         const updated = await this.scheduleModel
