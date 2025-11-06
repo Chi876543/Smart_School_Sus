@@ -98,7 +98,7 @@ export class AssignScheduleService {
     if (!updated) throw new BadRequestException('Cập nhật phân công thất bại');
 
     return {
-      message: '✅ Cập nhật phân công thành công',
+      message: 'Cập nhật phân công thành công',
       scheduleId: updated._id,
       driverId: updated.driverId ?? null,
       busId: updated.busId ?? null,
