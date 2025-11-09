@@ -23,7 +23,7 @@ export class CreateScheduleDTO{
     routeId: string;
 
     @IsMongoId({ each: true })
-    timeTables?: string[];
+    timeTables: string[];
 
     @IsMongoId({ each: true })
     students: string[];

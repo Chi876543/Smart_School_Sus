@@ -26,23 +26,18 @@ export class ScheduleController {
     return this.scheduleService.findAll();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: String) {
-  //   return this.scheduleService.findOne(id);
-  // }
-
   @Get(':id')
-  getScheduleDetail(@Param('id') id: string) {
+  findOne(@Param('id') id: string) {
     return this.scheduleService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: String, @Body() updateDto: UpdateScheduleDTO) {
+  update(@Param('id') id: string, @Body() updateDto: UpdateScheduleDTO) {
     return this.scheduleService.update(id, updateDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: String) {
+  remove(@Param('id') id: string) {
     return this.scheduleService.remove(id);
   }
 
