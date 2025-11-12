@@ -7,6 +7,7 @@ import { AssignModule } from './modules/assignment.module';
 import { ScheduleModule } from './modules/schedule.module';
 
 import { DatabaseModule } from './modules/database.module';
+import { StudentModule } from './modules/student.module';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { DatabaseModule } from './modules/database.module';
 
     // Kết nối MongoDB
     MongooseModule.forRoot(process.env.MONGODB_URI as string),
-
+    StudentModule,
     DatabaseModule,
     AssignModule,
     ScheduleModule,

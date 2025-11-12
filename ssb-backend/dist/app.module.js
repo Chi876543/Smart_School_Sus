@@ -15,6 +15,7 @@ const tracking_module_1 = require("./modules/tracking.module");
 const assignment_module_1 = require("./modules/assignment.module");
 const schedule_module_1 = require("./modules/schedule.module");
 const database_module_1 = require("./modules/database.module");
+const student_module_1 = require("./modules/student.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -23,6 +24,7 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({ isGlobal: true }),
             mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI),
+            student_module_1.StudentModule,
             database_module_1.DatabaseModule,
             assignment_module_1.AssignModule,
             schedule_module_1.ScheduleModule,
