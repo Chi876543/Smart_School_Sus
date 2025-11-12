@@ -7,10 +7,10 @@ import { LoginResponseDTO } from 'src/dtos/loginResponse.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
-  async register(@Body() body: { username: string; password: string }) {
-    return this.authService.register(body.username, body.password);
-  }
+  // @Post('register')
+  // async register(@Body() body: { username: string; password: string }) {
+  //   return this.authService.register(body.username, body.password);
+  // }
 
   @Post('login')
   async login(@Body() dto: LoginRequestDTO): Promise<LoginResponseDTO> {

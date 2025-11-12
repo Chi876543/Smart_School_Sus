@@ -41,10 +41,10 @@ async function seed() {
   ]);
 
   // Thêm dữ liệu mẫu
-  // const admin = await AdminModel.create({
-  //   username: 'admin',
-  //   password: 'hashed_123'
-  // });
+  const admin = await AdminModel.create({
+    username: 'admin',
+    password: 'hashed_123'
+  });
 
   // console.log('✅ Admin created:', admin.username);
 

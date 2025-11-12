@@ -7,10 +7,5 @@ export declare class AuthService {
     private userModel;
     private jwtService;
     constructor(userModel: Model<Admin>, jwtService: JwtService);
-    register(username: string, password: string): Promise<import("mongoose").Document<unknown, {}, Admin, {}, {}> & Admin & Required<{
-        _id: unknown;
-    }> & {
-        __v: number;
-    }>;
     login(dto: LoginRequestDTO): Promise<LoginResponseDTO>;
 }

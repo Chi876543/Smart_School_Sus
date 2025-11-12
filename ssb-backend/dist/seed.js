@@ -38,6 +38,10 @@ async function seed() {
         TripModel.deleteMany({}),
         TimetableModel.deleteMany({})
     ]);
+    const admin = await AdminModel.create({
+        username: 'admin',
+        password: 'hashed_123'
+    });
     const [stopA, stopB, stopC, stopD, stopE, stopF] = await StopModel.create([
         { name: 'Trường Lê Văn Tám', lat: 10.775, lng: 106.695, active: true },
         { name: 'Trường Hòa Bình', lat: 10.779, lng: 106.700, active: true },
