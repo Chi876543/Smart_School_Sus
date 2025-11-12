@@ -1,0 +1,30 @@
+
+
+.sidebar {
+  width: 220px;
+  background-color: #f9fafb;
+  height: 100vh;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+}
+
+.menuItem {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.menuItem:hover {
+  background-color: #c3c3c3;
+  color: rgb(0, 0, 0);
+}
+
+.active {
+  background-color: #c3c3c3;
+  color: rgb(0, 0, 0);
+}
