@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/services/api";
-import TopBar from "./components/topBar/TopBar";
-import LeftSidebar from "./components/leftSideBar/LeftSideBar";
+import TopBar from "../../components/topBar/TopBar";
+import LeftSidebar from "../../components/leftSideBar/LeftSideBar";
+import SearchBar from "../../components/searchBar/searchBar";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<any>(null);
@@ -53,6 +54,10 @@ export default function DashboardPage() {
       <div className="flex flex-1">
         <LeftSidebar items={menuItems} />
         <div className="flex-1 p-6 overflow-auto">
+          <SearchBar 
+            placeholder = "Search..."
+            onSearch={(v)=>console.log(v)}
+            ></SearchBar>
           <h1 className="text-2xl font-semibold mb-4">Tổng quan hệ thống</h1>
           {summary ? (
             <ul className="grid grid-cols-3 gap-4">
