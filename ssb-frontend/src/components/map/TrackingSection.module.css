@@ -25,3 +25,23 @@
     left: 10px;
     z-index: 10;
 }
+
+.suggestionList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+.suggestionList li {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+.suggestionList li:hover {
+  background: #f0f0f0;
+}

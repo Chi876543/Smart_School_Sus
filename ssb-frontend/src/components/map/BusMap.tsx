@@ -3,7 +3,7 @@
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import api from "@/services/api";
 import InfoBox from "../infoBox/infoBox";
 import styles from "./BusMap.module.css"
@@ -16,7 +16,7 @@ const busIcon = new L.Icon({
   className: styles.busMarker,
 });
 
-interface BusBasic {
+export interface BusBasic {
   scheduleId: string;
   busId: string;
   plateNumber: string;
@@ -34,10 +34,18 @@ interface BusDetail {
   eta: number; // seconds
 }
 
-export default function BusMap() {
+export interface BusMapRef {
+  selectBus: (bus: BusBasic) => void;
+  flyToBus: (bus: BusBasic) => void;
+  buses: BusBasic[];
+}
+
+const BusMap = forwardRef<BusMapRef>((props, ref) => {
   const [buses, setBuses] = useState<BusBasic[]>([]);
   const [busDetails, setbusDetails] = useState<Record<string, BusDetail>>({}); //key: busId
   const [selectedBus, setSelectedBus] = useState<BusBasic | null>(null);
+  const mapRef = useRef<any>(null);
+  const markerRefs = useRef<Record<string, L.Marker>>( {});
 
 
   const fetchBusData = async () => {
@@ -82,6 +90,20 @@ export default function BusMap() {
   const center: [number, number] =
     buses.length > 0 ? [buses[0].lat, buses[0].lng] : [10.762622, 106.660172];
 
+  useImperativeHandle(ref, () => ({
+    selectBus: (bus: BusBasic) => {
+      setSelectedBus(bus);
+      fetchBusDetail(bus);
+      if (mapRef.current) mapRef.current.flyTo([bus.lat, bus.lng], 15);
+      // open tooltip
+      markerRefs.current[bus.busId]?.openTooltip();
+    },
+    flyToBus: (bus: BusBasic) => {
+      mapRef.current?.flyTo([bus.lat, bus.lng], 15);
+    },
+    buses,
+  }));
+
 
   return (
     <div style={{ height: "80vh", width: "100%", borderRadius: "1rem", position: "relative" }}>
@@ -112,7 +134,7 @@ export default function BusMap() {
         />
       )}
 
-      <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }} zoomControl={false}>
+      <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }} zoomControl={false} ref={mapRef}>
         <TileLayer
           attribution='© <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -128,7 +150,11 @@ export default function BusMap() {
               click: () => {
                 setSelectedBus(bus);
                 fetchBusDetail(bus);
+                markerRefs.current[bus.busId]?.openTooltip();
               },
+            }}
+            ref={(el) => {
+              if (el) markerRefs.current[bus.busId] = el;
             }}
           >
             <Tooltip 
@@ -141,7 +167,9 @@ export default function BusMap() {
       </MapContainer>
     </div>
   );
-}
+});
+
+export default BusMap;
 
 {/* <Popup>
     <div>
