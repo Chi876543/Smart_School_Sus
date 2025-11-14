@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import api from "@/services/api";
 import TopBar from "../../components/topBar/TopBar";
 import LeftSidebar from "../../components/leftSideBar/LeftSideBar";
-import SearchBar from "../../components/searchBar/searchBar";
 import TrackingSection from "@/components/map/TrackingSection";
 import ScheduleManagement from "@/components/ScheduleManagement";
 

@@ -10,8 +10,8 @@ interface SearchBarProps {
 export default function SearchBar({placeholder = "Tìm kiếm...", onSearch}:SearchBarProps){
     const [value, setValue] = useState("");
 
-    const handleSummit = (e: React.FormEvent) =>{
-        e.preventDefault;
+    const handleSubmit = (e: React.FormEvent) =>{
+        e.preventDefault();
         onSearch?.(value);
     };
 
@@ -19,7 +19,7 @@ export default function SearchBar({placeholder = "Tìm kiếm...", onSearch}:Sea
     return (
         <form 
             className={styles.container}
-            onSubmit={handleSummit}
+            onSubmit={handleSubmit}
         >
             <div className={styles.inputWrapper}>
                 <img 
