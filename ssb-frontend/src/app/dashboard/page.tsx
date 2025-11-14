@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/services/api";
-import TopBar from "./TopBar";
-import LeftSidebar from "./LeftSideBar";
+import TopBar from "./components/topBar/TopBar";
+import LeftSidebar from "./components/leftSideBar/LeftSideBar";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<any>(null);
