@@ -5,19 +5,19 @@ import styles from "./LeftSidebar.module.css";
 interface MenuItem{
     label: string;
     key: string;
-    onClick?: () => void;
 }
 
 interface LeftSidebarProps{
     items: MenuItem[];
+    onSelect?: (key: string) => void;
 }
 
-export default function LeftSidebar({items}: LeftSidebarProps){
+export default function LeftSidebar({items, onSelect}: LeftSidebarProps){
     const [activeKey, setActiveKey] = useState<string>(items[0]?.key || "");
 
     const handleClick = (item: MenuItem) => {
         setActiveKey(item.key);
-        if(item.onClick) item.onClick();
+        if(onSelect) onSelect(item.key);
     };
 
     return (

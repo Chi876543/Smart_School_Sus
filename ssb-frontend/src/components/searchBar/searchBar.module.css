@@ -21,6 +21,7 @@
 
 .input {
   width: 100%;
+  background-color: white;
   padding: 10px 14px 10px 44px; /* space for the SVG */
   border: 1px solid #ccc;
   border-radius: 8px;

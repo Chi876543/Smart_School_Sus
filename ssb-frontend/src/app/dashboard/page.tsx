@@ -4,10 +4,13 @@ import api from "@/services/api";
 import TopBar from "../../components/topBar/TopBar";
 import LeftSidebar from "../../components/leftSideBar/LeftSideBar";
 import SearchBar from "../../components/searchBar/searchBar";
+import BusMap from "@/components/map/BusMap";
+import TrackingSection from "@/components/map/TrackingSection";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<any>(null);
   const [username, setUsername] = useState<string>("Admin");
+  const [activeMenu, setActiveMenu] = useState<string>("overview");
 
   // useEffect(() => {
   //   const token = localStorage.getItem("token");
@@ -52,20 +55,34 @@ export default function DashboardPage() {
     <div className="flex flex-col h-screen">
       <TopBar username={username} onLogout={handleLogout}/>
       <div className="flex flex-1">
-        <LeftSidebar items={menuItems} />
+        <LeftSidebar items={menuItems} onSelect={(key) => setActiveMenu(key)}/>
         <div className="flex-1 p-6 overflow-auto">
           <SearchBar 
             placeholder = "Search..."
             onSearch={(v)=>console.log(v)}
-            ></SearchBar>
-          <h1 className="text-2xl font-semibold mb-4">Tổng quan hệ thống</h1>
-          {summary ? (
-            <ul className="grid grid-cols-3 gap-4">
-              <li className="bg-white p-4 rounded-xl shadow">Xe buýt: {summary.buses}</li>
-              <li className="bg-white p-4 rounded-xl shadow">Tài xế: {summary.drivers}</li>
-              <li className="bg-white p-4 rounded-xl shadow">Học sinh: {summary.students}</li>
-            </ul>
-          ) : <p>Đang tải dữ liệu...</p>}
+          />
+
+          {activeMenu === "overview" && (
+            <>
+              <h1 className="text-2xl font-semibold mb-4">Tổng quan hệ thống</h1>
+              {summary ? 
+              (
+                <ul className="grid grid-cols-3 gap-4">
+                  <li className="bg-white p-4 rounded-xl shadow">Xe buýt: {summary.buses}</li>
+                  <li className="bg-white p-4 rounded-xl shadow">Tài xế: {summary.drivers}</li>
+                  <li className="bg-white p-4 rounded-xl shadow">Học sinh: {summary.students}</li>
+                </ul>
+              ) : <p>Đang tải dữ liệu...</p>
+              }
+            </>
+          )}
+
+          {activeMenu === "tracking" &&(
+            <>
+              <TrackingSection/>
+            </>
+          )}
+      
         </div>
       </div>
     </div>
