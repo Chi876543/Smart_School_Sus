@@ -4,41 +4,41 @@ import api from "@/services/api";
 import TopBar from "../../components/topBar/TopBar";
 import LeftSidebar from "../../components/leftSideBar/LeftSideBar";
 import SearchBar from "../../components/searchBar/searchBar";
-import BusMap from "@/components/map/BusMap";
 import TrackingSection from "@/components/map/TrackingSection";
 import ScheduleManagement from "@/components/ScheduleManagement";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<any>(null);
   const [username, setUsername] = useState<string>("Admin");
+  const [activeMenu, setActiveMenu] = useState<string>("overview");
 
-  // ←←← THÊM CHỈ 1 DÒNG NÀY: Đọc trang hiện tại từ URL
-  const [currentPage, setCurrentPage] = useState("overview");
+  // // ←←← THÊM CHỈ 1 DÒNG NÀY: Đọc trang hiện tại từ URL
+  // const [currentPage, setCurrentPage] = useState("overview");
 
-  useEffect(() => {
-    const page = new URLSearchParams(location.search).get("page");
-    if (page === "schedules") setCurrentPage("schedules");
-    else setCurrentPage("overview");
-  }, []);
+  // useEffect(() => {
+  //   const page = new URLSearchParams(location.search).get("page");
+  //   if (page === "schedules") setCurrentPage("schedules");
+  //   else setCurrentPage("overview");
+  // }, []);
 
-  // ←←← Khi bấm menu → thay đổi URL (không reload trang)
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.textContent?.includes("Quản lý lịch trình")) {
-        e.preventDefault();
-        setCurrentPage("schedules");
-        window.history.replaceState(null, "", "?page=schedules");
-      }
-      if (target.textContent?.includes("Tổng quan")) {
-        e.preventDefault();
-        setCurrentPage("overview");
-        window.history.replaceState(null, "", "/dashboard");
-      }
-    };
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
-  }, []);
+  // // ←←← Khi bấm menu → thay đổi URL (không reload trang)
+  // useEffect(() => {
+  //   const handleClick = (e: MouseEvent) => {
+  //     const target = e.target as HTMLElement;
+  //     if (target.textContent?.includes("Quản lý lịch trình")) {
+  //       e.preventDefault();
+  //       setCurrentPage("schedules");
+  //       window.history.replaceState(null, "", "?page=schedules");
+  //     }
+  //     if (target.textContent?.includes("Tổng quan")) {
+  //       e.preventDefault();
+  //       setCurrentPage("overview");
+  //       window.history.replaceState(null, "", "/dashboard");
+  //     }
+  //   };
+  //   document.addEventListener("click", handleClick);
+  //   return () => document.removeEventListener("click", handleClick);
+  // }, []);
 
   useEffect(() => {
     const useFake = localStorage.getItem('USE_FAKE') === 'Admin';
@@ -72,11 +72,6 @@ export default function DashboardPage() {
       <div className="flex flex-1">
         <LeftSidebar items={menuItems} onSelect={(key) => setActiveMenu(key)}/>
         <div className="flex-1 p-6 overflow-auto">
-          <SearchBar 
-            placeholder = "Search..."
-            onSearch={(v)=>console.log(v)}
-          />
-
           {activeMenu === "overview" && (
             <>
               <h1 className="text-2xl font-semibold mb-4">Tổng quan hệ thống</h1>
@@ -97,6 +92,8 @@ export default function DashboardPage() {
               <TrackingSection/>
             </>
           )}
+
+          {activeMenu === "schedules" && <ScheduleManagement/>}
       
         </div>
       </div>
