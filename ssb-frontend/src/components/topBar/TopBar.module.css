@@ -1,0 +1,45 @@
+.topBar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #41BD79;
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.rightSection{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.username {
+  font-weight: 500;
+  color: white;
+  font-size: 28px;
+}
+
+.logoutButton {
+  color: white;
+  border-color: white;
+  padding: 3px;
+  padding-left: 25px;
+  padding-right: 25px;
+  border-radius: 10px;
+  border-width: 1.5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logoutButton:hover {
+    background-color: white;
+    color: #41BD79;
+    font-weight: bold;
+}
+
+.leftSection {
+  font-size: 40px;
+  color: white;
+  font-weight: bold;
+}

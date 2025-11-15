@@ -92,7 +92,7 @@ export class TrackingService {
     if (!nextStop) throw new Error('Không tìm thấy điểm dừng hợp lệ');
     // Tính ETA (qua OSRM)
     const url = `https://router.project-osrm.org/route/v1/driving/${bus.lng},${bus.lat};${nextStop.lng},${nextStop.lat}?overview=false`;
-    let etaSeconds = 0;
+    let etaSeconds = 0; //Estimate Time of Arrival
     let distanceMeters = 0;
 
     try {

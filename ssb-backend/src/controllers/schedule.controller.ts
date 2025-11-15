@@ -16,10 +16,10 @@ import { ScheduleService } from 'src/services/schedule.service';
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
-  // @Post()
-  // create(@Body() createDto: CreateScheduleDTO) {
-  //   return this.scheduleService.create(createDto);
-  // }
+  @Post()
+  create(@Body() createDto: CreateScheduleDTO) {
+    return this.scheduleService.create(createDto);
+  }
 
   @Get()
   findAll() {
@@ -27,17 +27,17 @@ export class ScheduleController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: String) {
+  findOne(@Param('id') id: string) {
     return this.scheduleService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: String, @Body() updateDto: UpdateScheduleDTO) {
+  update(@Param('id') id: string, @Body() updateDto: UpdateScheduleDTO) {
     return this.scheduleService.update(id, updateDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: String) {
+  remove(@Param('id') id: string) {
     return this.scheduleService.remove(id);
   }
 

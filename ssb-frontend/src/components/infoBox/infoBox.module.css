@@ -1,0 +1,65 @@
+.infoboxContainer {
+  position: absolute;
+
+  width: fit-content;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+  padding-bottom: 10px;
+  z-index: 999;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+.infoboxHeader {
+  background: #41BD79;
+  color: white;
+  text-align: center;
+  padding: 5px;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.infoboxContent {
+  padding: 10px 30px 10px 15px;
+  margin-top: 10px;
+}
+
+.infoboxRow {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.infoboxLabel {
+  font-weight: bold;
+  color: #333;
+}
+
+.infoboxValue {
+  color: #555;
+}
+
+.infoboxActions {
+  padding: 5px 30px 10px 15px;
+  margin-top: -5px;
+}
+
+.infoboxActionBtn {
+  display: block;
+  width: 100%;
+  text-align: left;
+
+  background: none;
+  border: none;
+  padding: 6px 0;
+  margin-top: 4px;
+
+  font-size: 14px;
+  color: #1976d2;
+  cursor: pointer;
+}
+
+.infoboxActionBtn:hover {
+  color: #0d47a1;
+  text-decoration: underline;
+}

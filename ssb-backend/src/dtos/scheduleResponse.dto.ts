@@ -15,21 +15,4 @@ export class ScheduleResponseDTO{
     dateStart: Date;
     @Expose()
     dateEnd: Date;
-    @Expose()
-
-    @Type(() => BusResponseDTO)
-    @Expose()
-    bus: BusResponseDTO;
-
-    @Type(() => DriverResponseDTO)
-    @Expose()
-    driver: DriverResponseDTO;
-
-    @Type(() => RouteResponseDTO)
-    @Expose()
-    route: RouteResponseDTO;
-
-    @Type(() => TimeTableResponseDTO)
-    @Expose()
-    timeTables: TimeTableResponseDTO[]
 }

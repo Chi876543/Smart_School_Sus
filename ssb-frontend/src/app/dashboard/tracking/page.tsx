@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 import BusMap from "@/components/map/BusMap";
 
 export default function TrackingPage() {

@@ -14,22 +14,23 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async register(username: string, password: string) {
-    const existing = await this.userModel.findOne({ username });
-    if (existing) throw new Error('Username already exists');
+  // async register(username: string, password: string) {
+  //   const existing = await this.userModel.findOne({ username });
+  //   if (existing) throw new Error('Username already exists');
 
-    const saltRounds = 10;
-    const hash = await bcrypt.hash(password, saltRounds);
-    const newUser = new this.userModel({ username, password: hash });
-    return newUser.save();
-    }
+  //   const saltRounds = 10;
+  //   const hash = await bcrypt.hash(password, saltRounds);
+  //   const newUser = new this.userModel({ username, password: hash });
+  //   return newUser.save();
+  //   }
 
   async login(dto: LoginRequestDTO): Promise<LoginResponseDTO> {
     const user = await this.userModel.findOne({ username: dto.username });
     if (!user) throw new Error('Invalid credentials');
 
-    const match = await bcrypt.compare( dto.password, user.password);
-    if (!match) throw new Error('Invalid credentials');
+    if (dto.password !== user.password) {
+      throw new Error('Invalid credentials');
+    }
 
     const token = this.jwtService.sign({sub: user._id, username: user.username});
 
