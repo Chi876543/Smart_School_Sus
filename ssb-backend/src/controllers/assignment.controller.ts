@@ -7,14 +7,6 @@ import { UpdateAssignScheduleDTO } from '../dtos/updateAssignSchedule.dto';
 export class AssignScheduleController {
   constructor(private readonly assignService: AssignScheduleService) {}
 
-  @Patch(':scheduleId')
-  async assignSchedule(
-    @Param('scheduleId') scheduleId: string,
-    @Body() dto: AssignScheduleDTO,
-  ) {
-    return this.assignService.assignSchedule(scheduleId, dto);
-  }
-
     @Patch('drivers')
     async getDrivers() {
         return this.assignService.getDrivers();
@@ -23,6 +15,14 @@ export class AssignScheduleController {
     @Patch('buses')
     async getBuses() {
         return this.assignService.getBuses();
+    }
+
+    @Patch(':scheduleId')
+    async assignSchedule(
+      @Param('scheduleId') scheduleId: string,
+      @Body() dto: AssignScheduleDTO,
+    ) {
+      return this.assignService.assignSchedule(scheduleId, dto);
     }
 
     @Patch(':scheduleId/update')
