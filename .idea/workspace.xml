@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d255b9fe-ef1b-4923-9a59-facb4b265078" name="Changes" comment="backend" />
+    <list default="true" id="d255b9fe-ef1b-4923-9a59-facb4b265078" name="Changes" comment="backend">
+      <change beforePath="$PROJECT_DIR$/ssb-backend/dist/app.module.js" beforeDir="false" afterPath="$PROJECT_DIR$/ssb-backend/dist/app.module.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-backend/dist/app.module.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/ssb-backend/dist/app.module.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssb-backend/dist/tsconfig.build.tsbuildinfo" beforeDir="false" afterPath="$PROJECT_DIR$/ssb-backend/dist/tsconfig.build.tsbuildinfo" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
