@@ -22,23 +22,8 @@
 .input {
   width: 100%;
   background-color: white;
-  padding: 10px 14px 10px 44px; /* space for the SVG */
+  padding: 10px 14px 10px 44px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 16px;
 }
-
-/* .button {
-  padding: 10px 18px;
-  background-color: #3da76c;
-  color: white;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.button:hover {
-  background-color: #43bcb2;
-} */

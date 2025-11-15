@@ -7,6 +7,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "re
 import api from "@/services/api";
 import InfoBox from "../infoBox/infoBox";
 import styles from "./BusMap.module.css"
+import StudentPopup from "./studentPopup";
 
 const busIcon = new L.Icon({
   iconUrl: "/bus-pointer.svg",
@@ -32,6 +33,11 @@ interface BusDetail {
     distance: number; // meters
   };
   eta: number; // seconds
+
+  students: {
+    fullName: string;
+    status: string;
+  }[];
 }
 
 export interface BusMapRef {
@@ -44,6 +50,7 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
   const [buses, setBuses] = useState<BusBasic[]>([]);
   const [busDetails, setbusDetails] = useState<Record<string, BusDetail>>({}); //key: busId
   const [selectedBus, setSelectedBus] = useState<BusBasic | null>(null);
+  const [studentPopupOpen, setStudentPopupOpen] = useState(false);
   const mapRef = useRef<any>(null);
   const markerRefs = useRef<Record<string, L.Marker>>( {});
 
@@ -82,6 +89,7 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
           routeName: "Unknown",
           nextStop: { name: "Unknown", distance: 0 },
           eta: 0,
+          students: []
         },
       }));
     }
@@ -128,9 +136,17 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
           actions={[
             {
               label: "Danh sách học sinh",
-              onClick: () => console.log("Open student list"),
+              onClick: () => setStudentPopupOpen(true),
             },
           ]}
+        />
+      )}
+
+      {selectedBus && busDetails[selectedBus.busId] && (
+        <StudentPopup
+          open={studentPopupOpen}
+          onClose={() => setStudentPopupOpen(false)}
+          students={busDetails[selectedBus.busId].students}
         />
       )}
 
@@ -171,20 +187,3 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
 
 export default BusMap;
 
-{/* <Popup>
-    <div>
-      <b>{bus.plateNumber}</b> <br />
-      {detail ? (
-        <>
-          Tài xế: {detail.driverName} <br />
-          Tuyến: {detail.routeName} <br />
-          Điểm kế tiếp: {detail.nextStop.name} (
-          {(detail.nextStop.distance / 1000).toFixed(2)} km) <br />
-          ETA: {Math.ceil(detail.eta / 60)} phút
-        </>
-      ) : (
-        <span>Đang tải thông tin...</span>
-      )}
-    </div>
-  </Popup>
-</Marker> */}
