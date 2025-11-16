@@ -35,6 +35,20 @@ export class ScheduleController {
   findAll() {
     return this.scheduleService.findAll();
   }
+// src/controllers/schedule.controller.ts
+// CHỈ THÊM 2 ROUTE MỚI
+
+// ... [TẤT CẢ ROUTE CŨ GIỮ NGUYÊN] ...
+
+@Get('management')
+async findAllForManagement() {
+  return this.scheduleService.findAllForManagement();
+}
+
+@Get('detail/:id')
+async findOneDetail(@Param('id') id: string) {
+  return this.scheduleService.findOneDetail(id);
+}
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -50,5 +64,6 @@ export class ScheduleController {
   remove(@Param('id') id: string) {
     return this.scheduleService.remove(id);
   }
+
 
 }
