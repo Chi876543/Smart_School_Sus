@@ -8,27 +8,40 @@ import Step2StudentSelection from "./Step2StudentSelection";
 interface AddScheduleModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onCreate: (data: any) => Promise<void>;
 }
 
-export default function AddScheduleModal({ isOpen, onClose }: AddScheduleModalProps) {
+export default function AddScheduleModal({ isOpen, onClose, onCreate }: AddScheduleModalProps) {
   const [step, setStep] = useState(1);
 
-  // Dữ liệu chung giữa 2 bước
   const [scheduleName, setScheduleName] = useState("");
-  const [route, setRoute] = useState("");
+  const [routeId, setRouteId] = useState("");
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
-  const [timeRows, setTimeRows] = useState([{ day: "", pick: "", drop: "" }]);
-  const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
+  const [timeRows, setTimeRows] = useState<{ timetableId: string; day: string; pick: string; drop: string }[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
 
   const resetAndClose = () => {
     setStep(1);
     setScheduleName("");
-    setRoute("");
+    setRouteId("");
     setPeriodStart("");
     setPeriodEnd("");
-    setTimeRows([{ day: "", pick: "", drop: "" }]);
+    setTimeRows([]);
+    setSelectedStudents([]);
     onClose();
+  };
+
+  const handleConfirm = async () => {
+    await onCreate({
+      name: scheduleName,
+      routeId,
+      dateStart: periodStart,
+      dateEnd: periodEnd,
+      timeTables: timeRows.map(r => r.timetableId),
+      students: selectedStudents,
+    });
+    resetAndClose();
   };
 
   if (!isOpen) return null;
@@ -40,7 +53,7 @@ export default function AddScheduleModal({ isOpen, onClose }: AddScheduleModalPr
         onClick={(e) => e.stopPropagation()}
       >
         <div className="bg-gradient-to-r from-green-500 to-cyan-500 text-white p-6 text-center rounded-t-2xl">
-          <h2 className="text-2xl font-bold">Thêm lịchXFF trình</h2>
+          <h2 className="text-2xl font-bold">Thêm lịch trình mới</h2>
         </div>
 
         <div className="p-8">
@@ -48,8 +61,8 @@ export default function AddScheduleModal({ isOpen, onClose }: AddScheduleModalPr
             <Step1ScheduleInfo
               scheduleName={scheduleName}
               setScheduleName={setScheduleName}
-              route={route}
-              setRoute={setRoute}
+              routeId={routeId}
+              setRouteId={setRouteId}
               periodStart={periodStart}
               setPeriodStart={setPeriodStart}
               periodEnd={periodEnd}
@@ -61,14 +74,11 @@ export default function AddScheduleModal({ isOpen, onClose }: AddScheduleModalPr
             />
           ) : (
             <Step2StudentSelection
-              route={route}
+              routeId={routeId}
               selectedStudents={selectedStudents}
               setSelectedStudents={setSelectedStudents}
               onBack={() => setStep(1)}
-              onConfirm={() => {
-                alert("Đã lưu lịch trình thành công!");
-                resetAndClose();
-              }}
+              onConfirm={handleConfirm}
             />
           )}
         </div>
