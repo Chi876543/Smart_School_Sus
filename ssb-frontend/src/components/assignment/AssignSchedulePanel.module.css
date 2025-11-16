@@ -1,0 +1,193 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.panel {
+  background: #ffffff;
+  color: #000000; /* chữ màu đen như bạn muốn */
+  border-radius: 8px;
+  width: 480px;
+  max-width: 95vw;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  font-size: 14px;
+}
+
+/* Thanh xanh trên cùng */
+.headerBar {
+  background: #00b050; /* xanh giống header table */
+  color: #ffffff;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.headerTitle {
+  font-size: 16px;
+}
+
+.closeBtn {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.scheduleName {
+  padding: 12px 16px 4px;
+  font-weight: 600;
+}
+
+.scheduleStatusRow {
+  padding: 0 16px 8px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.statusLabel {
+  font-weight: 500;
+}
+
+.statusText {
+  font-weight: 500;
+}
+
+/* Bố cục 2 cột */
+.form {
+  padding: 8px 16px 16px;
+}
+
+.columnsHeader {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #f0f0f0;
+  padding: 6px 10px;
+  font-weight: 600;
+}
+
+.colHeader {
+  text-align: center;
+}
+
+.columnsBody {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px 0 12px;
+}
+
+/* Dropdown custom */
+.dropdownWrapper {
+  position: relative;
+}
+
+.dropdownControl {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.dropdownText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdownArrow {
+  margin-left: 8px;
+}
+
+/* menu + ô search bên trong */
+.dropdownMenu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  background: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 220px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  border-bottom: 1px solid #eee;
+}
+
+.searchIcon {
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 13px;
+}
+
+.options {
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.option {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.option:hover {
+  background: #f2f2f2;
+}
+
+.emptyOption {
+  padding: 6px 10px;
+  color: #888;
+}
+
+/* Footer buttons */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.btnSecondary,
+.btnPrimary {
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btnSecondary {
+  background: #e0e0e0;
+  color: #000;
+}
+
+.btnPrimary {
+  background: #00b050;
+  color: #fff;
+}

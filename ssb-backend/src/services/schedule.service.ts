@@ -1,286 +1,315 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { plainToInstance } from "class-transformer";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { plainToInstance } from 'class-transformer';
 import { Model, Types } from 'mongoose';
-import { CreateScheduleDTO } from "src/dtos/createSchedule.dto";
-import { ScheduleResponseDTO } from "src/dtos/scheduleResponse.dto";
-import { UpdateScheduleDTO } from "src/dtos/updateSchedule.dto";
-import { Bus, Driver, Route, Schedule, Student, Trip } from "src/schema";
-import { Timetable } from "src/schema/timetable.schema";
+import { CreateScheduleDTO } from 'src/dtos/createSchedule.dto';
+import { ScheduleResponseDTO } from 'src/dtos/scheduleResponse.dto';
+import { UpdateScheduleDTO } from 'src/dtos/updateSchedule.dto';
+import { Bus, Driver, Route, Schedule, Student, Trip } from 'src/schema';
+import { Timetable } from 'src/schema/timetable.schema';
 
 @Injectable()
-export class ScheduleService{
-    constructor(
-        @InjectModel(Schedule.name) private readonly scheduleModel: Model<Schedule>,
-        @InjectModel(Route.name) private readonly routeModel: Model<Route>,
-        @InjectModel(Student.name) private readonly studentModel: Model<Student>,
-        @InjectModel(Timetable.name) private readonly timetableModel: Model<Timetable>,
-        @InjectModel(Trip.name) private readonly tripModel: Model<Trip>,
-        @InjectModel(Driver.name) private readonly driverModel: Model<Driver>,
-        @InjectModel(Bus.name) private readonly busModel: Model<Bus>,
-    ) {}
+export class ScheduleService {
+  constructor(
+    @InjectModel(Schedule.name) private readonly scheduleModel: Model<Schedule>,
+    @InjectModel(Route.name) private readonly routeModel: Model<Route>,
+    @InjectModel(Student.name) private readonly studentModel: Model<Student>,
+    @InjectModel(Timetable.name)
+    private readonly timetableModel: Model<Timetable>,
+    @InjectModel(Trip.name) private readonly tripModel: Model<Trip>,
+    @InjectModel(Driver.name) private readonly driverModel: Model<Driver>,
+    @InjectModel(Bus.name) private readonly busModel: Model<Bus>,
+  ) {}
 
-    async findAllRoute() {
-      return this.routeModel.find().lean();
-    }
+  async findAllRoute() {
+    return this.routeModel.find().lean();
+  }
 
-    async findAllTimetable() {
-      return this.timetableModel.find().lean();
-    }
+  async findAllTimetable() {
+    return this.timetableModel.find().lean();
+  }
 
-    async create(data: CreateScheduleDTO) {
-      const { name, dateStart, dateEnd, routeId, students, timeTables } = data;
+  async create(data: CreateScheduleDTO) {
+    const { name, dateStart, dateEnd, routeId, students, timeTables } = data;
 
-      const {foundStudents, timetableDocs} = await this.validate(name, dateStart, dateEnd, routeId, students, timeTables)
-  
-      // Tạo Schedule mới (chưa có bus/driver)
-      const schedule = await this.scheduleModel.create({
-        name,
-        dateStart,
-        dateEnd,
-        routeId,
-        status: 'unassigned',
-        timeTables: timetableDocs,
-        students: foundStudents.map(s => s._id),
-        busId: null,
-        driverId: null,
-      });
+    const { foundStudents, timetableDocs } = await this.validate(
+      name,
+      dateStart,
+      dateEnd,
+      routeId,
+      students,
+      timeTables,
+    );
 
-      const trips = await this.createTrip(schedule, students);
-  
-      // Trả kết quả
-      return {
-        message: 'Schedule created successfully',
-        scheduleId: schedule._id,
-        totalStudents: foundStudents.length,
-        timetableCount: timetableDocs.length,
-        totalTrips: trips.length,
-      };
-    }
-    
-    // Lấy chi tiết lịch trình bao gồm danh sách học sinh
-    async findOne(scheduleId: string) {
-      const schedule = await this.scheduleModel
-        .findById(scheduleId)
-        .populate('timeTables')
-        .lean();
-      
-      if (!schedule) throw new BadRequestException('Không tìm thấy lịch trình');
-  
-      // Lấy thông tin driver/bus nếu có
-      const driver = schedule.driverId
-        ? await this.driverModel.findById(schedule.driverId).lean()
-        : null;
-      const bus = schedule.busId
-        ? await this.busModel.findById(schedule.busId).lean()
-        : null;
+    // Tạo Schedule mới (chưa có bus/driver)
+    const schedule = await this.scheduleModel.create({
+      name,
+      dateStart,
+      dateEnd,
+      routeId,
+      status: 'unassigned',
+      timeTables: timetableDocs,
+      students: foundStudents.map((s) => s._id),
+      busId: null,
+      driverId: null,
+    });
 
-      // Lấy thông tin route
-      const route = await this.routeModel
-      .findById(schedule.routeId)
+    const trips = await this.createTrip(schedule, students);
+
+    // Trả kết quả
+    return {
+      message: 'Schedule created successfully',
+      scheduleId: schedule._id,
+      totalStudents: foundStudents.length,
+      timetableCount: timetableDocs.length,
+      totalTrips: trips.length,
+    };
+  }
+
+  // Lấy chi tiết lịch trình bao gồm danh sách học sinh
+  async findOne(scheduleId: string) {
+    const schedule = await this.scheduleModel
+      .findById(scheduleId)
+      .populate('timeTables')
+      .lean();
+
+    if (!schedule) throw new BadRequestException('Không tìm thấy lịch trình');
+
+    // Lấy thông tin driver/bus nếu có
+    const driver = schedule.driverId
+      ? await this.driverModel.findById(schedule.driverId).lean()
+      : null;
+    const bus = schedule.busId
+      ? await this.busModel.findById(schedule.busId).lean()
+      : null;
+
+    // Lấy thông tin route
+    const route = await this.routeModel.findById(schedule.routeId).populate({
+      path: 'stops.stopId',
+      model: 'Stop',
+    });
+
+    // Lấy danh sách học sinh từ Trip
+    const trips = await this.tripModel
+      .find({ scheduleId: new Types.ObjectId(scheduleId) })
       .populate({
-              path: 'stops.stopId',
-              model: 'Stop'
-          })
-  
-      // Lấy danh sách học sinh từ Trip
-      const trips = await this.tripModel
-        .find({ scheduleId: new Types.ObjectId(scheduleId) })
-        .populate({
-          path: 'students.studentId',
-          populate: { path: 'stopId' },
-        })
-        .lean();
-  
-      // Gom tất cả học sinh unique theo lịch trình
-      const allStudentsMap = new Map();
-      for (const trip of trips) {
-        for (const s of trip.students) {
-          const student = s.studentId as any;
-          if (student && !allStudentsMap.has(student._id.toString())) {
-            allStudentsMap.set(student._id.toString(), {
-              id: student._id,
-              fullName: student.fullName,
-              stopName: student.stopId?.name ?? null,
-            });
-          }
+        path: 'students.studentId',
+        populate: { path: 'stopId' },
+      })
+      .lean();
+
+    // Gom tất cả học sinh unique theo lịch trình
+    const allStudentsMap = new Map();
+    for (const trip of trips) {
+      for (const s of trip.students) {
+        const student = s.studentId as any;
+        if (student && !allStudentsMap.has(student._id.toString())) {
+          allStudentsMap.set(student._id.toString(), {
+            id: student._id,
+            fullName: student.fullName,
+            stopName: student.stopId?.name ?? null,
+          });
         }
       }
-      const students = Array.from(allStudentsMap.values());
-  
-      return {
-        scheduleId: schedule._id,
-        name: schedule.name,
-        status: schedule.status,
-        dateStart: schedule.dateStart,
-        dateEnd: schedule.dateEnd,
-        routeName: route?.name ?? null,
-        stops: (route?.stops as any[]).map(s => ({
-          id: s.stopId._id,
-          order: s.order,
-          name: s.stopId.name
-        })),
-        driverName: driver?.name ?? null,
-        busPlate: bus?.plateNumber ?? null,
-        timeTables: (schedule.timeTables as any[]).map(t => ({
-          id: t._id,
-          dayOfWeek: t.dayOfWeek,
-          pickupTime: t.pickupTime,
-          dropoffTime: t.dropoffTime,
-        })),
-        students, // danh sách học sinh lấy từ Trip
-      };
     }
+    const students = Array.from(allStudentsMap.values());
 
-    async findAll():Promise<ScheduleResponseDTO[]>{
-      const schedule = await this.scheduleModel
-      .find()
+    return {
+      scheduleId: schedule._id,
+      name: schedule.name,
+      status: schedule.status,
+      dateStart: schedule.dateStart,
+      dateEnd: schedule.dateEnd,
+      routeName: route?.name ?? null,
+      stops: (route?.stops as any[]).map((s) => ({
+        id: s.stopId._id,
+        order: s.order,
+        name: s.stopId.name,
+      })),
+      driverName: driver?.name ?? null,
+      busPlate: bus?.plateNumber ?? null,
+      timeTables: (schedule.timeTables as any[]).map((t) => ({
+        id: t._id,
+        dayOfWeek: t.dayOfWeek,
+        pickupTime: t.pickupTime,
+        dropoffTime: t.dropoffTime,
+      })),
+      students, // danh sách học sinh lấy từ Trip
+    };
+  }
+
+  async findAll(): Promise<ScheduleResponseDTO[]> {
+    const schedule = await this.scheduleModel.find().exec();
+
+    return plainToInstance(
+      ScheduleResponseDTO,
+      schedule.map((s) => ({
+        id: s.id,
+        status: s.status,
+        name: s.name,
+        dateStart: s.dateStart,
+        dateEnd: s.dateEnd,
+      })),
+    );
+  }
+
+  async update(id: string, updateDto: UpdateScheduleDTO) {
+    const updated = await this.scheduleModel
+      .findByIdAndUpdate(id, updateDto, { new: true })
       .exec();
 
-      return plainToInstance(ScheduleResponseDTO,
-          schedule.map((s) => ({
-              id: s.id,
-              status: s.status,
-              name: s.name,
-              dateStart: s.dateStart,
-              dateEnd: s.dateEnd
-          }))
-      );
-    }
+    if (!updated) throw new NotFoundException(`Schedule ${id} not found`);
 
-    async update(id: string, updateDto: UpdateScheduleDTO){
-
-      const updated = await this.scheduleModel
-      .findByIdAndUpdate(id, updateDto, {new: true})
-      .exec();
-
-      if(!updated) throw new NotFoundException(`Schedule ${id} not found`);
-
-      // Get trips from schedule
-      const trips = await this.tripModel
+    // Get trips from schedule
+    const trips = await this.tripModel
       .find({ scheduleId: new Types.ObjectId(id) })
       .lean();
 
-      if(trips.length === 0) throw new NotFoundException(`Trips not found for schedule ${id}`);
+    if (trips.length === 0)
+      throw new NotFoundException(`Trips not found for schedule ${id}`);
 
-      // Get students from trip
-      const oldStudents: string[] = Array.from(
-        new Set(trips.flatMap(trip => trip.students.map(s => s.studentId.toString())))
-      );
+    // Get students from trip
+    const oldStudents: string[] = Array.from(
+      new Set(
+        trips.flatMap((trip) =>
+          trip.students.map((s) => s.studentId.toString()),
+        ),
+      ),
+    );
 
-      if(oldStudents.length === 0) throw new NotFoundException(`students not found`);
-      
-      const {dateStart, dateEnd, routeId, timeTables, students} = updateDto;
+    if (oldStudents.length === 0)
+      throw new NotFoundException(`students not found`);
 
-      if (
-        dateStart !== undefined ||
-        dateEnd !== undefined ||
-        routeId !== undefined ||
-        (Array.isArray(timeTables) && timeTables.length > 0) ||
-        (Array.isArray(students) && students.length > 0)
-      ){ // if any is defined create new trips for the schedule
+    const { dateStart, dateEnd, routeId, timeTables, students } = updateDto;
 
-        // Delete old trips
-        await this.tripModel.deleteMany({ scheduleId: new Types.ObjectId(id) });
+    if (
+      dateStart !== undefined ||
+      dateEnd !== undefined ||
+      routeId !== undefined ||
+      (Array.isArray(timeTables) && timeTables.length > 0) ||
+      (Array.isArray(students) && students.length > 0)
+    ) {
+      // if any is defined create new trips for the schedule
 
-        const newTrips = await this.createTrip(updated, students ?? oldStudents);
+      // Delete old trips
+      await this.tripModel.deleteMany({ scheduleId: new Types.ObjectId(id) });
 
-        return {
-          message: 'Schedule updated successfully',
-          scheduleId: updated._id,
-          totalTrips: newTrips.length,
-        };
-      }
+      const newTrips = await this.createTrip(updated, students ?? oldStudents);
 
       return {
         message: 'Schedule updated successfully',
-        scheduleId: updated._id
+        scheduleId: updated._id,
+        totalTrips: newTrips.length,
       };
     }
 
-    async remove(id: string):Promise<void>{
-      const schedule = await this.scheduleModel
-      .findById(id)
-      .exec();
-      
-      if (!schedule) throw new NotFoundException(`Schedule ${id} not found`);
+    return {
+      message: 'Schedule updated successfully',
+      scheduleId: updated._id,
+    };
+  }
 
-      schedule.status = 'cancelled';
-    }
+  async remove(id: string): Promise<void> {
+    const schedule = await this.scheduleModel.findById(id).exec();
 
-    async createTrip(schedule: Schedule, students: string[]): Promise<any[]>{
-      // Tạo Trip tự động dựa vào timetable và ngày
-      const trips: any[] = [];
-      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    if (!schedule) throw new NotFoundException(`Schedule ${id} not found`);
 
-      for (let d = new Date(schedule.dateStart); d <= new Date(schedule.dateEnd); d.setDate(d.getDate() + 1)) {
-          const dayName = dayNames[d.getDay()]; // ví dụ: "Monday"
-          const timetable = await this.timetableModel.findOne({ dayOfWeek: dayName }).lean();
-          if (!timetable) {
-              continue;
-          }
-  
-          trips.push({
-              scheduleId: schedule._id,
-              date: new Date(d),
-              timeStart: timetable.pickupTime,
-              timeEnd: timetable.dropoffTime,
-              status: 'planned',
-              students: students.map(sid => ({
-                studentId: sid,
-                status: 'not_pickup',
-              })),
-          });
+    schedule.status = 'cancelled';
+  }
+
+  async createTrip(schedule: Schedule, students: string[]): Promise<any[]> {
+    // Tạo Trip tự động dựa vào timetable và ngày
+    const trips: any[] = [];
+    const dayNames = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
+
+    for (
+      let d = new Date(schedule.dateStart);
+      d <= new Date(schedule.dateEnd);
+      d.setDate(d.getDate() + 1)
+    ) {
+      const dayName = dayNames[d.getDay()]; // ví dụ: "Monday"
+      const timetable = await this.timetableModel
+        .findOne({ dayOfWeek: dayName })
+        .lean();
+      if (!timetable) {
+        continue;
       }
-  
-      if (trips.length > 0) 
-        await this.tripModel.insertMany(trips);
-      
-      return trips;
-    }
 
-    async validate(name: string, dateStart: Date, dateEnd: Date, routeId: string, students: string[], timeTables: string[]){
-  
-      // Kiểm tra logic ngày tháng
-      if (new Date(dateStart) > new Date(dateEnd)) {
-        throw new BadRequestException('dayeStart must be before dateEnd');
-      }
-  
-      // Kiểm tra route hợp lệ
-      const route = await this.routeModel.findById(routeId).lean();
-      if (!route) throw new BadRequestException('Route non found');
-
-      // Kiểm tra học sinh được chọn
-      if (!students || students.length === 0) {
-        throw new BadRequestException('Must select at least one student');
-      }
-  
-      const foundStudents = await this.studentModel.find({
-        _id: { $in: students.map(id => new Types.ObjectId(id)) },
+      trips.push({
+        scheduleId: schedule._id,
+        date: new Date(d),
+        timeStart: timetable.pickupTime,
+        timeEnd: timetable.dropoffTime,
+        status: 'planned',
+        students: students.map((sid) => ({
+          studentId: sid,
+          status: 'not_pickup',
+        })),
       });
-      if (foundStudents.length !== students.length) {
-        throw new BadRequestException('Student non found');
-      }
-  
-      // Kiểm tra TimeTable
-      let timetableDocs: string[] = [];
-      if (timeTables && timeTables.length > 0) {
-        const found = await this.timetableModel.find({
-          _id: { $in: timeTables.map(id => new Types.ObjectId(id)) },
-        });
-        if (found.length !== timeTables.length) {
-          throw new BadRequestException('Timetable non found');
-        }
-        timetableDocs = found.map(t => (t._id as Types.ObjectId).toString());
-      }
-      console.log(timetableDocs);
-
-      return {
-        foundStudents,
-        timetableDocs
-      };
     }
 
-    
-    
+    if (trips.length > 0) await this.tripModel.insertMany(trips);
+
+    return trips;
+  }
+
+  async validate(
+    name: string,
+    dateStart: Date,
+    dateEnd: Date,
+    routeId: string,
+    students: string[],
+    timeTables: string[],
+  ) {
+    // Kiểm tra logic ngày tháng
+    if (new Date(dateStart) > new Date(dateEnd)) {
+      throw new BadRequestException('dayeStart must be before dateEnd');
+    }
+
+    // Kiểm tra route hợp lệ
+    const route = await this.routeModel.findById(routeId).lean();
+    if (!route) throw new BadRequestException('Route non found');
+
+    // Kiểm tra học sinh được chọn
+    if (!students || students.length === 0) {
+      throw new BadRequestException('Must select at least one student');
+    }
+
+    const foundStudents = await this.studentModel.find({
+      _id: { $in: students.map((id) => new Types.ObjectId(id)) },
+    });
+    if (foundStudents.length !== students.length) {
+      throw new BadRequestException('Student non found');
+    }
+
+    // Kiểm tra TimeTable
+    let timetableDocs: string[] = [];
+    if (timeTables && timeTables.length > 0) {
+      const found = await this.timetableModel.find({
+        _id: { $in: timeTables.map((id) => new Types.ObjectId(id)) },
+      });
+      if (found.length !== timeTables.length) {
+        throw new BadRequestException('Timetable non found');
+      }
+      timetableDocs = found.map((t) => (t._id as Types.ObjectId).toString());
+    }
+    console.log(timetableDocs);
+
+    return {
+      foundStudents,
+      timetableDocs,
+    };
+  }
 }

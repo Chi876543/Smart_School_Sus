@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ScheduleRepository } from '../repositories/schedule.repository';
 import { DriverRepository } from '../repositories/driver.repository';
 import { BusRepository } from '../repositories/bus.repository';
@@ -12,7 +16,25 @@ export class AssignScheduleService {
     private readonly driverRepo: DriverRepository,
     private readonly busRepo: BusRepository,
   ) {}
-  
+
+  /** Lấy danh sách schedule để đổ ra bảng phân công */
+  async getAllAssignments() {
+    const raw = await this.scheduleRepo.findAll(); // findAll đã populate
+
+    return raw.map((s: any) => ({
+      _id: s._id,
+      name: s.name,
+      status: s.status,
+
+      // driver
+      driverId: s.driverId?._id ?? null,
+      driverName: s.driverId?.name ?? '',
+
+      // bus
+      busId: s.busId?._id ?? null,
+      plateNumber: s.busId?.plateNumber ?? '',
+    }));
+  }
 
   /** Hàm phân công lịch trình */
   async assignSchedule(scheduleId: string, dto: AssignScheduleDTO) {
@@ -26,7 +48,7 @@ export class AssignScheduleService {
     if (driverId === null || busId === null) {
       throw new BadRequestException('Phải cung cấp cả driverId và busId');
     }
-    
+
     // Kiểm tra tài xế tồn tại
     const driver = await this.driverRepo.findDriverById(driverId);
     if (!driver) {
@@ -40,11 +62,19 @@ export class AssignScheduleService {
     }
 
     // Kiểm tra trùng lịch tài xế/xe nếu muốn mở rộng
-    const existing = await this.scheduleRepo.findActiveByDriverOrBus(driverId, busId);
-    if (existing) throw new BadRequestException('Tài xế hoặc xe buýt đang bận lịch khác.');
+    const existing = await this.scheduleRepo.findActiveByDriverOrBus(
+      driverId,
+      busId,
+    );
+    if (existing)
+      throw new BadRequestException('Tài xế hoặc xe buýt đang bận lịch khác.');
 
     // Cập nhật lịch trình
-    const updated = await this.scheduleRepo.assignSchedule(scheduleId, driverId, busId);
+    const updated = await this.scheduleRepo.assignSchedule(
+      scheduleId,
+      driverId,
+      busId,
+    );
     if (!updated) {
       throw new BadRequestException('Phân công lịch trình thất bại');
     }
@@ -59,15 +89,15 @@ export class AssignScheduleService {
     };
   }
 
-    async getDrivers() {
-        return this.driverRepo.findAll();
-    }
+  async getDrivers() {
+    return this.driverRepo.findAll();
+  }
 
-    async getBuses() {
-        return this.busRepo.findAll();
-    }
+  async getBuses() {
+    return this.busRepo.findAll();
+  }
 
-    /** Cập nhật (chỉnh sửa) phân công tài xế / xe buýt */
+  /** Cập nhật (chỉnh sửa) phân công tài xế / xe buýt */
   async updateAssignment(scheduleId: string, dto: UpdateAssignScheduleDTO) {
     const { driverId, busId } = dto;
 
@@ -75,7 +105,9 @@ export class AssignScheduleService {
     if (!schedule) throw new NotFoundException('Không tìm thấy lịch trình');
 
     if (!driverId && !busId) {
-      throw new BadRequestException('Phải cung cấp ít nhất 1 trường để cập nhật');
+      throw new BadRequestException(
+        'Phải cung cấp ít nhất 1 trường để cập nhật',
+      );
     }
 
     if (driverId) {
@@ -89,12 +121,21 @@ export class AssignScheduleService {
     }
 
     // Kiểm tra trùng lịch (nếu muốn hạn chế driver/bus đang active)
-    const existing = await this.scheduleRepo.findActiveByDriverOrBus(driverId, busId);
+    const existing = await this.scheduleRepo.findActiveByDriverOrBus(
+      driverId,
+      busId,
+    );
     if (existing && existing._id.toString() !== scheduleId) {
-      throw new BadRequestException(`Tài xế hoặc xe buýt đang bận ở lịch trình khác (${existing.name})`);
+      throw new BadRequestException(
+        `Tài xế hoặc xe buýt đang bận ở lịch trình khác (${existing.name})`,
+      );
     }
 
-    const updated = await this.scheduleRepo.updateAssignment(scheduleId, driverId, busId);
+    const updated = await this.scheduleRepo.updateAssignment(
+      scheduleId,
+      driverId,
+      busId,
+    );
     if (!updated) throw new BadRequestException('Cập nhật phân công thất bại');
 
     return {
@@ -105,5 +146,4 @@ export class AssignScheduleService {
       status: updated.status,
     };
   }
-
 }

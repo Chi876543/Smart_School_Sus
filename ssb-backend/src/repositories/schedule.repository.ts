@@ -5,7 +5,9 @@ import { Schedule } from '../schema/schedule.schema';
 
 @Injectable()
 export class ScheduleRepository {
-  constructor(@InjectModel(Schedule.name) private readonly scheduleModel: Model<Schedule>) {}
+  constructor(
+    @InjectModel(Schedule.name) private readonly scheduleModel: Model<Schedule>,
+  ) {}
 
   // async create(data: Partial<Schedule>) {
   //   return this.scheduleModel.create(data);
@@ -28,8 +30,7 @@ export class ScheduleRepository {
     });
   }
 
-
-   // Lấy 1 schedule cụ thể
+  // Lấy 1 schedule cụ thể
   async findScheduleById(scheduleId: string) {
     return this.scheduleModel.findById(scheduleId);
   }
@@ -58,16 +59,22 @@ export class ScheduleRepository {
 
   // Hàm kiểm tra xem driver hoặc bus đang bận ở schedule khác không
   async findActiveByDriverOrBus(driverId?: string, busId?: string) {
-    return this.scheduleModel.findOne({
-      status: { $in: ['planned', 'active'] }, // chỉ kiểm tra schedule còn hiệu lực
-      $or: [
-        { driverId: new Types.ObjectId(driverId) },
-        { busId: new Types.ObjectId(busId) },
-      ],
-    }).lean();
+    return this.scheduleModel
+      .findOne({
+        status: { $in: ['planned', 'active'] }, // chỉ kiểm tra schedule còn hiệu lực
+        $or: [
+          { driverId: new Types.ObjectId(driverId) },
+          { busId: new Types.ObjectId(busId) },
+        ],
+      })
+      .lean();
   }
 
-  async updateAssignment(scheduleId: string, driverId?: string, busId?: string) {
+  async updateAssignment(
+    scheduleId: string,
+    driverId?: string,
+    busId?: string,
+  ) {
     const updateData: any = {};
     if (driverId) updateData.driverId = new Types.ObjectId(driverId);
     if (busId) updateData.busId = new Types.ObjectId(busId);
@@ -77,5 +84,4 @@ export class ScheduleRepository {
       .findByIdAndUpdate(scheduleId, { $set: updateData }, { new: true })
       .lean();
   }
-
 }

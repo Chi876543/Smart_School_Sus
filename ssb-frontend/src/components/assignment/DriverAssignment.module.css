@@ -1,0 +1,137 @@
+.page {
+  padding: 0;
+  background-color: #ffffff;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+/* Nếu muốn dùng title */
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 12px 16px;
+}
+
+/* Bảng phân công */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+}
+
+/* Ô tiêu đề & ô dữ liệu */
+.table th,
+.table td {
+  padding: 10px 12px;
+  border: 1px solid #dddddd;
+  text-align: left;
+  font-size: 14px;
+  color: black;
+}
+
+/* Header màu xanh giống hình */
+.table th {
+  background-color: #00b050;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Căn chiều rộng cột (gần giống hình) */
+.colRoute {
+  width: 50%;
+}
+
+.colDriver {
+  width: 20%;
+}
+
+.colVehicle {
+  width: 15%;
+}
+
+.colStatus {
+  width: 15%;
+}
+
+/* Dòng dữ liệu */
+.row {
+  cursor: pointer;
+}
+
+.row:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Hover & chọn dòng */
+.row:hover {
+  background-color: #f0f7ff;
+}
+
+.rowSelected {
+  background-color: #e0f0ff;
+}
+
+/* Badge trạng thái */
+.statusBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Đã hoàn thành – xanh lá */
+.statusCompleted {
+  background-color: #00b050;
+}
+
+/* Chưa phân công – đỏ cam */
+.statusUnassigned {
+  background-color: #ff5a36;
+}
+
+/* Đang thực thi – vàng cam */
+.statusInProgress {
+  background-color: #f0ad0b;
+}
+.row {
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+}
+
+.rowSelected {
+  background-color: #e6f4ff !important; /* màu xanh nhạt */
+}
+
+.row:hover {
+  background-color: #f2f2f2;
+}
+.statusBadge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  display: inline-block;
+}
+
+.statusCompleted {
+  background-color: #4caf50;
+} /* xanh lá */
+.statusActive {
+  background-color: #2196f3;
+} /* xanh dương */
+.statusPlanned {
+  background-color: #9c27b0;
+} /* tím */
+.statusSuspended {
+  background-color: #ff9800;
+} /* cam */
+.statusCancelled {
+  background-color: #f44336;
+} /* đỏ */
+.statusUnassigned {
+  background-color: #9e9e9e;
+} /* xám */
