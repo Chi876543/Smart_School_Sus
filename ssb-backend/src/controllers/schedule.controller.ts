@@ -16,6 +16,16 @@ import { ScheduleService } from 'src/services/schedule.service';
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
+  @Get('routes')
+  async getAllRoutes() {
+    return this.scheduleService.findAllRoute();
+  }
+
+  @Get('timetables')
+  async getAllTimetables() {
+    return this.scheduleService.findAllTimetable();
+  }
+
   @Post()
   create(@Body() createDto: CreateScheduleDTO) {
     return this.scheduleService.create(createDto);

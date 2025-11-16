@@ -18,6 +18,10 @@ export class RouteRepository {
     return this.routeModel.find().populate('stops').lean();
   }
 
+  async findAllRoute() {
+    return this.routeModel.find().lean();
+  }
+
   // Lấy thông tin tuyến đường
   async findRouteById(routeId: string) {
     return this.routeModel.findById(routeId);

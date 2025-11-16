@@ -20,6 +20,14 @@ export class ScheduleService{
         @InjectModel(Bus.name) private readonly busModel: Model<Bus>,
     ) {}
 
+    async findAllRoute() {
+      return this.routeModel.find().lean();
+    }
+
+    async findAllTimetable() {
+      return this.timetableModel.find().lean();
+    }
+
     async create(data: CreateScheduleDTO) {
       const { name, dateStart, dateEnd, routeId, students, timeTables } = data;
 
@@ -272,5 +280,7 @@ export class ScheduleService{
         timetableDocs
       };
     }
+
+    
     
 }

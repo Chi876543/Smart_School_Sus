@@ -11,9 +11,9 @@ export class TimetableRepository {
   //   return this.timetableModel.create(data);
   // }
 
-  // async findAll() {
-  //   return this.timetableModel.find().lean();
-  // }
+  async findAll() {
+    return this.timetableModel.find().lean();
+  }
 
   // async findById(id: string) {
   //   return this.timetableModel.findById(new Types.ObjectId(id)).lean();
