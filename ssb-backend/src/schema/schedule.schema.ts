@@ -11,8 +11,8 @@ export class Schedule extends Document {
   })
   status: string;
 
-  // unassigned Chưa phân công xe, tài xế, tuyến Lúc mới tạo, hoặc khi gỡ phân công
-  // planned	Đã phân công đủ, chờ ngày bắt đầu	Khi busId, driverId, routeId đã có
+  // unassigned Chưa phân công xe, tài xế, hoặc khi gỡ phân công
+  // planned	Đã phân công đủ, chờ ngày bắt đầu	Khi busId, driverId đã có
   // active	Đang hoạt động	Trong khoảng ngày
   // completed	Đã hoàn thành	Sau ngày kết thúc
   // suspended	Tạm dừng	Do lỗi kỹ thuật, bảo trì
