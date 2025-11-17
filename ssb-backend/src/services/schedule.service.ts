@@ -259,10 +259,9 @@ export class ScheduleService {
         })),
       });
     }
-a// src/services/schedule.service.ts
+// src/services/schedule.service.ts
 // CHỈ THÊM 2 API MỚI – KHÔNG ĐỘNG VÀO CÁC HÀM CŨ
 
-<<<<<<< HEAD
     if (trips.length > 0) await this.tripModel.insertMany(trips);
 
     return trips;
@@ -315,20 +314,8 @@ a// src/services/schedule.service.ts
       timetableDocs,
     };
   }
-}
-=======
-// ... [TẤT CẢ CÁC HÀM CŨ GIỮ NGUYÊN] ...
 
-// ==========================================
-// THÊM 2 API MỚI – ĐẢM BẢO HIỂN THỊ ĐỦ DỮ LIỆU
-// ==========================================
-
-/**
- * API cho ScheduleManagement
- * Gọi: GET /schedules/management
- * Đảm bảo: route.name, dateStart, dateEnd, students, stations
- */
-async findAllForManagement(): Promise<any[]> {
+  async findAllForManagement(): Promise<any[]> {
   const schedules = await this.scheduleModel
     .find({ status: { $ne: 'cancelled' } })
     .populate({
@@ -390,16 +377,6 @@ async findAllForManagement(): Promise<any[]> {
   return result;
 }
 
-/**
- * API cho DetailScheduleModal
- * Gọi: GET /schedules/detail/:id
- * Đảm bảo: timetable, students (name), stations (string[])
- */
-// src/services/schedule.service.ts
-// Chỉ sửa hàm findOneDetail – giữ nguyên tất cả phần còn lại
-
-// src/services/schedule.service.ts
-// CHỈ SỬA HÀM findOneDetail – ĐẢM BẢO POPULATE timeTables
 
 async findOneDetail(scheduleId: string): Promise<any> {
   // BƯỚC 1: Tìm schedule + populate timeTables
@@ -471,4 +448,6 @@ async findOneDetail(scheduleId: string): Promise<any> {
   };
 }
 }
->>>>>>> e7a128ee4c130dad0cff1e40b1c7ad5affb19084
+
+
+
