@@ -6,11 +6,12 @@ import * as bcrypt from 'bcryptjs';
 import { Admin } from '../schema/admin.schema';
 import { LoginRequestDTO } from 'src/dtos/loginRequest.dto';
 import { LoginResponseDTO } from 'src/dtos/loginResponse.dto';
+import { UserRepository } from 'src/repositories/user.repository';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(Admin.name) private userModel: Model<Admin>,
+    private readonly userRepo: UserRepository,
     private jwtService: JwtService
   ) {}
 
@@ -25,7 +26,7 @@ export class AuthService {
   //   }
 
   async login(dto: LoginRequestDTO): Promise<LoginResponseDTO> {
-    const user = await this.userModel.findOne({ username: dto.username });
+    const user = await this.userRepo.findByUsername(dto.username);
     if (!user) throw new Error('Invalid credentials');
 
     if (dto.password !== user.password) {
