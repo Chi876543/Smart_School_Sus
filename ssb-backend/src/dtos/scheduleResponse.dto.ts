@@ -8,6 +8,10 @@ export class ScheduleResponseDTO{
     @Expose()
     id: string;
     @Expose()
+    routeId: string;
+    @Expose()
+    routeName: string;
+    @Expose()
     status: string;
     @Expose()
     name: string;

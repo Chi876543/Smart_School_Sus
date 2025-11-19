@@ -32,7 +32,13 @@ export class ScheduleRepository {
   }
 
   async findAlls() {
-    return this.scheduleModel.find().exec();
+    return this.scheduleModel
+      .find()
+      .populate({
+        path: 'routeId',
+        select: 'name', // lấy đúng trường name
+      })
+      .exec();
   }
 
   // Lấy tất cả schedule đang hoạt động hoặc đã được lên kế hoạch
