@@ -15,6 +15,17 @@ export class TimetableRepository {
     return this.timetableModel.find().lean();
   }
 
+    async findDayOfWeekTrips(dayName: string) {
+    return this.timetableModel
+      .findOne({ dayOfWeek: dayName })
+        .lean();
+  }
+
+  async findByIds(timeTables: string[]) {
+    return this.timetableModel.find({
+      _id: { $in: timeTables.map((id) => new Types.ObjectId(id)) },
+    });
+  }
   // async findById(id: string) {
   //   return this.timetableModel.findById(new Types.ObjectId(id)).lean();
   // }

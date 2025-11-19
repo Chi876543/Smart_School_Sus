@@ -15,6 +15,11 @@ export class StudentRepository {
     return this.studentModel.find().populate('stopId').lean();
   }
 
+  async findByIds(students: string[]) {
+    return this.studentModel.find({
+      _id: { $in: students.map((id) => new Types.ObjectId(id)) },
+    });
+  }
   // async findById(id: string) {
   //   return this.studentModel.findById(new Types.ObjectId(id)).populate('stopId').lean();
   // }

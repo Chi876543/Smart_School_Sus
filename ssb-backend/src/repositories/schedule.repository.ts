@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Schedule } from '../schema/schedule.schema';
+import { UpdateScheduleDTO } from 'src/dtos/updateSchedule.dto';
 
 @Injectable()
 export class ScheduleRepository {
@@ -9,15 +10,29 @@ export class ScheduleRepository {
     @InjectModel(Schedule.name) private readonly scheduleModel: Model<Schedule>,
   ) {}
 
-  // async create(data: Partial<Schedule>) {
-  //   return this.scheduleModel.create(data);
-  // }
+  async create(name : string, dateStart: Date, dateEnd: Date, routeId: string, timetableDocs: any[], foundStudents: any[]) {
+    return this.scheduleModel.create({
+      name,
+      dateStart,
+      dateEnd,
+      routeId,
+      status: 'unassigned',
+      timeTables: timetableDocs,
+      students: foundStudents.map((s) => s._id),
+      busId: null,
+      driverId: null,
+    });
+  }
 
   async findAll() {
     return this.scheduleModel
       .find()
       .populate('routeId driverId busId timeTables')
       .lean();
+  }
+
+  async findAlls() {
+    return this.scheduleModel.find().exec();
   }
 
   // Lấy tất cả schedule đang hoạt động hoặc đã được lên kế hoạch
@@ -30,18 +45,25 @@ export class ScheduleRepository {
     });
   }
 
+  async findOne(scheduleId: string) {
+    return this.scheduleModel
+      .findById(scheduleId)
+      .populate('timeTables')
+      .lean();
+  }
+
   // Lấy 1 schedule cụ thể
   async findScheduleById(scheduleId: string) {
     return this.scheduleModel.findById(scheduleId);
   }
 
-  // async update(id: string, data: Partial<Schedule>) {
-  //   return this.scheduleModel.findByIdAndUpdate(id, data, { new: true }).lean();
-  // }
+  async findById(id: string) {
+    return this.scheduleModel.findById(new Types.ObjectId(id)).exec();
+  }
 
-  // async delete(id: string) {
-  //   return this.scheduleModel.findByIdAndDelete(id);
-  // }
+  async findByIdAndUpdate(id: string, updateDto: UpdateScheduleDTO){
+    return this.scheduleModel.findByIdAndUpdate(id, updateDto, { new: true }).exec();
+  }
 
   async assignSchedule(scheduleId: string, driverId: string, busId: string) {
     return this.scheduleModel.findByIdAndUpdate(

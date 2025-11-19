@@ -20,6 +20,10 @@ export class BusRepository {
     return this.busModel.findById(busId);
   }
 
+  async findById(id: string) {
+    return this.busModel.findById(new Types.ObjectId(id)).lean();
+  }
+
   // Cập nhật vị trí xe buýt
   async updateBusLocation(busId: string, lat: number, lng: number, speed?: number) {
     return this.busModel.findByIdAndUpdate(

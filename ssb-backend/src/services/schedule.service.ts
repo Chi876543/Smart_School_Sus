@@ -3,34 +3,38 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
 import { Model, Types } from 'mongoose';
 import { CreateScheduleDTO } from 'src/dtos/createSchedule.dto';
 import { ScheduleResponseDTO } from 'src/dtos/scheduleResponse.dto';
 import { UpdateScheduleDTO } from 'src/dtos/updateSchedule.dto';
-import { Bus, Driver, Route, Schedule, Student, Trip } from 'src/schema';
-import { Timetable } from 'src/schema/timetable.schema';
+import { ScheduleRepository } from 'src/repositories/schedule.repository';
+import { RouteRepository } from 'src/repositories/route.repository';
+import { StudentRepository } from 'src/repositories/student.repository';
+import { TimetableRepository } from 'src/repositories/timetable.repository';
+import { TripRepository } from 'src/repositories/trip.repository';
+import { DriverRepository } from 'src/repositories/driver.repository';
+import { BusRepository } from 'src/repositories/bus.repository';
+import { Schedule } from 'src/schema/schedule.schema';
 
 @Injectable()
 export class ScheduleService {
   constructor(
-    @InjectModel(Schedule.name) private readonly scheduleModel: Model<Schedule>,
-    @InjectModel(Route.name) private readonly routeModel: Model<Route>,
-    @InjectModel(Student.name) private readonly studentModel: Model<Student>,
-    @InjectModel(Timetable.name)
-    private readonly timetableModel: Model<Timetable>,
-    @InjectModel(Trip.name) private readonly tripModel: Model<Trip>,
-    @InjectModel(Driver.name) private readonly driverModel: Model<Driver>,
-    @InjectModel(Bus.name) private readonly busModel: Model<Bus>,
+    private readonly scheduleRepo: ScheduleRepository,
+    private readonly routeRepo: RouteRepository,
+    private readonly studentRepo: StudentRepository,
+    private readonly timetableRepo: TimetableRepository,
+    private readonly tripRepo: TripRepository,
+    private readonly driverRepo: DriverRepository,
+    private readonly busRepo: BusRepository,
   ) {}
 
   async findAllRoute() {
-    return this.routeModel.find().lean();
+    return this.routeRepo.findAllRoute();
   }
 
   async findAllTimetable() {
-    return this.timetableModel.find().lean();
+    return this.timetableRepo.findAll();
   }
 
   async create(data: CreateScheduleDTO) {
@@ -46,17 +50,7 @@ export class ScheduleService {
     );
 
     // Tạo Schedule mới (chưa có bus/driver)
-    const schedule = await this.scheduleModel.create({
-      name,
-      dateStart,
-      dateEnd,
-      routeId,
-      status: 'unassigned',
-      timeTables: timetableDocs,
-      students: foundStudents.map((s) => s._id),
-      busId: null,
-      driverId: null,
-    });
+    const schedule = await this.scheduleRepo.create( name, dateStart, dateEnd, routeId, timetableDocs, foundStudents );
 
     const trips = await this.createTrip(schedule, students);
 
@@ -72,35 +66,23 @@ export class ScheduleService {
 
   // Lấy chi tiết lịch trình bao gồm danh sách học sinh
   async findOne(scheduleId: string) {
-    const schedule = await this.scheduleModel
-      .findById(scheduleId)
-      .populate('timeTables')
-      .lean();
+    const schedule = await this.scheduleRepo.findOne(scheduleId);
 
     if (!schedule) throw new BadRequestException('Không tìm thấy lịch trình');
 
     // Lấy thông tin driver/bus nếu có
     const driver = schedule.driverId
-      ? await this.driverModel.findById(schedule.driverId).lean()
+      ? await this.driverRepo.findById(String(schedule.driverId))
       : null;
     const bus = schedule.busId
-      ? await this.busModel.findById(schedule.busId).lean()
+      ? await this.busRepo.findById(String(schedule.busId))
       : null;
 
     // Lấy thông tin route
-    const route = await this.routeModel.findById(schedule.routeId).populate({
-      path: 'stops.stopId',
-      model: 'Stop',
-    });
+    const route = await this.routeRepo.findById(String(schedule.routeId));
 
     // Lấy danh sách học sinh từ Trip
-    const trips = await this.tripModel
-      .find({ scheduleId: new Types.ObjectId(scheduleId) })
-      .populate({
-        path: 'students.studentId',
-        populate: { path: 'stopId' },
-      })
-      .lean();
+    const trips = await this.tripRepo.findByScheduleId(scheduleId);
 
     // Gom tất cả học sinh unique theo lịch trình
     const allStudentsMap = new Map();
@@ -143,7 +125,7 @@ export class ScheduleService {
   }
 
   async findAll(): Promise<ScheduleResponseDTO[]> {
-    const schedule = await this.scheduleModel.find().exec();
+    const schedule = await this.scheduleRepo.findAlls();
 
     return plainToInstance(
       ScheduleResponseDTO,
@@ -158,16 +140,12 @@ export class ScheduleService {
   }
 
   async update(id: string, updateDto: UpdateScheduleDTO) {
-    const updated = await this.scheduleModel
-      .findByIdAndUpdate(id, updateDto, { new: true })
-      .exec();
+    const updated = await this.scheduleRepo.findByIdAndUpdate(id, updateDto);
 
     if (!updated) throw new NotFoundException(`Schedule ${id} not found`);
 
     // Get trips from schedule
-    const trips = await this.tripModel
-      .find({ scheduleId: new Types.ObjectId(id) })
-      .lean();
+    const trips = await this.tripRepo.findByScheduleId(id);
 
     if (trips.length === 0)
       throw new NotFoundException(`Trips not found for schedule ${id}`);
@@ -196,7 +174,7 @@ export class ScheduleService {
       // if any is defined create new trips for the schedule
 
       // Delete old trips
-      await this.tripModel.deleteMany({ scheduleId: new Types.ObjectId(id) });
+      await this.tripRepo.deleteMany(id);
 
       const newTrips = await this.createTrip(updated, students ?? oldStudents);
 
@@ -214,7 +192,7 @@ export class ScheduleService {
   }
 
   async remove(id: string): Promise<void> {
-    const schedule = await this.scheduleModel.findById(id).exec();
+    const schedule = await this.scheduleRepo.findById(id);
 
     if (!schedule) throw new NotFoundException(`Schedule ${id} not found`);
 
@@ -234,35 +212,29 @@ export class ScheduleService {
       'Saturday',
     ];
 
-    for (
-      let d = new Date(schedule.dateStart);
-      d <= new Date(schedule.dateEnd);
-      d.setDate(d.getDate() + 1)
-    ) {
+    for ( let d = new Date(schedule.dateStart); d <= new Date(schedule.dateEnd); d.setDate(d.getDate() + 1) ) {
       const dayName = dayNames[d.getDay()]; // ví dụ: "Monday"
-      const timetable = await this.timetableModel
-        .findOne({ dayOfWeek: dayName })
-        .lean();
+      const timetable = await this.timetableRepo.findDayOfWeekTrips(dayName);
       if (!timetable) {
         continue;
       }
 
-      trips.push({
-        scheduleId: schedule._id,
-        date: new Date(d),
-        timeStart: timetable.pickupTime,
-        timeEnd: timetable.dropoffTime,
-        status: 'planned',
-        students: students.map((sid) => ({
-          studentId: sid,
-          status: 'not_pickup',
-        })),
-      });
-    }
+    trips.push({
+      scheduleId: schedule._id,
+      date: new Date(d),
+      timeStart: timetable.pickupTime,
+      timeEnd: timetable.dropoffTime,
+      status: 'planned',
+      students: students.map((sid) => ({
+        studentId: sid,
+        status: 'not_pickup',
+       })),
+    });
+  }
 // src/services/schedule.service.ts
 // CHỈ THÊM 2 API MỚI – KHÔNG ĐỘNG VÀO CÁC HÀM CŨ
 
-    if (trips.length > 0) await this.tripModel.insertMany(trips);
+    if (trips.length > 0) await this.tripRepo.insertMany(trips);
 
     return trips;
   }
@@ -281,7 +253,7 @@ export class ScheduleService {
     }
 
     // Kiểm tra route hợp lệ
-    const route = await this.routeModel.findById(routeId).lean();
+    const route = await this.routeRepo.findRouteById(routeId);
     if (!route) throw new BadRequestException('Route non found');
 
     // Kiểm tra học sinh được chọn
@@ -289,9 +261,7 @@ export class ScheduleService {
       throw new BadRequestException('Must select at least one student');
     }
 
-    const foundStudents = await this.studentModel.find({
-      _id: { $in: students.map((id) => new Types.ObjectId(id)) },
-    });
+    const foundStudents = await this.studentRepo.findByIds(students);
     if (foundStudents.length !== students.length) {
       throw new BadRequestException('Student non found');
     }
@@ -299,9 +269,7 @@ export class ScheduleService {
     // Kiểm tra TimeTable
     let timetableDocs: string[] = [];
     if (timeTables && timeTables.length > 0) {
-      const found = await this.timetableModel.find({
-        _id: { $in: timeTables.map((id) => new Types.ObjectId(id)) },
-      });
+      const found = await this.timetableRepo.findByIds(timeTables);
       if (found.length !== timeTables.length) {
         throw new BadRequestException('Timetable non found');
       }

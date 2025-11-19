@@ -27,6 +27,13 @@ export class RouteRepository {
     return this.routeModel.findById(routeId);
   }
 
+  async findById(id: string) {
+    return this.routeModel.findById(new Types.ObjectId(id)).populate({
+      path: 'stops.stopId',
+      model: 'Stop',
+    })
+  }
+
   // Lấy danh sách điểm dừng (Stop) của 1 Route
   async findStopsByRouteId(routeId: string) {
     const route = await this.routeModel.findById(routeId).lean();
@@ -43,11 +50,4 @@ export class RouteRepository {
       .filter(Boolean);
   }
 
-  // async update(id: string, data: Partial<Route>) {
-  //   return this.routeModel.findByIdAndUpdate(id, data, { new: true }).lean();
-  // }
-
-  // async delete(id: string) {
-  //   return this.routeModel.findByIdAndDelete(id);
-  // }
 }

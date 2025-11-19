@@ -11,15 +11,15 @@ export class TripRepository {
   //   return this.tripModel.insertMany(trips);
   // }
 
-  // async findByScheduleId(scheduleId: string) {
-  //   return this.tripModel
-  //     .find({ scheduleId: new Types.ObjectId(scheduleId) })
-  //     .populate({
-  //       path: 'students.studentId',
-  //       populate: { path: 'stopId' },
-  //     })
-  //     .lean();
-  // }
+  async findByScheduleId(scheduleId: string) {
+    return this.tripModel
+      .find({ scheduleId: new Types.ObjectId(scheduleId) })
+      .populate({
+        path: 'students.studentId',
+        populate: { path: 'stopId' },
+      })
+      .lean();
+  }
 
   // Lấy danh sách học sinh của trip thuộc schedule
   async findTripStudents(scheduleId: string) {
@@ -38,11 +38,15 @@ export class TripRepository {
     return this.tripModel.find().populate('scheduleId').lean();
   }
 
-  // async update(id: string, data: Partial<Trip>) {
-  //   return this.tripModel.findByIdAndUpdate(id, data, { new: true }).lean();
-  // }
+  async findById(id: string) {
+    return this.tripModel.findById(new Types.ObjectId(id)).lean();
+  }
 
-  // async delete(id: string) {
-  //   return this.tripModel.findByIdAndDelete(id);
-  // }
+  async insertMany(trips: Partial<Trip>[]) {
+    return this.tripModel.insertMany(trips);
+  }
+
+  async deleteMany(id: string) {
+    return this.tripModel.deleteMany({ scheduleId: new Types.ObjectId(id) });
+  }
 }

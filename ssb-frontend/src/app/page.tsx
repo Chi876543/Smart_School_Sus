@@ -5,40 +5,42 @@ import api from "@/services/api";
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
-  // const handleLogin = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   try {
-  //     const res = await api.post("/auth/login", { username, password });
-  //     localStorage.setItem("token", res.data.token);
-  //     window.location.href = "/dashboard";
-  //   } catch {
-  //     alert("Sai tên đăng nhập hoặc mật khẩu");
-  //   }
-  // };
+  const [errors, setErrors] = useState("");
+  
 
   const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
+    try {
+      const res = await api.post("/auth/login", { username, password });
+      localStorage.setItem("token", res.data.token);
+      window.location.href = "/dashboard";
+    } catch {
+      alert("Sai tên đăng nhập hoặc mật khẩu");
+    }
+  };
 
-  const useFake = typeof window !== "undefined" && localStorage.getItem("USE_FAKE") === "Admin";
+//   const handleLogin = async (e: React.FormEvent) => {
+//   e.preventDefault();
 
-  if (useFake) {
-    // Fake login — just store a fake token and redirect
-    localStorage.setItem("token", "fake-token");
-    localStorage.setItem("username", username); // optional
-    window.location.href = "/dashboard";
-    return;
-  }
+//   const useFake = typeof window !== "undefined" && localStorage.getItem("USE_FAKE") === "Admin";
 
-  // Real backend login (keep this if you run backend later)
-  try {
-    const res = await api.post("/auth/login", { username, password });
-    localStorage.setItem("token", res.data.token);
-    window.location.href = "/dashboard";
-  } catch {
-    alert("Sai tên đăng nhập hoặc mật khẩu");
-  }
-};
+//   if (useFake) {
+//     // Fake login — just store a fake token and redirect
+//     localStorage.setItem("token", "fake-token");
+//     localStorage.setItem("username", username); // optional
+//     window.location.href = "/dashboard";
+//     return;
+//   }
+
+//   // Real backend login (keep this if you run backend later)
+//   try {
+//     const res = await api.post("/auth/login", { username, password });
+//     localStorage.setItem("token", res.data.token);
+//     window.location.href = "/dashboard";
+//   } catch {
+//     alert("Sai tên đăng nhập hoặc mật khẩu");
+//   }
+// };
 
 
   return (

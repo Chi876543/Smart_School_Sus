@@ -20,6 +20,10 @@ export class DriverRepository {
     return this.driverModel.findById(driverId);
   }
 
+  async findById(id: string) {
+    return this.driverModel.findById(new Types.ObjectId(id)).lean();
+  }
+
   // async update(id: string, data: Partial<Driver>) {
   //   return this.driverModel.findByIdAndUpdate(id, data, { new: true }).lean();
   // }
