@@ -283,138 +283,138 @@ export class ScheduleService {
     };
   }
 
-  async findAllForManagement(): Promise<any[]> {
-  const schedules = await this.scheduleModel
-    .find({ status: { $ne: 'cancelled' } })
-    .populate({
-      path: 'routeId',
-      select: 'name',
-      populate: {
-        path: 'stops.stopId',
-        select: 'name',
-        model: 'Stop',
-      },
-    })
-    .populate('timeTables', 'dayOfWeek pickupTime dropoffTime')
-    .sort({ dateStart: -1 })
-    .lean();
+//   async findAllForManagement(): Promise<any[]> {
+//   const schedules = await this.scheduleModel
+//     .find({ status: { $ne: 'cancelled' } })
+//     .populate({
+//       path: 'routeId',
+//       select: 'name',
+//       populate: {
+//         path: 'stops.stopId',
+//         select: 'name',
+//         model: 'Stop',
+//       },
+//     })
+//     .populate('timeTables', 'dayOfWeek pickupTime dropoffTime')
+//     .sort({ dateStart: -1 })
+//     .lean();
 
-  const result: any[] = [];
+//   const result: any[] = [];
 
-  for (const s of schedules) {
-    // Lấy học sinh từ Trip
-    const trips = await this.tripModel
-      .find({ scheduleId: s._id })
-      .populate({
-        path: 'students.studentId',
-        select: 'fullName',
-      })
-      .lean();
+//   for (const s of schedules) {
+//     // Lấy học sinh từ Trip
+//     const trips = await this.tripModel
+//       .find({ scheduleId: s._id })
+//       .populate({
+//         path: 'students.studentId',
+//         select: 'fullName',
+//       })
+//       .lean();
 
-    const studentsSet = new Set<string>();
-    for (const trip of trips) {
-      for (const item of trip.students || []) {
-        const student = item.studentId as any;
-        if (student) {
-          studentsSet.add(student.fullName);
-        }
-      }
-    }
+//     const studentsSet = new Set<string>();
+//     for (const trip of trips) {
+//       for (const item of trip.students || []) {
+//         const student = item.studentId as any;
+//         if (student) {
+//           studentsSet.add(student.fullName);
+//         }
+//       }
+//     }
 
-    // Lấy tên các trạm
-    const route = s.routeId as any;
-    const stations = route?.stops
-      ?.sort((a: any, b: any) => a.order - b.order)
-      ?.map((stop: any) => stop?.stopId?.name)
-      ?.filter(Boolean) || [];
+//     // Lấy tên các trạm
+//     const route = s.routeId as any;
+//     const stations = route?.stops
+//       ?.sort((a: any, b: any) => a.order - b.order)
+//       ?.map((stop: any) => stop?.stopId?.name)
+//       ?.filter(Boolean) || [];
 
-    result.push({
-      _id: s._id.toString(),
-      name: s.name || 'Chưa đặt tên',
-      route: {
-        _id: route?._id?.toString(),
-        name: route?.name || 'Chưa có thông tin tuyến',
-      },
-      dateStart: s.dateStart,
-      dateEnd: s.dateEnd,
-      totalStudents: studentsSet.size,
-      stations, // Đảm bảo có trạm
-    });
-  }
+//     result.push({
+//       _id: s._id.toString(),
+//       name: s.name || 'Chưa đặt tên',
+//       route: {
+//         _id: route?._id?.toString(),
+//         name: route?.name || 'Chưa có thông tin tuyến',
+//       },
+//       dateStart: s.dateStart,
+//       dateEnd: s.dateEnd,
+//       totalStudents: studentsSet.size,
+//       stations, // Đảm bảo có trạm
+//     });
+//   }
 
-  return result;
-}
+//   return result;
+// }
 
 
-async findOneDetail(scheduleId: string): Promise<any> {
-  // BƯỚC 1: Tìm schedule + populate timeTables
-  const schedule = await this.scheduleModel
-    .findById(scheduleId)
-    .populate({
-      path: 'timeTables',
-      select: 'dayOfWeek pickupTime dropoffTime',
-    })
-    .lean();
+// async findOneDetail(scheduleId: string): Promise<any> {
+//   // BƯỚC 1: Tìm schedule + populate timeTables
+//   const schedule = await this.scheduleModel
+//     .findById(scheduleId)
+//     .populate({
+//       path: 'timeTables',
+//       select: 'dayOfWeek pickupTime dropoffTime',
+//     })
+//     .lean();
 
-  if (!schedule) throw new BadRequestException('Không tìm thấy lịch trình');
+//   if (!schedule) throw new BadRequestException('Không tìm thấy lịch trình');
 
-  // BƯỚC 2: Lấy route + stops
-  const route = await this.routeModel
-    .findById(schedule.routeId)
-    .populate({
-      path: 'stops.stopId',
-      model: 'Stop',
-      select: 'name',
-    })
-    .lean();
+//   // BƯỚC 2: Lấy route + stops
+//   const route = await this.routeModel
+//     .findById(schedule.routeId)
+//     .populate({
+//       path: 'stops.stopId',
+//       model: 'Stop',
+//       select: 'name',
+//     })
+//     .lean();
 
-  // BƯỚC 3: Lấy học sinh từ Trip
-  const trips = await this.tripModel
-    .find({ scheduleId: new Types.ObjectId(scheduleId) })
-    .populate({
-      path: 'students.studentId',
-      select: 'fullName',
-    })
-    .lean();
+//   // BƯỚC 3: Lấy học sinh từ Trip
+//   const trips = await this.tripModel
+//     .find({ scheduleId: new Types.ObjectId(scheduleId) })
+//     .populate({
+//       path: 'students.studentId',
+//       select: 'fullName',
+//     })
+//     .lean();
 
-  const studentsSet = new Set<string>();
-  for (const trip of trips) {
-    for (const item of trip.students || []) {
-      const student = item.studentId as any;
-      if (student?.fullName) {
-        studentsSet.add(student.fullName);
-      }
-    }
-  }
-  const students = Array.from(studentsSet).map(name => ({ name }));
+//   const studentsSet = new Set<string>();
+//   for (const trip of trips) {
+//     for (const item of trip.students || []) {
+//       const student = item.studentId as any;
+//       if (student?.fullName) {
+//         studentsSet.add(student.fullName);
+//       }
+//     }
+//   }
+//   const students = Array.from(studentsSet).map(name => ({ name }));
 
-  // BƯỚC 4: Lấy trạm
-  const stations = (route?.stops as any[])
-    ?.sort((a: any, b: any) => a.order - b.order)
-    ?.map((s: any) => s.stopId?.name)
-    ?.filter(Boolean) || [];
+//   // BƯỚC 4: Lấy trạm
+//   const stations = (route?.stops as any[])
+//     ?.sort((a: any, b: any) => a.order - b.order)
+//     ?.map((s: any) => s.stopId?.name)
+//     ?.filter(Boolean) || [];
 
-  // BƯỚC 5: LẤY THỜI KHÓA BIỂU – ĐẢM BẢO CÓ DỮ LIỆU
-  const timetable = Array.isArray(schedule.timeTables) && schedule.timeTables.length > 0
-    ? schedule.timeTables.map((t: any) => ({
-        dayOfWeek: t.dayOfWeek,
-        pickupTime: t.pickupTime,
-        dropoffTime: t.dropoffTime,
-      }))
-    : [];
+//   // BƯỚC 5: LẤY THỜI KHÓA BIỂU – ĐẢM BẢO CÓ DỮ LIỆU
+//   const timetable = Array.isArray(schedule.timeTables) && schedule.timeTables.length > 0
+//     ? schedule.timeTables.map((t: any) => ({
+//         dayOfWeek: t.dayOfWeek,
+//         pickupTime: t.pickupTime,
+//         dropoffTime: t.dropoffTime,
+//       }))
+//     : [];
 
-  return {
-    _id: schedule._id.toString(),
-    name: schedule.name || 'Chưa đặt tên',
-    dateStart: schedule.dateStart,
-    dateEnd: schedule.dateEnd,
-    routeName: route?.name || 'Chưa có tuyến',
-    timetable,        // ĐÃ CÓ
-    students,         // ĐÃ CÓ
-    stations,         // ĐÃ CÓ
-    totalStudents: students.length,
-  };
-}
+//   return {
+//     _id: schedule._id.toString(),
+//     name: schedule.name || 'Chưa đặt tên',
+//     dateStart: schedule.dateStart,
+//     dateEnd: schedule.dateEnd,
+//     routeName: route?.name || 'Chưa có tuyến',
+//     timetable,        // ĐÃ CÓ
+//     students,         // ĐÃ CÓ
+//     stations,         // ĐÃ CÓ
+//     totalStudents: students.length,
+//   };
+// }
 }
 
 

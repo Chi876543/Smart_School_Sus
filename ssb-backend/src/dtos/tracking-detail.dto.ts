@@ -5,6 +5,12 @@ export class NextStopDto {
   distance: number;
 }
 
+class stopDTO{
+  name: string;
+  lat: number;
+  lng: number;
+}
+
 export class TripStudentDto {
   fullName: string;
   status: string;
@@ -15,6 +21,7 @@ export class TrackingDetailDto {
   plateNumber: string;
   driverName: string;
   routeName: string;
+  stops: stopDTO[];
   nextStop: NextStopDto;
   eta: number;
   students: TripStudentDto[];

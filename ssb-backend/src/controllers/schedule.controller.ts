@@ -40,15 +40,15 @@ export class ScheduleController {
 
 // ... [TẤT CẢ ROUTE CŨ GIỮ NGUYÊN] ...
 
-@Get('management')
-async findAllForManagement() {
-  return this.scheduleService.findAllForManagement();
-}
+// @Get('management')
+// async findAllForManagement() {
+//   return this.scheduleService.findAllForManagement();
+// }
 
-@Get('detail/:id')
-async findOneDetail(@Param('id') id: string) {
-  return this.scheduleService.findOneDetail(id);
-}
+// @Get('detail/:id')
+// async findOneDetail(@Param('id') id: string) {
+//   return this.scheduleService.findOneDetail(id);
+// }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
