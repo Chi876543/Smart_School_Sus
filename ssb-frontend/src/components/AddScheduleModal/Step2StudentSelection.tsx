@@ -10,10 +10,12 @@ interface Props {
   onBack: () => void;
   onConfirm: () => void;
   loading?: boolean;
+  isEditMode?: boolean; 
 }
 
+
 export default function Step2StudentSelection({
-  routeId, selectedStudents, setSelectedStudents, onBack, onConfirm, loading
+  routeId, selectedStudents, setSelectedStudents, onBack, onConfirm, loading, isEditMode
 }: Props) {
   const [students, setStudents] = useState<Student[]>([]);
   const [search, setSearch] = useState("");
@@ -75,10 +77,9 @@ export default function Step2StudentSelection({
           </button>
           <button
             onClick={onConfirm}
-            disabled={loading || selectedStudents.length === 0}
-            className="px-10 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold disabled:opacity-50 flex items-center gap-2"
+            className="bg-green-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-green-700"
           >
-            {loading ? "Đang tạo..." : "Tạo lịch trình"}
+            {loading ? "Đang xử lý..." : (isEditMode ? "Cập nhật lịch trình" : "Tạo lịch trình")}
           </button>
         </div>
       </div>

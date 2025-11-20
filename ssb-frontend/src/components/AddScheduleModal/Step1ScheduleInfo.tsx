@@ -7,7 +7,7 @@ interface Route {
 }
 
 interface Timetable {
-  _id: string;
+  id: string;
   dayOfWeek: string;
   pickupTime: string;
   dropoffTime: string;
@@ -64,7 +64,12 @@ export default function Step1ScheduleInfo({
           : [];
 
         const timetableList: Timetable[] = Array.isArray(timetablesData)
-          ? timetablesData
+          ? timetablesData.map((t: any) => ({
+              id: t._id?.toString(),          
+              dayOfWeek: t.dayOfWeek,
+              pickupTime: t.pickupTime,
+              dropoffTime: t.dropoffTime
+            }))
           : [];
 
         setRoutes(routeList);
@@ -93,7 +98,7 @@ export default function Step1ScheduleInfo({
     updated[i] = { ...updated[i], [field]: value };
 
     if (field === "timetableId" && value) {
-      const tt = timetables.find(t => t._id === value);
+      const tt = timetables.find(t => t.id === value);
       if (tt) {
         updated[i].day = tt.dayOfWeek;
         updated[i].pick = tt.pickupTime;
@@ -207,7 +212,7 @@ export default function Step1ScheduleInfo({
                       >
                         <option value="">-- Chọn --</option>
                         {timetables.map(t => (
-                          <option key={t._id} value={t._id}>
+                          <option key={t.id} value={t.id}>
                             {t.dayOfWeek} ({t.pickupTime} - {t.dropoffTime})
                           </option>
                         ))}

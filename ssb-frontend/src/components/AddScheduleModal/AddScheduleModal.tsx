@@ -45,21 +45,25 @@ export default function AddScheduleModal({
   };
 
   useEffect(() => {
+    console.log("Initial Data:", initialData);
     if (isOpen && isEditMode && initialData) {
-      setEditId(initialData._id);
+      setEditId(initialData.scheduleId);
+      console.log("initialData.scheduleId:", initialData.scheduleId);
       setScheduleName(initialData.name || "");
-      setRouteId(initialData.routeId?._id || initialData.routeId || "");
+      setRouteId(initialData.routeId);
       setPeriodStart(initialData.dateStart?.split("T")[0] || "");
       setPeriodEnd(initialData.dateEnd?.split("T")[0] || "");
       setTimeRows(
         (initialData.timeTables || []).map((t: any) => ({
-          timetableId: t._id || "",
+          timetableId: t.id || "",
           day: t.dayOfWeek || "",
           pick: t.pickupTime || "",
           drop: t.dropoffTime || "",
         }))
       );
-      setSelectedStudents(initialData.students?.map((s: any) => s._id || s) || []);
+      setSelectedStudents(
+        initialData.students.map((s: any) => s.id || s._id)
+      );
     } else if (isOpen && !isEditMode) {
       resetForm();
     }
@@ -78,8 +82,9 @@ export default function AddScheduleModal({
     setLoading(true);
     try {
       const isEdit = isEditMode && editId;
+      console.log("editId:", editId);
       const url = isEdit
-        ? `http://localhost:8080/schedules/${editId}`
+        ? `http://localhost:8080/schedules/${editId}/update`
         : "http://localhost:8080/schedules/create";
 
       const method = isEdit ? "PUT" : "POST";
@@ -144,6 +149,7 @@ export default function AddScheduleModal({
               onBack={() => setStep(1)}
               onConfirm={handleSubmit}
               loading={loading}
+              isEditMode={isEditMode}   // ← thêm vào đây
             />
           )}
         </div>
