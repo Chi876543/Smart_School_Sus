@@ -2,7 +2,7 @@
 
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl, Tooltip, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import L, { Marker as LeafletMarker} from "leaflet";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import api from "@/services/api";
 import InfoBox from "../infoBox/infoBox";
@@ -74,7 +74,10 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
   const [busPositions, setBusPositions] = useState<Record<string, BusPosition>>({})
   const [socket, setSocket] = useState<Socket | null>(null);
   const mapRef = useRef<any>(null);
-  const markerRefs = useRef<Record<string, L.Marker>>( {});
+  const markerRefs = useRef<Record<string, L.Marker>>({});
+
+  const lastPositions = useRef<Record<string, [number, number]>>({});
+
 
 
 
@@ -115,6 +118,30 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
       }));
     }
   }
+
+  function animateMarker(
+    marker: LeafletMarker,
+    from: [number, number],
+    to: [number, number],
+    duration: number = 1000
+  ) {
+    const start = performance.now();
+
+    function frame(time:number) {
+      let progress = (time - start) / duration;
+      if (progress > 1) progress = 1;
+
+      const lat = from[0] + (to[0] - from[0]) * progress;
+      const lng = from[1] + (to[1] - from[1]) * progress;
+
+      marker.setLatLng([lat, lng]);
+
+      if (progress < 1) requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
+  }
+
 
   useEffect(() => {
     const socketIo = io("http://localhost:8080");
@@ -263,11 +290,30 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
         {buses.map((bus) => {
           const pos = busPositions[bus.busId];
           if (!pos) return null;
+
           return (
             <Marker
               key={bus.busId}
-              position={[pos.lat, pos.lng]}
+              position={[pos.lat, pos.lng]} // initial only
               icon={busIcon}
+              ref={(el) => {
+                if (el) {
+                  const marker = el;
+
+                  // nếu marker đã tồn tại từ trước thì animate từ oldPos đến newPos
+                  const prev = lastPositions.current[bus.busId];
+                  const next: [number, number] = [pos.lat, pos.lng];
+
+                  if (prev) {
+                    animateMarker(marker, prev, next, 800);
+                  } else {
+                    marker.setLatLng(next); // lần đầu
+                  }
+
+                  lastPositions.current[bus.busId] = next;
+                  markerRefs.current[bus.busId] = marker;
+                }
+              }}
               eventHandlers={{
                 click: () => {
                   setSelectedBus(bus);
@@ -275,19 +321,13 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
                   markerRefs.current[bus.busId]?.openTooltip();
                 },
               }}
-              ref={(el) => {
-                if (el) markerRefs.current[bus.busId] = el;
-              }}
             >
-              <Tooltip 
-              direction="right" 
-              offset={[15, -10]}>
+              <Tooltip direction="right" offset={[15, -10]}>
                 Xe {bus.plateNumber}
               </Tooltip>
             </Marker>
           );
-        }
-        )}
+        })}
       </MapContainer>
     </div>
   );

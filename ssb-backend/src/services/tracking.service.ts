@@ -170,21 +170,21 @@ export class TrackingService {
         return; 
       } 
       
-      const latLng = routeLine[index];
+      const currentPosition = routeLine[index];
       let nextStop = stops[currentStopIndex];
 
       // Lấy distance + eta từ OSRM
-      const { distance, duration } = await this.getRouteInfo([latLng[0], latLng[1]], [nextStop.lat, nextStop.lng]);
+      const { distance, duration } = await this.getRouteInfo([currentPosition[0], currentPosition[1]], [nextStop.lat, nextStop.lng]);
       if(distance <= 0 || duration <= 0) 
         currentStopIndex++;
       
       callback({ 
         busId: bus.busId, 
-        lat: latLng[0], 
-        lng: latLng[1], 
+        lat: currentPosition[0], 
+        lng: currentPosition[1], 
         nextStop: nextStop.name,
         remainingDistance: distance, 
-        eta: duration,
+        eta: duration
       }); 
 
       index++; 
