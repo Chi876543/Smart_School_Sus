@@ -47,23 +47,17 @@ function mapStatus(status: string): string {
 
 export function mapScheduleToRow(raw: any): AssignmentRow {
   return {
-    id: raw.id,
+    id: raw._id, // sửa từ raw.id → raw._id nếu backend dùng _id
     routeName: raw.name,
 
-    // ★ Nếu không có tài xế → "Chưa có"
-    driver:
-      raw.driver && raw.driver.trim() !== "" ? raw.driver : "Chưa có tài xế",
-
+    driver: raw.driverName?.trim() || "Chưa có tài xế",
     driverId: raw.driverId ?? null,
 
-    // ★ Nếu không có xe → "Chưa có"
-    vehicle:
-      raw.vehicle && raw.vehicle.trim() !== "" ? raw.vehicle : "Chưa có xe",
-
+    vehicle: raw.plateNumber?.trim() || "Chưa có xe",
     vehicleId: raw.busId ?? null,
 
-    statusCode: raw.statusCode,
-    status: mapStatus(raw.statusCode),
+    statusCode: raw.status,
+    status: mapStatus(raw.status),
   };
 }
 

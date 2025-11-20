@@ -35,9 +35,21 @@ export default function DriverAssignment() {
   const [currentSchedule, setCurrentSchedule] = useState<ScheduleInfo | null>(
     null
   );
+  const [panelError, setPanelError] = useState<string | null>(null);
   const [initialDriverId, setInitialDriverId] = useState<string | null>(null);
   const [initialBusId, setInitialBusId] = useState<string | null>(null);
+  // 🔒 KHÓA SCROLL KHI PANEL MỞ
+  useEffect(() => {
+    if (isPanelOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
 
+      // cleanup: mở lại scroll khi panel đóng / component unmount
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [isPanelOpen]);
   // ====== LOAD API ======
   const reloadFromApi = async () => {
     try {
@@ -65,6 +77,9 @@ export default function DriverAssignment() {
   useEffect(() => {
     reloadFromApi();
   }, []);
+  const canInteract = (status: string) => {
+    return status === "Chưa phân công" || status === "Đã phân công";
+  };
 
   // ======= SEARCH FILTER ========
   const filteredData = data.filter((item) => {
@@ -77,28 +92,6 @@ export default function DriverAssignment() {
       item.vehicle.toLowerCase().includes(keyword)
     );
   });
-
-  // ======= HANDLE ADD ========
-  const handleAdd = () => {
-    const target =
-      selectedIndex !== null ? filteredData[selectedIndex] : filteredData[0];
-
-    if (!target) {
-      alert("Không có lịch trình nào để phân công");
-      return;
-    }
-
-    setPanelMode("create");
-    setCurrentSchedule({
-      id: target.id,
-      name: target.routeName,
-      status: target.status,
-    });
-
-    setInitialDriverId(null);
-    setInitialBusId(null);
-    setIsPanelOpen(true);
-  };
 
   // ======= HANDLE EDIT ========
   const handleEdit = () => {
@@ -117,32 +110,10 @@ export default function DriverAssignment() {
       status: row.status,
     });
 
-    setInitialDriverId(row.driver);
-    setInitialBusId(row.vehicle);
-
+    setInitialDriverId(row.driverId);
+    setInitialBusId(row.vehicleId);
+    setPanelError(null);
     setIsPanelOpen(true);
-  };
-
-  // ======= HANDLE DELETE ========
-  const handleDelete = async () => {
-    if (selectedIndex === null) {
-      alert("Vui lòng chọn để xoá phân công");
-      return;
-    }
-
-    const row = filteredData[selectedIndex];
-
-    if (!window.confirm(`Gỡ phân công của "${row.routeName}"?`)) return;
-
-    try {
-      setLoading(true);
-      await deleteAssignment(row.id);
-      await reloadFromApi();
-    } catch (err: any) {
-      alert(err.message || "Lỗi khi xoá");
-    } finally {
-      setLoading(false);
-    }
   };
 
   // ======= CSS STATUS ========
@@ -190,39 +161,35 @@ export default function DriverAssignment() {
             </thead>
 
             <tbody>
-              {filteredData.map((item, index) => (
-                <tr
-                  key={item.id}
-                  className={`${styles.row} ${
-                    selectedIndex === index ? styles.rowSelected : ""
-                  }`}
-                  onClick={() => setSelectedIndex(index)}
-                >
-                  <td>{item.routeName}</td>
-                  <td>{item.driver}</td>
-                  <td>{item.vehicle}</td>
-                  <td>
-                    <span
-                      className={`${styles.statusBadge} ${getStatusClass(
-                        item.status
-                      )}`}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {filteredData.map((item, index) => {
+                const clickable = canInteract(item.status);
 
-              {filteredData.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={4}
-                    style={{ padding: "10px", textAlign: "center" }}
+                return (
+                  <tr
+                    key={item.id}
+                    className={`${styles.row} 
+          ${selectedIndex === index ? styles.rowSelected : ""} 
+          ${!clickable ? styles.rowDisabled : ""}`}
+                    onClick={() => {
+                      if (!clickable) return; // Không làm gì nếu không được tương tác
+                      setSelectedIndex(index);
+                    }}
                   >
-                    Không có dữ liệu
-                  </td>
-                </tr>
-              )}
+                    <td>{item.routeName}</td>
+                    <td>{item.driver}</td>
+                    <td>{item.vehicle}</td>
+                    <td>
+                      <span
+                        className={`${styles.statusBadge} ${getStatusClass(
+                          item.status
+                        )}`}
+                      >
+                        {item.status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -236,21 +203,26 @@ export default function DriverAssignment() {
         buses={buses}
         initialDriverId={initialDriverId}
         initialBusId={initialBusId}
-        onClose={() => setIsPanelOpen(false)}
+        onClose={() => {
+          setIsPanelOpen(false);
+          setPanelError(null);
+        }}
+        errorMessage={panelError}
         onSubmit={async (p) => {
           try {
             setLoading(true);
+            setPanelError(null);
 
-            if (panelMode === "create") {
-              await assignSchedule(p.scheduleId, p.driverId, p.busId);
-            } else {
-              await updateAssignment(p.scheduleId, p.driverId, p.busId);
-            }
+            await assignSchedule(p.scheduleId, p.driverId, p.busId);
 
             await reloadFromApi();
             setIsPanelOpen(false);
           } catch (err: any) {
-            alert(err.message);
+            const msg =
+              err.response?.data?.message ||
+              err.message ||
+              "Có lỗi xảy ra khi phân công lịch trình";
+            setPanelError(msg);
           } finally {
             setLoading(false);
           }

@@ -10,7 +10,14 @@ export class ScheduleRepository {
     @InjectModel(Schedule.name) private readonly scheduleModel: Model<Schedule>,
   ) {}
 
-  async create(name : string, dateStart: Date, dateEnd: Date, routeId: string, timetableDocs: any[], foundStudents: any[]) {
+  async create(
+    name: string,
+    dateStart: Date,
+    dateEnd: Date,
+    routeId: string,
+    timetableDocs: any[],
+    foundStudents: any[],
+  ) {
     return this.scheduleModel.create({
       name,
       dateStart,
@@ -67,8 +74,10 @@ export class ScheduleRepository {
     return this.scheduleModel.findById(new Types.ObjectId(id)).exec();
   }
 
-  async findByIdAndUpdate(id: string, updateDto: UpdateScheduleDTO){
-    return this.scheduleModel.findByIdAndUpdate(id, updateDto, { new: true }).exec();
+  async findByIdAndUpdate(id: string, updateDto: UpdateScheduleDTO) {
+    return this.scheduleModel
+      .findByIdAndUpdate(id, updateDto, { new: true })
+      .exec();
   }
 
   async assignSchedule(scheduleId: string, driverId: string, busId: string) {

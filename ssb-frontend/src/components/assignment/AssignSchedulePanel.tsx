@@ -34,7 +34,7 @@ interface Props {
 
   initialDriverId: string | null;
   initialBusId: string | null;
-
+  errorMessage?: string | null;
   onClose: () => void;
   onSubmit: (payload: AssignSchedulePayload) => void;
 }
@@ -49,6 +49,7 @@ export default function AssignSchedulePanel({
   initialBusId,
   onClose,
   onSubmit,
+  errorMessage,
 }: Props) {
   const [driverId, setDriverId] = useState("");
   const [busId, setBusId] = useState("");
@@ -217,7 +218,9 @@ export default function AssignSchedulePanel({
               )}
             </div>
           </div>
-
+          {errorMessage && (
+            <div className={styles.errorBox}>{errorMessage}</div>
+          )}
           {/* Nút footer */}
           <div className={styles.footer}>
             <button

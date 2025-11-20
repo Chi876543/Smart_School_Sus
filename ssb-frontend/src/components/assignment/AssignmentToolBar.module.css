@@ -1,18 +1,9 @@
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 12px;
-  background-color: #f3f3f3; /* thanh xám phía trên */
-}
-
 /* khối bên trái: search + filter */
 .left {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1;
+  flex: 0.66;
 }
 
 .searchArea {
@@ -50,7 +41,7 @@
 }
 
 .btn {
-  min-width: 72px;
+  width: 160px;
   padding: 6px 14px;
   border-radius: 6px;
   border: none;
@@ -63,9 +54,38 @@
 /* màu giống hình */
 
 .btnEdit {
-  background-color: #00c3ff; /* vàng "Sửa" */
+  background-color: #2ebde8; /* xanh dương "Sửa" */
 }
 
 .btnEdit:hover {
   opacity: 0.9;
+}
+.left input {
+  width: 100%;
+  height: 30px;
+}
+.toolbar {
+  background-color: #f3f3f3;
+  padding: 5px 12px;
+  position: relative;
+  height: 50px;
+}
+
+/* Bên trái */
+.toolbar .left {
+  position: absolute;
+  left: 0px; /* cách mép trái */
+  top: 50%;
+  transform: translateY(-50%); /* căn giữa theo chiều dọc */
+  display: flex; /* nếu muốn các item bên trái vẫn nằm ngang */
+  gap: 8px;
+  width: 500px;
+}
+
+/* Bên phải */
+.toolbar .actions {
+  position: absolute;
+  right: 12px; /* cách mép phải */
+  top: 50%;
+  transform: translateY(-50%);
 }
