@@ -51,17 +51,12 @@ export class ScheduleRepository {
     });
   }
 
-async findOne(scheduleId: string) {
-  return this.scheduleModel
-    .findById(scheduleId)
-    .populate('timeTables')
-    .populate({
-      path: 'students',
-      populate: { path: 'stopId', select: 'name' },
-      select: 'fullName'
-    })
-    .lean();
-}
+  async findOne(scheduleId: string) {
+    return this.scheduleModel
+      .findById(scheduleId)
+      .populate('timeTables')
+      .lean();
+  }
 
   // Lấy 1 schedule cụ thể
   async findScheduleById(scheduleId: string) {
