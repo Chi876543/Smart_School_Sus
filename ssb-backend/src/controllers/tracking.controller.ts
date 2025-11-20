@@ -15,7 +15,7 @@ export class TrackingController {
   // Xem chi tiết 1 xe buýt (biển số, tài xế, tuyến, điểm kế tiếp, học sinh)
   @Get('schedule/:id')
   async getBusDetail(@Param('id') id: string) {
-    return this.trackingService.getBusDetail(id);
+    return this.trackingService.getBusStaticDetail(id);
   }
 
   // Cập nhật vị trí xe buýt

@@ -2,9 +2,7 @@
 
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl, Tooltip, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-// import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import L from "leaflet";
-// import "leaflet-routing-machine";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import api from "@/services/api";
 import InfoBox from "../infoBox/infoBox";
@@ -24,28 +22,24 @@ export interface BusBasic {
   scheduleId: string;
   busId: string;
   plateNumber: string;
-  lat: number;
-  lng: number;
+  // lat: number;
+  // lng: number;
 }
 
-interface BusDetail {
+interface BusDetailStatic {
   driverName: string;
   routeName: string;
-  stops: {
-    name: string;
-    lat: number;
-    lng: number;
-  }[]
-  nextStop: {
-    name: string;
-    distance: number; // meters
-  };
-  eta: number; // seconds
-
-  students: {
-    fullName: string;
-    status: string;
+  stops: { name: string; lat: number; lng: number }[];
+  students: { 
+    fullName: string; 
+    status: string 
   }[];
+}
+
+interface BusDetailRealtime {
+  nextStop: string;
+  distance: number; 
+  eta: number;
 }
 
 interface BusPosition {
@@ -67,11 +61,13 @@ export interface BusMapRef {
   selectBus: (bus: BusBasic) => void;
   flyToBus: (bus: BusBasic) => void;
   buses: BusBasic[];
+  busPositions: Record<string, BusPosition>;
 }
 
 const BusMap = forwardRef<BusMapRef>((props, ref) => {
   const [buses, setBuses] = useState<BusBasic[]>([]);
-  const [busDetails, setbusDetails] = useState<Record<string, BusDetail>>({}); //key: busId
+  const [busDetailsStatic, setBusDetailsStatic] = useState<Record<string, BusDetailStatic>>({});
+  const [busRealtime, setBusRealtime] = useState<Record<string, BusDetailRealtime>>({});
   const [selectedBus, setSelectedBus] = useState<BusBasic | null>(null);
   const [studentPopupOpen, setStudentPopupOpen] = useState(false);
   const [busRoutes, setBusRoutes] = useState<Record<string, BusRoute>>({});
@@ -97,24 +93,23 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
 
 
   const fetchBusDetail = async (bus: BusBasic) =>{
-    if(busDetails[bus.busId]) return;
+    if(busDetailsStatic[bus.busId]) return;
 
     try{
       const res = await api.get(`/tracking/schedule/${bus.scheduleId}`);
-      setbusDetails((prev) =>({
+      const { driverName, routeName, stops, students } = res.data;
+      setBusDetailsStatic((prev) => ({
         ...prev,
-        [bus.busId]: res.data
+        [bus.busId]: { driverName, routeName, stops, students },
       }));
     }catch(err){
       console.error(`Error fetching details for bus ${bus.plateNumber}:`, err);
-      setbusDetails((prev) => ({
+      setBusDetailsStatic((prev) => ({
         ...prev,
         [bus.busId]: {
           driverName: "Unknown",
           routeName: "Unknown",
           stops: [],
-          nextStop: { name: "Unknown", distance: 0 },
-          eta: 0,
           students: []
         },
       }));
@@ -138,14 +133,11 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
     };
   }, []);
 
-  console.log("Selected bus:", selectedBus?.busId);
-  console.log("Have route:", busRoutes[selectedBus?.busId || ""]?.polyline);
-
   useEffect(() =>{
     if(!socket) return;
 
-    socket.on('busDetail', (data: { busId: string; detail: BusDetail & { lat: number; lng: number } }) => {
-      setbusDetails(prev => ({
+    socket.on('busDetail', (data: { busId: string; detail: BusDetailRealtime & { lat: number; lng: number } }) => {
+      setBusRealtime(prev => ({
         ...prev,
         [data.busId]: data.detail
       }));
@@ -161,86 +153,58 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
       socket.off('busDetail');
     };
   }, [socket])
-
-  // useEffect(() =>{
-  //   if(!selectedBus || !busDetails[selectedBus.busId] || !mapRef.current) return;
-    
-  //   const stops = busDetails[selectedBus.busId].stops;
-  //   // Remove previous route
-  //   if (routingControlRef.current && mapRef.current) {
-  //     routingControlRef.current.remove();
-  //     routingControlRef.current = null;
-  //   }
-
-  //   const waypoints = [
-  //     [selectedBus.lat, selectedBus.lng],
-  //     ...stops.map((s) => [s.lat, s.lng]),
-  //   ];
-
-  //   const control = L.Routing.control({
-  //     waypoints,
-  //     lineOptions: { styles: [{ color: "blue", weight: 4 }] },
-  //     createMarker: (
-  //       index: number,
-  //       waypoint: { latLng: L.LatLng }
-  //     ): L.Marker | null => {
-  //       if(index === 0) return null; // skip the bus marker
-
-  //       return L.marker(waypoint.latLng, {
-  //         icon: L.icon({
-  //           iconUrl: "/pointer-pin.svg",
-  //           iconSize: [30, 30],
-  //           iconAnchor: [15, 30],
-  //         }),
-  //       }).bindPopup(
-  //         `Stop ${index}: ${stops[index - 1].name}`
-  //       );
-  //     },
-  //     addWaypoints: false,
-  //     routeWhileDragging: false,
-  //   }).addTo(mapRef.current);
-
-  //   routingControlRef.current = control;
-  // }, [selectedBus, busDetails]);
-
   
   const center: [number, number] =
-    buses.length > 0 ? [buses[0].lat, buses[0].lng] : [10.762622, 106.660172];
+    buses.length > 0 && busPositions[buses[0].busId]
+    ? [busPositions[buses[0].busId].lat, busPositions[buses[0].busId].lng] 
+    : [10.762622, 106.660172];
 
   useImperativeHandle(ref, () => ({
     selectBus: (bus: BusBasic) => {
       setSelectedBus(bus);
       fetchBusDetail(bus);
-      if (mapRef.current) mapRef.current.flyTo([bus.lat, bus.lng], 15);
+      const pos = busPositions[bus.busId];
+      if (mapRef.current) {
+        if(pos)
+          mapRef.current.flyTo([pos.lat, pos.lng], 15);
+      }
       markerRefs.current[bus.busId]?.openTooltip();
     },
     flyToBus: (bus: BusBasic) => {
-      mapRef.current?.flyTo([bus.lat, bus.lng], 15);
+      const pos = busPositions[bus.busId];
+      if (mapRef.current) {
+        if (pos)
+          mapRef.current.flyTo([pos.lat, pos.lng], 15);
+      }
     },
     buses,
+    busPositions
   }));
 
 
   return (
     <div style={{ height: "80vh", width: "100%", borderRadius: "1rem", position: "relative" }}>
-      {selectedBus && busDetails[selectedBus.busId] && (
+      {selectedBus && busDetailsStatic[selectedBus.busId] && (
         <InfoBox
           title="Thông tin"
           position={{ top: "10px", right: "10px" }}
           fields={[
             { label: "Xe", value: selectedBus.plateNumber },
-            { label: "Tài xế", value: busDetails[selectedBus.busId].driverName },
-            { label: "Tuyến", value: busDetails[selectedBus.busId].routeName },
+            { label: "Tài xế", value: busDetailsStatic[selectedBus.busId].driverName },
+            { label: "Tuyến", value: busDetailsStatic[selectedBus.busId].routeName },
             {
               label: "Trạm kế tiếp",
-              value: `${busDetails[selectedBus.busId].nextStop.name} (${(busDetails[selectedBus.busId].nextStop.distance/1000).toFixed(2)} km)`,
+              value: busRealtime[selectedBus.busId]
+              ? `${busRealtime[selectedBus.busId].nextStop} (${(busRealtime[selectedBus.busId].distance/1000).toFixed(2)} km)`
+              : "Đang tính...",
             },
             {
               label: "Thời gian dự kiến",
-              value: 
-                busDetails[selectedBus.busId].eta < 60 ?
-                `${busDetails[selectedBus.busId].eta} giây` :
-                `${Math.ceil(busDetails[selectedBus.busId].eta / 60)} phút`,
+              value: busRealtime[selectedBus.busId]
+              ? (busRealtime[selectedBus.busId].eta < 60 
+                ? `${busRealtime[selectedBus.busId].eta} giây`
+                : `${Math.ceil(busRealtime[selectedBus.busId].eta / 60)} phút`)
+              : "Đang tính...",
             },
           ]}
           actions={[
@@ -252,11 +216,11 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
         /> 
       )}
 
-      {selectedBus && busDetails[selectedBus.busId] && (
+      {selectedBus && busDetailsStatic[selectedBus.busId] && (
         <StudentPopup
           open={studentPopupOpen}
           onClose={() => setStudentPopupOpen(false)}
-          students={busDetails[selectedBus.busId].students}
+          students={busDetailsStatic[selectedBus.busId].students}
         />
       )}
 
@@ -297,7 +261,8 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
         ))}
 
         {buses.map((bus) => {
-          const pos = busPositions[bus.busId] || { lat: bus.lat, lng: bus.lng };
+          const pos = busPositions[bus.busId];
+          if (!pos) return null;
           return (
             <Marker
               key={bus.busId}

@@ -22,6 +22,7 @@
   flex-direction: column;
 }
 
+/* Header popup */
 .header {
   display: flex;
   justify-content: space-between;
@@ -45,6 +46,7 @@
     font-weight: bold;
 }
 
+/* Controls: search + filter */
 .controls {
   display: flex;
   gap: 10px;
@@ -62,17 +64,14 @@
   cursor: pointer;
 }
 
-.filter:hover {
-    border: 1px solid #2a72d7;
-}
-
+.filter:hover,
 .filter:focus {
     border: 1px solid #2a72d7;
 }
 
 .tableContainer {
   overflow-y: auto;
-  max-height: 55vh;
+  max-height: 35vh;
 }
 
 .table {
@@ -80,16 +79,20 @@
   border-collapse: collapse;
 }
 
-.table th {
+.table thead th {
   background: #cecece;
   padding: 10px;
   text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .table td {
   padding: 8px;
   border-bottom: 1px solid #ececec;
 }
+
 
 .emptyText {
   text-align: center;
