@@ -1,188 +1,213 @@
-// components/ScheduleManagement.tsx
+// src/components/ScheduleManagement.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import AddScheduleModal from "./AddScheduleModal/AddScheduleModal";
 import DetailScheduleModal from "./DetailScheduleModal";
-import { api } from "@/lib/api";
+import api from "@/services/api";
 
 interface Schedule {
-  _id: string;
+  id: string;
   name: string;
-  route: { _id: string; name: string };
-  dateStart: string;  // Đổi từ periodStart
-  dateEnd: string;    // Đổi từ periodEnd
+  routeName: string;
+  dateStart: string;
+  dateEnd: string;
+  status: string;
 }
 
 export default function ScheduleManagement() {
-  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]); // toàn bộ lịch trình
+  const [routes, setRoutes] = useState<any[]>([]); // toàn bộ tuyến đường
+
   const [filtered, setFiltered] = useState<Schedule[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editData, setEditData] = useState<any>(null);
 
+  // fetch data schedule từ backend
   const fetchSchedules = async () => {
     try {
-      const data = await api<Schedule[]>("/schedules/management");
-      setSchedules(data);
-      setFiltered(data);
-    } catch {
-      alert("Không tải được danh sách lịch trình");
+      setLoading(true);
+
+      const res = await api.get("/schedules");  // axios thay fetch
+      const list = Array.isArray(res.data) ? res.data : [];
+
+      setSchedules(list.filter((s:any) => s.status !== "cancelled"));
+      setFiltered(list.filter((s:any) => s.status !== "cancelled"));
+      
+    } catch (err) {
+      console.error(err);
+      alert("Không kết nối được backend hoặc lỗi dữ liệu!");
+      setSchedules([]);
+      setFiltered([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // fetch chi tiết lịch trình
+  const fetchScheduleDetail = async (id: string) => {
+    try {
+      const res = await api.get(`/schedules/${id}`);
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      alert("Không tải được dữ liệu chi tiết!");
+      return null;
+    }
+  };
+
+  // fetch danh sách tuyến đường
+  const fetchRoutes = async () => {
+    const res = await api.get("/schedules/routes");
+    setRoutes(res.data);
+  };
+
   useEffect(() => {
     fetchSchedules();
+    fetchRoutes();
   }, []);
 
   useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFiltered(schedules);
+      return;
+    }
     const term = searchTerm.toLowerCase();
     const result = schedules.filter(
       (s) =>
         s.name.toLowerCase().includes(term) ||
-        s.route.name.toLowerCase().includes(term)
+        s.routeName.toLowerCase().includes(term)
     );
     setFiltered(result);
   }, [searchTerm, schedules]);
 
-  const handleDelete = async () => {
+  // Chọn hàng để thực hiện chức năng
+  const handleRowClick = (id: string) => {
+    setSelectedSchedule(schedules.find(s => s.id === id) || null);
+  };
+
+  // Xem chi tiết
+  const openDetail = (schedule: Schedule) => {
+    setSelectedSchedule(schedule);
+    setIsDetailModalOpen(true);
+  }
+
+  // Chỉnh sửa lịch trình
+  const handleEdit = async () => {
     if (!selectedSchedule) {
-      alert("Vui lòng chọn 1 lịch trình để xóa");
+      alert("Vui lòng chọn 1 lịch trình để sửa!");
       return;
     }
-    if (!confirm("Bạn có chắc chắn muốn xóa lịch trình này?")) return;
+    
+
+    const detail = await fetchScheduleDetail(selectedSchedule.id);
+    if (!detail) return;
+    console.log("DETAIL STUDENTS:", detail.students);
+
+    const match = routes.find(r => r.name === detail.routeName);
+    detail.routeId = match ? match._id : "";
+
+    setEditData(detail);        // lưu dữ liệu chi tiết để truyền vào form
+    setIsEditModalOpen(true);   // mở form sửa
+  };
+
+  // Xóa lịch trình
+  const handleDelete = async (id: string) => {
+    if (!id) return alert("Không tìm thấy ID lịch trình");
+
+    const confirmDelete = window.confirm("Bạn có chắc muốn xoá lịch trình này?");
+    if (!confirmDelete) return;
 
     try {
-      await api(`/schedules/${selectedSchedule._id}`, { method: "DELETE" });
-      setSchedules((prev) => prev.filter((s) => s._id !== selectedSchedule._id));
-      setSelectedSchedule(null);
-      alert("Xóa thành công!");
-    } catch {
-      alert("Xóa thất bại");
+      const res = await fetch(`http://localhost:8080/schedules/${id}/delete`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || "Xoá thất bại!");
+      }
+
+      alert("Xoá thành công!");
+      fetchSchedules(); // reload danh sách
+    } catch (err: any) {
+      alert("Lỗi khi xoá: " + err.message);
     }
   };
 
-  const handleEdit = (sch: Schedule) => {
-    setEditingSchedule(sch);
-    setIsAddModalOpen(true);
-  };
 
-  const openDetail = (sch: Schedule) => {
-    setSelectedSchedule(sch);
-    setIsDetailModalOpen(true);
-  };
-
-  const closeAddModal = () => {
-    setIsAddModalOpen(false);
-    setEditingSchedule(null);
-  };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-xl text-gray-600">Đang tải dữ liệu...</div>
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-2xl text-green-600">Đang tải dữ liệu...</div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        {/* Tìm kiếm + Nút */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex justify-between items-center flex-wrap gap-4">
-            <div className="flex items-center gap-4 flex-1 max-w-md">
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 transition"
-                />
-                <svg
-                  className="absolute left-4 top-4 w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setEditingSchedule(null);
-                  setIsAddModalOpen(true);
-                }}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 shadow-sm transition"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Thêm
-              </button>
-
-              <button
-                onClick={() => selectedSchedule && handleEdit(selectedSchedule)}
-                className={`px-6 py-3 rounded-lg font-medium flex items-center gap-2 shadow-sm transition ${
-                  selectedSchedule
-                    ? "bg-blue-600 hover:bg-blue-700 text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-                disabled={!selectedSchedule}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                Sửa
-              </button>
-
-              <button
-                onClick={handleDelete}
-                className={`px-6 py-3 rounded-lg font-medium flex items-center gap-2 shadow-sm transition ${
-                  selectedSchedule
-                    ? "bg-red-600 hover:bg-red-700 text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-                disabled={!selectedSchedule}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2.175 2.175 0 0116.138 21H7.862a2.175 2.175 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-                Xóa
-              </button>
-            </div>
+    <div className="min-h-screen bg-gray-100">
+      {/* Thanh tìm kiếm + nút hành động */}
+      <div className="bg-white shadow-md px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Tìm kiếm..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg w-80 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <svg
+              className="absolute left-3 top-3.5 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
           </div>
         </div>
 
-        {/* Bảng */}
-        <div className="overflow-x-auto">
+        <div className="flex gap-3">
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-3 rounded-lg font-medium hover:from-green-500 hover:to-green-600 shadow-md transition"
+          >
+            Thêm
+          </button>
+          <button 
+            onClick={handleEdit}
+            className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-6 py-3 rounded-lg font-medium hover:from-yellow-500 hover:to-yellow-600 shadow-md transition">
+            Sửa
+          </button>
+          <button 
+            onClick={() => {
+              if (!selectedSchedule) return alert("Vui lòng chọn lịch trình để xoá!");
+              handleDelete(selectedSchedule.id);
+            }} 
+            className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg font-medium hover:from-red-600 hover:to-red-700 shadow-md transition">
+            Xóa
+          </button>
+        </div>
+      </div>
+
+      {/* Bảng danh sách */}
+      <div className="p-6">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <table className="w-full">
-            <thead className="bg-green-600 text-white">
+            <thead className="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
               <tr>
                 <th className="px-6 py-4 text-left font-medium">Tên lịch trình</th>
                 <th className="px-6 py-4 text-left font-medium">Tuyến đường</th>
@@ -192,42 +217,30 @@ export default function ScheduleManagement() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="text-center py-16 text-gray-500 text-lg">
+                <tr key="empty-row">
+                  <td colSpan={4} className="text-center py-20 text-gray-500 text-lg">
                     Chưa có lịch trình nào
                   </td>
                 </tr>
               ) : (
-                filtered.map((s: any) => (
+                filtered.map((s) => (
                   <tr
-                    key={s._id}
-                    className={`hover:bg-gray-50 transition cursor-pointer ${
-                      selectedSchedule?._id === s._id ? "bg-blue-50" : ""
-                    }`}
-                    onClick={() => setSelectedSchedule(s)}
-                  >
-                    <td className="px-6 py-4 font-medium">{s.name || "Chưa đặt tên"}</td>
-
-                    {/* Tuyến đường – giờ đã có dữ liệu */}
-                    <td className="px-6 py-4 text-gray-700 font-medium">
-                      {s.route.name}
+                      key={s.id}
+                      onClick={() => handleRowClick(s.id)}
+                      className={`cursor-pointer transition 
+                                  ${selectedSchedule?.id === s.id ? "bg-green-100" : "hover:bg-gray-50"}
+                                `}
+                    >
+                    <td className="px-6 py-5 font-medium text-gray-800">{s.name}</td>
+                    <td className="px-6 py-5 text-gray-700">{s.routeName}</td>
+                    <td className="px-6 py-5 text-gray-600">
+                      {new Date(s.dateStart).toLocaleDateString("vi-VN")} to{" "}
+                      {new Date(s.dateEnd).toLocaleDateString("vi-VN")}
                     </td>
-
-                    {/* Kỳ hoạt động */}
-                    <td className="px-6 py-4">
-                      {s.dateStart && s.dateEnd
-                        ? `${new Date(s.dateStart).toLocaleDateString("vi-VN")} - ${new Date(s.dateEnd).toLocaleDateString("vi-VN")}`
-                        : "Chưa xác định"}
-                    </td>
-
-                    {/* Xem chi tiết */}
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-6 py-5 text-center">
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openDetail(s);
-                        }}
-                        className="text-blue-600 hover:text-blue-800 font-medium underline"
+                        onClick={() => openDetail(s)}
+                        className="text-green-600 hover:text-green-800 font-semibold underline transition"
                       >
                         Xem
                       </button>
@@ -240,22 +253,28 @@ export default function ScheduleManagement() {
         </div>
       </div>
 
-      {/* Modals */}
       <AddScheduleModal
-        isOpen={isAddModalOpen}
-        onClose={closeAddModal}
-        editingSchedule={editingSchedule}
-        onSuccess={() => {
-          fetchSchedules();
-          closeAddModal();
-        }}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSuccess={fetchSchedules}
+        initialData={editData}
+        editMode={true}
       />
 
-      <DetailScheduleModal
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-        scheduleId={selectedSchedule?._id || ""}
+      <AddScheduleModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSuccess={fetchSchedules}   // ← quan trọng: reload danh sách sau khi tạo
       />
+
+      {/* Modal Chi tiết */}
+      {selectedSchedule && (
+        <DetailScheduleModal
+          isOpen={isDetailModalOpen}
+          onClose={() => setIsDetailModalOpen(false)}
+          scheduleId={selectedSchedule.id}
+        />
+      )}
     </div>
   );
 }

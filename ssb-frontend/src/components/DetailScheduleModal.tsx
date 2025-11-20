@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { api } from "@/lib/api";
+import api from "@/services/api";
 
 interface DetailScheduleModalProps {
   isOpen: boolean;
@@ -11,20 +11,27 @@ interface DetailScheduleModalProps {
 }
 
 interface ScheduleDetail {
-  _id: string;
+  scheduleId: string;
   name: string;
+  status: string;
   dateStart: string;
   dateEnd: string;
   routeName: string;
-  students: { name: string }[];
-  stations: string[];
-  totalStudents: number;
-}
 
-interface Timetable {
-  dayOfWeek: string;
-  pickupTime: string;
-  dropoffTime: string;
+  stops: { id: string; order: number; name: string }[];
+
+  students: { 
+    id: string; 
+    fullName: string; 
+    stopName: string; 
+  }[];
+
+  timeTables: {
+    id: string;
+    dayOfWeek: string;
+    pickupTime: string;
+    dropoffTime: string;
+  }[];
 }
 
 export default function DetailScheduleModal({
@@ -35,43 +42,28 @@ export default function DetailScheduleModal({
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
   const [schedule, setSchedule] = useState<ScheduleDetail | null>(null);
-  const [timetables, setTimetables] = useState<Timetable[]>([]); // Thêm state riêng
   const [loading, setLoading] = useState(false);
   const [timetableLoading, setTimetableLoading] = useState(false);
 
-  // === 1. GỌI CHI TIẾT LỊCH TRÌNH (giữ nguyên) ===
+  // Lấy chi tiết lịch trình
   const fetchScheduleDetail = async () => {
     if (!scheduleId || !isOpen) return;
+
     setLoading(true);
     try {
-      const data = await api<ScheduleDetail>(`/schedules/detail/${scheduleId}`);
-      setSchedule(data);
+      const res = await api.get<ScheduleDetail>(`/schedules/${scheduleId}`);
+      setSchedule(res.data);
     } catch (err) {
+      console.error(err);
       alert("Không tải được chi tiết lịch trình");
     } finally {
       setLoading(false);
     }
   };
 
-  // === 2. GỌI THỜI KHÓA BIỂU RIÊNG (mới) ===
-  const fetchTimetables = async () => {
-    if (!isOpen) return;
-    setTimetableLoading(true);
-    try {
-      const data = await api<Timetable[]>("/schedules/timetables");
-      setTimetables(data);
-    } catch (err) {
-      console.error("Lỗi tải thời khóa biểu:", err);
-      setTimetables([]);
-    } finally {
-      setTimetableLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (isOpen) {
       fetchScheduleDetail();
-      fetchTimetables(); // Gọi song song
     }
   }, [isOpen, scheduleId]);
 
@@ -88,12 +80,17 @@ export default function DetailScheduleModal({
   }
 
   // Dữ liệu phân trang
-  const students = schedule?.students.map((s) => s.name) || [];
-  const stations = schedule?.stations || [];
-  const totalPages = Math.ceil(Math.max(students.length, stations.length) / itemsPerPage);
-  const currentStudents = students.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-  const currentStations = stations.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  const students = schedule?.students?.map((s) => ({
+    name: s.fullName,
+    stop: s.stopName
+  })) || [];
+  const totalPages = Math.ceil(students.length / itemsPerPage);
+  const currentStudents = students.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
 
+  // Giao diện Chi tiết lịch trình
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
@@ -129,76 +126,49 @@ export default function DetailScheduleModal({
                   </tr>
                 </thead>
                 <tbody>
-                  {timetables.length > 0 ? (
-                    timetables
+                  {schedule?.timeTables?.length ? (
+                    schedule.timeTables
                       .sort((a, b) => {
-                        const order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                        const order = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
                         return order.indexOf(a.dayOfWeek) - order.indexOf(b.dayOfWeek);
                       })
-                      .map((item, index) => (
-                        <tr key={index} className="border-t hover:bg-gray-50">
-                          <td className="px-6 py-4 font-medium">{item.dayOfWeek}</td>
-                          <td className="px-6 py-4 text-green-600 font-medium">{item.pickupTime}</td>
-                          <td className="px-6 py-4 text-red-600 font-medium">{item.dropoffTime}</td>
+                      .map((item) => (
+                        <tr key={item.id}>
+                          <td>{item.dayOfWeek}</td>
+                          <td>{item.pickupTime}</td>
+                          <td>{item.dropoffTime}</td>
                         </tr>
                       ))
                   ) : (
-                    <tr>
-                      <td colSpan={3} className="text-center py-4 text-gray-500">
-                        Chưa có thời khóa biểu
-                      </td>
-                    </tr>
+                    <tr><td colSpan={3}>Chưa có thời khóa biểu</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
           </div>
+                  {/* Danh sách học sinh */}
+          <div>
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Danh sách học sinh</h3>
 
-          {/* 2 cột: Học sinh + Trạm đón */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Danh sách học sinh */}
-            <div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Danh sách học sinh</h3>
-              <div className="space-y-3 max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
-                {currentStudents.length === 0 ? (
-                  <div className="text-center text-gray-500 py-4">
-                    Chưa có học sinh
+            <div className="space-y-3 max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
+              {currentStudents.length === 0 ? (
+                <div className="text-center text-gray-500 py-4">
+                  Chưa có học sinh
+                </div>
+              ) : (
+                currentStudents.map((student, i) => (
+                  <div
+                    key={i}
+                    className="bg-white border border-gray-300 rounded-lg px-5 py-3 shadow-sm hover:shadow transition"
+                  >
+                    <div className="font-semibold text-gray-800">{student.name}</div>
+                    <div className="text-sm text-gray-500">Trạm: {student.stop}</div>
                   </div>
-                ) : (
-                  currentStudents.map((name, i) => (
-                    <div
-                      key={i}
-                      className="bg-white border border-gray-300 rounded-lg px-5 py-3 shadow-sm hover:shadow transition"
-                    >
-                      {name}
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Các trạm đón */}
-            <div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Các trạm đón</h3>
-              <div className="space-y-3 max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
-                {currentStations.length === 0 ? (
-                  <div className="text-center text-gray-500 py-4">
-                    Chưa có trạm đón
-                  </div>
-                ) : (
-                  currentStations.map((station, i) => (
-                    <div
-                      key={i}
-                      className="bg-white border border-gray-300 rounded-lg px-5 py-3 shadow-sm hover:shadow transition flex items-center gap-3"
-                    >
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      {station}
-                    </div>
-                  ))
-                )}
-              </div>
+                ))
+              )}
             </div>
           </div>
+
         </div>
 
         {/* Footer phân trang */}

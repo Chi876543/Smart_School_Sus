@@ -13,7 +13,7 @@ export default function TopBar({username, onLogout}: TopBarProps){
             <div className={styles.leftSection}>SSB</div>
             <div className={styles.rightSection}>
                 <span className={styles.username}>{username}</span>
-                <button className={styles.logoutButton}>Đăng xuất</button>
+                <button className={styles.logoutButton} onClick={onLogout}>Đăng xuất</button>
             </div>
         </div>
     );

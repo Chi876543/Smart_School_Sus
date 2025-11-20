@@ -47,16 +47,17 @@ export class ScheduleController {
   }
 
   // Cập nhập Schedule
-  @Put(':id')
+  @Put(':id/update')
   update(@Param('id') id: string, @Body() updateDto: UpdateScheduleDTO) {
     return this.scheduleService.update(id, updateDto);
   }
 
   // Xóa lịch trình (trạng thái cancel)
-  @Delete(':id')
+  @Delete(':id/delete')
   remove(@Param('id') id: string) {
     return this.scheduleService.remove(id);
   }
+
 
 
 }

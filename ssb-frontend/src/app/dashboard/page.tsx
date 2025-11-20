@@ -6,9 +6,10 @@ import LeftSidebar from "../../components/leftSideBar/LeftSideBar";
 import TrackingSection from "@/components/map/TrackingSection";
 import ScheduleManagement from "@/components/ScheduleManagement";
 import Assignment from "../../components/assignment/DriverAssignment";
+
 export default function DashboardPage() {
   const [summary, setSummary] = useState<any>(null);
-  const [username, setUsername] = useState<string>("Admin");
+  const [username, setUsername] = useState("");
   const [activeMenu, setActiveMenu] = useState<string>("overview");
 
   // // ←←← THÊM CHỈ 1 DÒNG NÀY: Đọc trang hiện tại từ URL
@@ -39,23 +40,41 @@ export default function DashboardPage() {
   //   return () => document.removeEventListener("click", handleClick);
   // }, []);
 
+
   useEffect(() => {
-    const useFake = localStorage.getItem("USE_FAKE") === "Admin";
-    if (useFake) {
+    // Lấy token từ cookie
+    const token = document.cookie
+      .split("; ")
+      .find((c) => c.startsWith("token="))
+      ?.split("=")[1];
+    
+    // Nếu không có token, chuyển hướng về trang đăng nhập  
+    if (!token) {
+      window.location.href = "/login";
+      return;
+    }
+    // Lấy username từ localStorage  
+    const username = typeof window !== "undefined"
+    ? localStorage.getItem("username")
+    : null;
+    setUsername(username || "");
+    if (username) {
       setSummary({ buses: 10, drivers: 5, students: 120 });
       return;
     }
-    const token = localStorage.getItem("token");
+
+    // Gọi API lấy dữ liệu tổng quan
     api
-      .get("/dashboard", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .get("/dashboard")
       .then((res) => setSummary(res.data))
       .catch((err) => console.error("Dashboard API error", err));
   }, []);
 
+  // Xử lý đăng xuất
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    console.log("Logging out...");
+    document.cookie =
+      "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     localStorage.removeItem("username");
     window.location.href = "/login";
   };
@@ -67,6 +86,7 @@ export default function DashboardPage() {
     { label: "Phân công lịch trình", key: "assign" },
   ];
 
+  // Giao diện trang dashboard
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <TopBar username={username} onLogout={handleLogout} />

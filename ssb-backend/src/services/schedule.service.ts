@@ -201,6 +201,7 @@ export class ScheduleService {
     if (!schedule) throw new NotFoundException(`Schedule ${id} not found`);
 
     schedule.status = 'cancelled';
+    await schedule.save();
   }
 
   async createTrip(schedule: Schedule, students: string[]): Promise<any[]> {

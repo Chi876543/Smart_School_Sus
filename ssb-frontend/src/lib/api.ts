@@ -1,24 +1,20 @@
-// ssb-frontend/lib/api.ts → PHẢI LÀ DÒNG NÀY, KHÔNG ĐƯỢC LÀ localhost:3000 hay 3001
-const API_BASE = "/api";   // ← ĐÚNG
-
-export async function api<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const url = `${API_BASE}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
-  console.log("Calling API:", url); // ← thêm dòng này để debug
-
-  const res = await fetch(url, {
+// src/lib/api.ts
+export const api = async <T>(url: string, options?: RequestInit): Promise<T> => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}${url}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      ...options.headers,
+      ...options?.headers,
     },
   });
 
+  const data = await res.json().catch(() => ({}));
+
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: "Lỗi server" }));
-    throw new Error(error.message || `HTTP ${res.status}`);
+    console.warn("API lỗi:", url, res.status, data);
+    // Không throw → không crash app
+    return data as T;
   }
-  return res.json();
-}
+
+  return data as T;
+};
