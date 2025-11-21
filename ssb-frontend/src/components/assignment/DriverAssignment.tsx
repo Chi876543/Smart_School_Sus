@@ -182,6 +182,7 @@ export default function DriverAssignment() {
 
             <tbody>
               {filteredData.map((item, index) => {
+            if (item.status === "cancelled"  || item.status === "Hủy bỏ") return null;
                 const clickable = canInteract(item.status);
 
                 return (
