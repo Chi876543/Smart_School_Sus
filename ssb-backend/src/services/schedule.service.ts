@@ -201,6 +201,8 @@ export class ScheduleService {
     if (!schedule) throw new NotFoundException(`Schedule ${id} not found`);
 
     schedule.status = 'cancelled';
+    schedule.driverId = null;
+    schedule.busId = null;
     await schedule.save();
   }
 
