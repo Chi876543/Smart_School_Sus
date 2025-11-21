@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "@/services/api";
 import { validateLogin } from "@/utils/validateLogin";
 import Toast from "@/components/toast/toast";
@@ -12,11 +12,15 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
 
   // Hiển thị thông báo đăng xuất thành công nếu có
-  if (localStorage.getItem("logoutSuccess") === "true") {
+  useEffect(() => {
+    const logoutSuccess = localStorage.getItem("logoutSuccess");
+    if (logoutSuccess === "true") {
       setShowToast1(true);
       localStorage.removeItem("logoutSuccess");
-      setTimeout(() => setShowToast1(false), 3000);
+      const timer = setTimeout(() => setShowToast1(false), 3000);
+      return () => clearTimeout(timer); // cleanup on unmount
     }
+  }, []);
   
   // Xử lý đăng nhập
   const handleLogin = async (e: React.FormEvent) => {

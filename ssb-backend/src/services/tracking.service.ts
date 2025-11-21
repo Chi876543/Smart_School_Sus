@@ -216,7 +216,7 @@ export class TrackingService {
         clearInterval(interval); 
         return; 
       } 
-      
+
       const currentPosition = routeLine[index];
       let nextStop = stops[currentStopIndex];
       let distance = -1;
