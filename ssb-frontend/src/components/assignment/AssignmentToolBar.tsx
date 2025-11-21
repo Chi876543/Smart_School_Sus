@@ -9,6 +9,8 @@ export interface AssignmentToolbarProps {
   onSearch?: (value: string) => void;
   onSearchChange?: (value: string) => void;
   onEdit?: () => void;
+  filterStatus: string; // ví dụ: "ALL" | "Chưa phân công" | "Đã phân công" | ...
+  onFilterStatusChange: (status: string) => void;
   onFilterClick?: () => void;
 }
 
@@ -18,8 +20,21 @@ export default function AssignmentToolbar({
   onSearch,
   onSearchChange,
   onEdit,
+  filterStatus,
+  onFilterStatusChange,
   onFilterClick,
 }: AssignmentToolbarProps) {
+  const [open, setOpen] = React.useState(false);
+  const statuses = [
+    { label: "Tất cả", value: "ALL" },
+    { label: "Chưa phân công", value: "Chưa phân công" },
+    { label: "Đã phân công", value: "Đã phân công" },
+    { label: "Đang hoạt động", value: "Đang hoạt động" },
+    { label: "Đã hoàn thành", value: "Đã hoàn thành" },
+    { label: "Tạm dừng", value: "Tạm dừng" },
+    { label: "Hủy bỏ", value: "Hủy bỏ" },
+  ];
+
   return (
     <div className={styles.toolbar}>
       {/* BÊN TRÁI: Search + Filter */}
@@ -32,16 +47,39 @@ export default function AssignmentToolbar({
             onChange={onSearchChange}
           />
         </div>
+        <div className={styles.filterWrapper}>
+          <button
+            type="button"
+            className={styles.filterButton}
+            onClick={() => {
+              setOpen((v) => !v);
+            }}
+          >
+            <img src="/filter.png" className={styles.icon} />
+          </button>
 
-        <button
-          type="button"
-          className={styles.iconButton}
-          onClick={onFilterClick}
-        >
-          <img src="/filter.svg" alt="Lọc" className={styles.icon} />
-        </button>
+          {open && (
+            <div className={styles.filterDropdown}>
+              {statuses.map((status) => (
+                <div
+                  key={status.value}
+                  className={`${styles.filterItem} ${
+                    filterStatus === status.value
+                      ? styles.filterItemSelected
+                      : ""
+                  }`}
+                  onClick={() => {
+                    onFilterStatusChange(status.value);
+                    setOpen(false);
+                  }}
+                >
+                  {status.label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-
       {/* BÊN PHẢI: Chỉ còn nút Sửa */}
       <div className={styles.actions}>
         <button
