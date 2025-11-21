@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import AssignmentToolbar from "./AssignmentToolBar";
 import styles from "./DriverAssignment.module.css";
 import AssignSchedulePanel, { ScheduleInfo } from "./AssignSchedulePanel";
+import Toast from "@/components/toast/toast"; 
 
 // == API đã chuẩn hóa ==
 import {
@@ -28,7 +29,14 @@ export default function DriverAssignment() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+<<<<<<< HEAD
   const [filterStatus, setFilterStatus] = useState("ALL");
+=======
+  // Toast
+  const [showToastEdit, setShowToastEdit] = useState(false);
+  const [showToastEditSuccess, setShowToastEditSuccess] = useState(false);
+  const [showToastEditFail, setShowToastEditFail] = useState(false);
+>>>>>>> 7806d00fba6744ba157154eef21ac15dacc36258
   // PANEL
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [panelMode, setPanelMode] = useState<"create" | "edit">("create");
@@ -109,7 +117,8 @@ export default function DriverAssignment() {
   // ======= HANDLE EDIT ========
   const handleEdit = () => {
     if (selectedIndex === null) {
-      alert("Vui lòng chọn 1 dòng để sửa");
+      setShowToastEdit(true);
+      setTimeout(() => setShowToastEdit(false), 2000);
       return;
     }
 
@@ -231,17 +240,28 @@ export default function DriverAssignment() {
 
             await reloadFromApi();
             setIsPanelOpen(false);
+            // Hiện toast thành công
+            setShowToastEditSuccess(true);
+            setTimeout(() => setShowToastEditSuccess(false), 2000);
           } catch (err: any) {
             const msg =
               err.response?.data?.message ||
               err.message ||
               "Có lỗi xảy ra khi phân công lịch trình";
+            
             setPanelError(msg);
+            // Hiện toast thất bại
+            setShowToastEditFail(true);
+            setTimeout(() => setShowToastEditFail(false), 2000);
           } finally {
             setLoading(false);
           }
         }}
       />
+      {/* Toast */}
+      {showToastEdit && <Toast message="Vui lòng chọn 1 dòng để sửa !" type="error" />}
+      {showToastEditSuccess && <Toast message="Chỉnh sửa phân công thành công !" type="success" />}
+      {showToastEditFail && <Toast message="Chỉnh sửa phân công thất bại !" type="error" />}
     </div>
   );
 }

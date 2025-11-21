@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import styles from "./AssignSchedulePanel.module.css";
+import Toast from "@/components/toast/toast"; 
 
 export interface DriverOption {
   id: string;
@@ -60,6 +61,9 @@ export default function AssignSchedulePanel({
   const [isDriverOpen, setIsDriverOpen] = useState(false);
   const [isBusOpen, setIsBusOpen] = useState(false);
 
+  // Toast
+  const [showToast, setShowToast] = useState(false);
+
   useEffect(() => {
     if (open) {
       setDriverId(initialDriverId || "");
@@ -77,7 +81,8 @@ export default function AssignSchedulePanel({
     e.preventDefault();
 
     if (!driverId || !busId) {
-      alert("Vui lòng chọn đầy đủ tài xế và xe buýt.");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
       return;
     }
 
@@ -236,6 +241,8 @@ export default function AssignSchedulePanel({
           </div>
         </form>
       </div>
+      {/* Toast */}
+      {showToast && (<Toast message="Vui lòng chọn đầy đủ tài xế và xe buýt." type="error" /> )}
     </div>
   );
 }

@@ -28,10 +28,10 @@ export class Schedule extends Document {
   dateEnd: Date;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Bus', required: false, default: null })
-  busId?: mongoose.Schema.Types.ObjectId;
+  busId?: mongoose.Schema.Types.ObjectId | null;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: false, default: null })
-  driverId?: mongoose.Schema.Types.ObjectId;
+  driverId?: mongoose.Schema.Types.ObjectId | null;
 
   @Prop({ type: Types.ObjectId, ref: 'Route', required: true })
   routeId: Types.ObjectId;

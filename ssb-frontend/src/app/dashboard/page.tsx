@@ -6,11 +6,13 @@ import LeftSidebar from "../../components/leftSideBar/LeftSideBar";
 import TrackingSection from "@/components/map/TrackingSection";
 import ScheduleManagement from "@/components/ScheduleManagement";
 import Assignment from "../../components/assignment/DriverAssignment";
+import Toast from "@/components/toast/toast";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<any>(null);
   const [username, setUsername] = useState("");
   const [activeMenu, setActiveMenu] = useState<string>("overview");
+  const [showToast, setShowToast] = useState(false);
 
   // // ←←← THÊM CHỈ 1 DÒNG NÀY: Đọc trang hiện tại từ URL
   // const [currentPage, setCurrentPage] = useState("overview");
@@ -53,6 +55,12 @@ export default function DashboardPage() {
       window.location.href = "/login";
       return;
     }
+    // Hiển thị thông báo đăng nhập thành công nếu có
+    if (localStorage.getItem("loginSuccess") === "true") {
+      setShowToast(true);
+      localStorage.removeItem("loginSuccess");
+      setTimeout(() => setShowToast(false), 3000);
+    }
     // Lấy username từ localStorage  
     const username = typeof window !== "undefined"
     ? localStorage.getItem("username")
@@ -72,7 +80,7 @@ export default function DashboardPage() {
 
   // Xử lý đăng xuất
   const handleLogout = () => {
-    console.log("Logging out...");
+    localStorage.setItem("logoutSuccess", "true");
     document.cookie =
       "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     localStorage.removeItem("username");
@@ -88,6 +96,7 @@ export default function DashboardPage() {
 
   // Giao diện trang dashboard
   return (
+    
     <div className="flex flex-col h-screen bg-gray-100">
       <TopBar username={username} onLogout={handleLogout} />
       <div className="flex flex-1">
@@ -126,6 +135,9 @@ export default function DashboardPage() {
           {activeMenu === "assign" && <Assignment />}
         </div>
       </div>
+      {/* Hiện thị toast login success */}
+      {showToast && <Toast message="Đăng nhập thành công!" type="success" />}
     </div>
+    
   );
 }

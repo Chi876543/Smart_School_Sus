@@ -5,9 +5,11 @@ import { AuthModule } from './modules/auth.module';
 import { TrackingModule } from './modules/tracking.module';
 import { AssignModule } from './modules/assignment.module';
 import { ScheduleModule } from './modules/schedule.module';
+import { TripModule } from './modules/trip.module';
 
 import { DatabaseModule } from './modules/database.module';
 import { StudentModule } from './modules/student.module';
+import { Trip } from './schema';
 
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import { StudentModule } from './modules/student.module';
     ScheduleModule,
     AuthModule,
     TrackingModule,
+    TripModule,
 
   ],
 })
