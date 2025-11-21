@@ -29,6 +29,7 @@ export default function DriverAssignment() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState("ALL");
   // Toast
   const [showToastEdit, setShowToastEdit] = useState(false);
   const [showToastEditSuccess, setShowToastEditSuccess] = useState(false);
@@ -82,19 +83,32 @@ export default function DriverAssignment() {
     reloadFromApi();
   }, []);
   const canInteract = (status: string) => {
-    return status === "Chưa phân công" || status === "Đã phân công";
+    return (
+      status === "Chưa phân công" ||
+      status === "Đã phân công" ||
+      status === "Đang hoạt động"
+    );
   };
-
+  const handleFilterStatusChange = (status: string) => {
+    console.log("Đã chọn trạng thái:", status);
+    setFilterStatus(status);
+  };
   // ======= SEARCH FILTER ========
   const filteredData = data.filter((item) => {
     const keyword = search.toLowerCase().trim();
-    if (!keyword) return true;
 
-    return (
+    // 1. Lọc theo search
+    const matchSearch =
+      !keyword ||
       item.routeName.toLowerCase().includes(keyword) ||
       item.driver.toLowerCase().includes(keyword) ||
-      item.vehicle.toLowerCase().includes(keyword)
-    );
+      item.vehicle.toLowerCase().includes(keyword);
+
+    // 2. Lọc theo status
+    const matchStatus =
+      filterStatus === "ALL" ? true : item.status === filterStatus;
+
+    return matchSearch && matchStatus;
   });
 
   // ======= HANDLE EDIT ========
@@ -147,7 +161,8 @@ export default function DriverAssignment() {
         onSearch={setSearch}
         onSearchChange={setSearch}
         onEdit={handleEdit}
-        onFilterClick={() => {}}
+        filterStatus={filterStatus}
+        onFilterStatusChange={handleFilterStatusChange}
       />
 
       <div className={styles.tableWrapper}>
