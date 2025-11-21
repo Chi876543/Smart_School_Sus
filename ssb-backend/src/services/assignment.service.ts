@@ -67,7 +67,9 @@ export class AssignScheduleService {
       busId,
     );
     if (existing)
-      throw new BadRequestException('Tài xế hoặc xe buýt đang bận lịch khác.');
+      throw new BadRequestException(
+        `Tài xế hoặc xe buýt đang bận lịch khác (${existing.name})`,
+      );
 
     // Cập nhật lịch trình
     const updated = await this.scheduleRepo.assignSchedule(

@@ -33,6 +33,7 @@ export default function AddScheduleModal({
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [editId, setEditId] = useState<string | null>(null);
 
+  // Reset form khi mở modal tạo mới hoặc đóng
   const resetForm = () => {
     setStep(1);
     setScheduleName("");
@@ -44,11 +45,10 @@ export default function AddScheduleModal({
     setEditId(null);
   };
 
+  // Load dữ liệu khi chỉnh sửa
   useEffect(() => {
-    console.log("Initial Data:", initialData);
     if (isOpen && isEditMode && initialData) {
       setEditId(initialData.scheduleId);
-      console.log("initialData.scheduleId:", initialData.scheduleId);
       setScheduleName(initialData.name || "");
       setRouteId(initialData.routeId);
       setPeriodStart(initialData.dateStart?.split("T")[0] || "");
@@ -61,36 +61,48 @@ export default function AddScheduleModal({
           drop: t.dropoffTime || "",
         }))
       );
-      setSelectedStudents(
-        initialData.students.map((s: any) => s.id || s._id)
-      );
+      setSelectedStudents(initialData.students.map((s: any) => s.id || s._id));
     } else if (isOpen && !isEditMode) {
       resetForm();
     }
   }, [isOpen, initialData, isEditMode]);
 
+  // Kiểm tra hợp lệ để sang bước 2 (không alert, chỉ chặn)
+  const canGoToNextStep = (): boolean => {
+    if (!periodStart || !periodEnd) return false;
+    return periodStart < periodEnd; // Phải nhỏ hơn, không được bằng
+  };
+
+  // Xử lý khi nhấn "Tiếp theo" ở Step 1
+  const handleNextStep = () => {
+    if (canGoToNextStep()) {
+      setStep(2);
+    }
+    // Nếu không hợp lệ → im lặng, không cho đi tiếp (không alert)
+  };
+
+  // Gửi dữ liệu lên server
   const handleSubmit = async () => {
+    // Kiểm tra ngày bắt đầu < ngày kết thúc (nghiêm ngặt)
     if (!periodStart || !periodEnd || periodStart >= periodEnd) {
-      alert("Ngày bắt đầu phải trước ngày kết thúc!");
+      // Không hiện alert → chỉ chặn submit
       return;
     }
+
     if (!scheduleName.trim() || !routeId || timeRows.length === 0) {
-      alert("Vui lòng điền đầy đủ thông tin!");
+      // Thiếu thông tin → chặn submit, không cảnh báo
       return;
     }
 
     setLoading(true);
     try {
       const isEdit = isEditMode && editId;
-      console.log("editId:", editId);
       const url = isEdit
         ? `http://localhost:8080/schedules/${editId}/update`
         : "http://localhost:8080/schedules/create";
 
-      const method = isEdit ? "PUT" : "POST";
-
       const res = await fetch(url, {
-        method,
+        method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: scheduleName.trim(),
@@ -107,11 +119,13 @@ export default function AddScheduleModal({
         throw new Error(err || "Lỗi server");
       }
 
-      alert(isEdit ? "Cập nhật thành công!" : "Tạo lịch trình thành công!");
+      // Thành công → gọi callback và đóng
       onSuccess();
       onClose();
     } catch (err: any) {
-      alert("Lỗi: " + err.message);
+      // Có lỗi mạng/server → vẫn không hiện alert (theo yêu cầu)
+      console.error("Lỗi khi lưu lịch trình:", err);
+      // Nếu sau này muốn hiện toast thì thêm sau, hiện tại để im lặng
     } finally {
       setLoading(false);
     }
@@ -120,10 +134,17 @@ export default function AddScheduleModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
-      onClick={() => { onClose(); resetForm(); }}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
-        onClick={e => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
+      onClick={() => {
+        onClose();
+        resetForm();
+      }}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 text-center rounded-t-2xl">
           <h2 className="text-3xl font-bold">
             {isEditMode ? "Chỉnh sửa lịch trình" : "Thêm lịch trình mới"}
@@ -133,13 +154,21 @@ export default function AddScheduleModal({
         <div className="p-8">
           {step === 1 ? (
             <Step1ScheduleInfo
-              scheduleName={scheduleName} setScheduleName={setScheduleName}
-              routeId={routeId} setRouteId={setRouteId}
-              periodStart={periodStart} setPeriodStart={setPeriodStart}
-              periodEnd={periodEnd} setPeriodEnd={setPeriodEnd}
-              timeRows={timeRows} setTimeRows={setTimeRows}
-              onNext={() => periodStart < periodEnd ? setStep(2) : alert("Ngày bắt đầu phải trước ngày kết thúc!")}
-              onCancel={() => { onClose(); resetForm(); }}
+              scheduleName={scheduleName}
+              setScheduleName={setScheduleName}
+              routeId={routeId}
+              setRouteId={setRouteId}
+              periodStart={periodStart}
+              setPeriodStart={setPeriodStart}
+              periodEnd={periodEnd}
+              setPeriodEnd={setPeriodEnd}
+              timeRows={timeRows}
+              setTimeRows={setTimeRows}
+              onNext={handleNextStep} // Chỉ đi tiếp nếu ngày bắt đầu < ngày kết thúc
+              onCancel={() => {
+                onClose();
+                resetForm();
+              }}
             />
           ) : (
             <Step2StudentSelection
@@ -149,7 +178,7 @@ export default function AddScheduleModal({
               onBack={() => setStep(1)}
               onConfirm={handleSubmit}
               loading={loading}
-              isEditMode={isEditMode}   // ← thêm vào đây
+              isEditMode={isEditMode}
             />
           )}
         </div>

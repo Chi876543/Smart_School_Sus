@@ -122,6 +122,8 @@ async function seed() {
 
   const timetables = [
     { dayOfWeek: 'Monday', pickupTime: '06:30', dropoffTime: '15:00' },
+
+    { dayOfWeek: 'Monday', pickupTime: '06:30', dropoffTime: '15:00' },
     { dayOfWeek: 'Tuesday', pickupTime: '06:30', dropoffTime: '15:00' },
     { dayOfWeek: 'Wednesday', pickupTime: '06:30', dropoffTime: '15:00' },
     { dayOfWeek: 'Thursday', pickupTime: '06:30', dropoffTime: '15:00' },

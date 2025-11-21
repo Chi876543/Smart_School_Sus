@@ -12,43 +12,36 @@ interface DetailScheduleModalProps {
 
 interface ScheduleDetail {
   scheduleId: string;
-  name: string;
-  status: string;
-  dateStart: string;
-  dateEnd: string;
-  routeName: string;
-
-  stops: { id: string; order: number; name: string }[];
-
-  students: { 
-    id: string; 
-    fullName: string; 
-    stopName: string; 
-  }[];
-
+  students: { id: string; fullName: string; stopName: string }[];
   timeTables: {
     id: string;
-    dayOfWeek: string;
-    pickupTime: string;
-    dropoffTime: string;
+    dayOfWeek: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+    pickupTime: string | null;
+    dropoffTime: string | null;
   }[];
 }
+
+const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const dayLabel: Record<string, string> = {
+  Monday: "Thứ 2",
+  Tuesday: "Thứ 3",
+  Wednesday: "Thứ 4",
+  Thursday: "Thứ 5",
+  Friday: "Thứ 6",
+  Saturday: "Thứ 7",
+  Sunday: "Chủ nhật",
+};
 
 export default function DetailScheduleModal({
   isOpen,
   onClose,
   scheduleId,
 }: DetailScheduleModalProps) {
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
   const [schedule, setSchedule] = useState<ScheduleDetail | null>(null);
   const [loading, setLoading] = useState(false);
-  const [timetableLoading, setTimetableLoading] = useState(false);
-
-  // Lấy chi tiết lịch trình
+// Lấy chi tiết lịch trình từ backend khi modal mở
   const fetchScheduleDetail = async () => {
     if (!scheduleId || !isOpen) return;
-
     setLoading(true);
     try {
       const res = await api.get<ScheduleDetail>(`/schedules/${scheduleId}`);
@@ -60,137 +53,113 @@ export default function DetailScheduleModal({
       setLoading(false);
     }
   };
-
+// Gọi API mỗi khi modal mở hoặc scheduleId thay đổi
   useEffect(() => {
-    if (isOpen) {
-      fetchScheduleDetail();
-    }
+    if (isOpen) fetchScheduleDetail();
   }, [isOpen, scheduleId]);
 
   if (!isOpen) return null;
 
-  if (loading || timetableLoading) {
+  if (loading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-6 text-xl text-gray-600">
-          Đang tải chi tiết...
-        </div>
+      <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
+        <div className="bg-white rounded-2xl p-10 text-lg">Đang tải...</div>
       </div>
     );
   }
-
-  // Dữ liệu phân trang
-  const students = schedule?.students?.map((s) => ({
+// Chuẩn bị dữ liệu học sinh để hiển thị
+  const students = schedule?.students?.map(s => ({
     name: s.fullName,
     stop: s.stopName
   })) || [];
-  const totalPages = Math.ceil(students.length / itemsPerPage);
-  const currentStudents = students.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
+// Sắp xếp thời khóa biểu theo thứ tự tuần (Thứ 2 → Chủ nhật)
+  const sortedTimeTables = schedule?.timeTables
+    .slice()
+    .sort((a, b) => dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek)) || [];
 
-  // Giao diện Chi tiết lịch trình
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+      
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg h-[90vh] max-h-[840px] flex flex-col overflow-hidden"
+        onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="bg-gradient-to-r from-green-500 to-cyan-500 text-white p-6 flex justify-between items-center rounded-t-2xl">
-          <h2 className="text-2xl font-bold">Chi tiết đón - trả học sinh</h2>
-<button
-  onClick={onClose}
-  className="text-4xl hover:opacity-80 transition-opacity"
->
-  ×
-</button>
+        {/* Header */}      
+        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-5 flex justify-center items-center relative">
+          <h2 className="text-2xl font-bold">Đón - Trả học sinh</h2>
+          <button
+            onClick={onClose}
+            className="absolute right-6 text-4xl leading-none hover:opacity-70 transition"
+          >
+            ×
+          </button>
         </div>
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-10">
-          {/* Thời khóa biểu – DÙNG API RIÊNG */}
-          <div>
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Thời khóa biểu</h3>
-            <div className="border border-gray-300 rounded-lg overflow-hidden">
+        {/* Nội dung cuộn dọc */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-6 space-y-6">
+            {/* Bảng Thời khóa biểu */}
+            <div className="border border-gray-300 rounded-lg overflow-hidden text-sm">
               <table className="w-full">
-                <thead className="bg-gray-100">
+                <thead className="bg-gray-200">
                   <tr>
-                    <th className="px-6 py-4 text-left font-medium">Thứ</th>
-                    <th className="px-6 py-4 text-left font-medium">Thời gian đón</th>
-                    <th className="px-6 py-4 text-left font-medium">Thời gian trả</th>
+                    <th className="px-5 py-3 text-left font-medium text-gray-700">Thứ</th>
+                    <th className="px-5 py-3 text-left font-medium text-gray-700">Thời gian đón</th>
+                    <th className="px-5 py-3 text-left font-medium text-gray-700">Thời gian trả</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {schedule?.timeTables?.length ? (
-                    schedule.timeTables
-                      .sort((a, b) => {
-                        const order = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-                        return order.indexOf(a.dayOfWeek) - order.indexOf(b.dayOfWeek);
-                      })
-                      .map((item) => (
-                        <tr key={item.id}>
-                          <td>{item.dayOfWeek}</td>
-                          <td>{item.pickupTime}</td>
-                          <td>{item.dropoffTime}</td>
-                        </tr>
-                      ))
+                <tbody className="bg-white divide-y divide-gray-300">
+                  {sortedTimeTables.length > 0 ? (
+                    sortedTimeTables.map(item => (
+                      <tr key={item.id} className="hover:bg-gray-50">
+                        <td className="px-5 py-3 font-medium">{dayLabel[item.dayOfWeek]}</td>
+                        <td className="px-5 py-3">{item.pickupTime || "N/A"}</td>
+                        <td className="px-5 py-3">{item.dropoffTime || "N/A"}</td>
+                      </tr>
+                    ))
                   ) : (
-                    <tr><td colSpan={3}>Chưa có thời khóa biểu</td></tr>
+                    <tr>
+                      <td colSpan={3} className="px-5 py-8 text-center text-gray-500">
+                        Chưa có thời khóa biểu
+                      </td>
+                    </tr>
                   )}
                 </tbody>
               </table>
             </div>
-          </div>
-                  {/* Danh sách học sinh */}
-          <div>
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Danh sách học sinh</h3>
 
-            <div className="space-y-3 max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
-              {currentStudents.length === 0 ? (
-                <div className="text-center text-gray-500 py-4">
-                  Chưa có học sinh
-                </div>
-              ) : (
-                currentStudents.map((student, i) => (
-                  <div
-                    key={i}
-                    className="bg-white border border-gray-300 rounded-lg px-5 py-3 shadow-sm hover:shadow transition"
-                  >
-                    <div className="font-semibold text-gray-800">{student.name}</div>
-                    <div className="text-sm text-gray-500">Trạm: {student.stop}</div>
-                  </div>
-                ))
-              )}
+            {/* Bảng Học sinh */}
+            <div className="border border-gray-300 rounded-lg overflow-hidden text-sm">
+              {/* Header của học sinh */}
+              <div className="bg-gray-200 px-5 py-3 flex">
+                <div className="flex-1 font-medium text-gray-700">Học sinh</div>
+                <div className="w-24 text-right font-medium text-gray-700">Trạm</div>
+              </div>
+
+              {/* Danh sách học sinh  */}
+              <div className="max-h-96 overflow-y-auto">
+                <table className="w-full">
+                  <tbody className="divide-y divide-gray-300 bg-white">
+                    {students.length === 0 ? (
+                      <tr>
+                        <td colSpan={2} className="px-5 py-10 text-center text-gray-500">
+                          Chưa có học sinh
+                        </td>
+                      </tr>
+                    ) : (
+                      students.map((student, i) => (
+                        <tr key={i} className="hover:bg-gray-50">
+                          <td className="px-5 py-3 text-gray-800">{student.name}</td>
+                          <td className="px-5 py-3 text-right text-gray-600 pr-8">
+                            {student.stop}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-
-        </div>
-
-        {/* Footer phân trang */}
-        <div className="bg-gray-50 border-t p-6 flex justify-between items-center">
-          <span className="font-medium text-gray-700">
-            Trang {page} / {totalPages}
-          </span>
-          <div className="flex gap-4">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-400 transition"
-            >
-              Trước
-            </button>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="px-6 py-3 bg-green-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600 transition"
-            >
-              Sau
-            </button>
           </div>
         </div>
       </div>
