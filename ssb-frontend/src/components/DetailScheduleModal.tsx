@@ -39,7 +39,7 @@ export default function DetailScheduleModal({
 }: DetailScheduleModalProps) {
   const [schedule, setSchedule] = useState<ScheduleDetail | null>(null);
   const [loading, setLoading] = useState(false);
-
+// Lấy chi tiết lịch trình từ backend khi modal mở
   const fetchScheduleDetail = async () => {
     if (!scheduleId || !isOpen) return;
     setLoading(true);
@@ -53,7 +53,7 @@ export default function DetailScheduleModal({
       setLoading(false);
     }
   };
-
+// Gọi API mỗi khi modal mở hoặc scheduleId thay đổi
   useEffect(() => {
     if (isOpen) fetchScheduleDetail();
   }, [isOpen, scheduleId]);
@@ -67,24 +67,24 @@ export default function DetailScheduleModal({
       </div>
     );
   }
-
+// Chuẩn bị dữ liệu học sinh để hiển thị
   const students = schedule?.students?.map(s => ({
     name: s.fullName,
     stop: s.stopName
   })) || [];
-
+// Sắp xếp thời khóa biểu theo thứ tự tuần (Thứ 2 → Chủ nhật)
   const sortedTimeTables = schedule?.timeTables
     .slice()
     .sort((a, b) => dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek)) || [];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-      {/* Modal chính - tỉ lệ giống ảnh 2747x1840 */}
+      
       <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-lg h-[90vh] max-h-[840px] flex flex-col overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        {/* Header xanh lá - giống hệt ảnh */}
+        {/* Header */}      
         <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-5 flex justify-center items-center relative">
           <h2 className="text-2xl font-bold">Đón - Trả học sinh</h2>
           <button
@@ -128,15 +128,15 @@ export default function DetailScheduleModal({
               </table>
             </div>
 
-            {/* Bảng Học sinh - giống ảnh 100% */}
+            {/* Bảng Học sinh */}
             <div className="border border-gray-300 rounded-lg overflow-hidden text-sm">
-              {/* Header xám của học sinh */}
+              {/* Header của học sinh */}
               <div className="bg-gray-200 px-5 py-3 flex">
                 <div className="flex-1 font-medium text-gray-700">Học sinh</div>
                 <div className="w-24 text-right font-medium text-gray-700">Trạm</div>
               </div>
 
-              {/* Danh sách học sinh có thanh cuộn mảnh như ảnh */}
+              {/* Danh sách học sinh  */}
               <div className="max-h-96 overflow-y-auto">
                 <table className="w-full">
                   <tbody className="divide-y divide-gray-300 bg-white">
