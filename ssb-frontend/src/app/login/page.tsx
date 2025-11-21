@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import api from "@/services/api";
 import { validateLogin } from "@/utils/validateLogin";
 import Toast from "@/components/toast/toast";
@@ -15,14 +15,11 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
 
   // Hiển thị thông báo đăng xuất thành công nếu có
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      if (localStorage.getItem("logoutSuccess") === "true") {
-        setShowToast1(true);
-        localStorage.removeItem("logoutSuccess");
-
-        setTimeout(() => setShowToast1(false), 3000);
-      }
+  if (localStorage.getItem("logoutSuccess") === "true") {
+      setShowToast1(true);
+      localStorage.removeItem("logoutSuccess");
+      const timer = setTimeout(() => setShowToast1(false), 3000);
+      return () => clearTimeout(timer); // cleanup on unmount
     }
   }, []);
   

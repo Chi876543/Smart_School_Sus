@@ -1,8 +1,11 @@
 "use client";
-import BusMap, { BusMapRef, BusBasic } from "./BusMap";
+import  { BusMapRef, BusBasic } from "./BusMap";
 import SearchBar from "../searchBar/searchBar";
 import styles from "./TrackingSection.module.css"
 import { useRef, useState } from "react";
+import dynamic from "next/dynamic";
+
+const BusMap = dynamic(() => import("./BusMap"), { ssr: false });
 
 export default function TrackingSection(){
     const busMapRef = useRef<BusMapRef>(null);

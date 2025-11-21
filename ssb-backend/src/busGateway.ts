@@ -11,26 +11,35 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
     constructor(private readonly trackingService: TrackingService) {} 
 
     async afterInit() { 
-        await this.trackingService.initRoutes(); 
+        try{
+            await this.trackingService.initRoutes(); 
+        }catch(err){
+            console.log("Failed to initialize routes: ", err.message)
+        }
+        
         const buses = await this.trackingService.getAllBusLocations(); 
         
         for (const bus of buses) { 
             const busId = bus.busId.toString();
             const detail = await this.trackingService.getBusStaticDetail(bus.scheduleId.toString());
 
-            this.trackingService.simulateBus(busId, (data) => { 
-
-                // Khi có cập nhật vị trí, merge các trường realtime vào BusDetail
-                const updatedDetail = {
-                    ...detail,
-                    eta: data.eta,
-                    nextStop: data.nextStop,
-                    distance: data.remainingDistance ,
-                    lat: data.lat,
-                    lng: data.lng,
-                };
-                this.server.emit('busDetail', { busId, detail: updatedDetail });
-            }); 
+            try{
+                this.trackingService.simulateBus(busId, (data) => { 
+                    // Khi có cập nhật vị trí, merge các trường realtime vào BusDetail
+                    const updatedDetail = {
+                        ...detail,
+                        eta: data.eta,
+                        nextStop: data.nextStop,
+                        distance: data.remainingDistance,
+                        lat: data.lat,
+                        lng: data.lng,
+                    };
+                    this.server.emit('busDetail', { busId, detail: updatedDetail });
+                }); 
+            }catch(err){
+                console.log("simulateBus failed:", err.message);
+            }
+            
         } 
     } 
     
