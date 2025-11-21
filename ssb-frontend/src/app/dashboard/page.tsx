@@ -6,12 +6,13 @@ import LeftSidebar from "../../components/leftSideBar/LeftSideBar";
 import TrackingSection from "@/components/map/TrackingSection";
 import ScheduleManagement from "@/components/ScheduleManagement";
 import Assignment from "../../components/assignment/DriverAssignment";
+import Toast from "@/components/toast/toast";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<any>(null);
   const [username, setUsername] = useState("");
   const [activeMenu, setActiveMenu] = useState<string>("overview");
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   // // ←←← THÊM CHỈ 1 DÒNG NÀY: Đọc trang hiện tại từ URL
   // const [currentPage, setCurrentPage] = useState("overview");
@@ -56,9 +57,9 @@ export default function DashboardPage() {
     }
     // Hiển thị thông báo đăng nhập thành công nếu có
     if (localStorage.getItem("loginSuccess") === "true") {
-      setShowSuccess(true);
+      setShowToast(true);
       localStorage.removeItem("loginSuccess");
-      setTimeout(() => setShowSuccess(false), 3000);
+      setTimeout(() => setShowToast(false), 3000);
     }
     // Lấy username từ localStorage  
     const username = typeof window !== "undefined"
@@ -79,7 +80,7 @@ export default function DashboardPage() {
 
   // Xử lý đăng xuất
   const handleLogout = () => {
-    console.log("Logging out...");
+    localStorage.setItem("logoutSuccess", "true");
     document.cookie =
       "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     localStorage.removeItem("username");
@@ -134,13 +135,8 @@ export default function DashboardPage() {
           {activeMenu === "assign" && <Assignment />}
         </div>
       </div>
-          {/* Hiện thị toast đăng nhập thành công */}
-          {showSuccess && (
-            <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg">
-              ✔️ Đăng nhập thành công!
-            </div>
-          )}
-
+      {/* Hiện thị toast login success */}
+      {showToast && <Toast message="Đăng nhập thành công!" type="success" />}
     </div>
     
   );

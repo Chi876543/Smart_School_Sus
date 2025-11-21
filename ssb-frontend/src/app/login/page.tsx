@@ -2,12 +2,21 @@
 import { useState } from "react";
 import api from "@/services/api";
 import { validateLogin } from "@/utils/validateLogin";
+import Toast from "@/components/toast/toast";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loginFail, setLoginFail] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [showToast1, setShowToast1] = useState(false);
   const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
+
+  // Hiển thị thông báo đăng xuất thành công nếu có
+  if (localStorage.getItem("logoutSuccess") === "true") {
+      setShowToast1(true);
+      localStorage.removeItem("logoutSuccess");
+      setTimeout(() => setShowToast1(false), 3000);
+    }
   
   // Xử lý đăng nhập
   const handleLogin = async (e: React.FormEvent) => {
@@ -24,8 +33,8 @@ export default function LoginPage() {
       localStorage.setItem("loginSuccess", "true");
       window.location.href = "/dashboard"; // Chuyển hướng sang dashboard
     } catch {
-      setLoginFail(true);
-      setTimeout(() => setLoginFail(false), 3000);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     }
   };
 
@@ -89,13 +98,9 @@ export default function LoginPage() {
         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#43BCB2")}
         >Xác nhận</button>
       </form>
-
-      {loginFail && (
-        <div className="fixed top-4 right-4 z-50 animate-slide-in bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2">
-          <span className="text-xl">❌</span>
-          <span>Đăng nhập thất bại</span>
-        </div>
-      )}
+      {/* Toast */}
+      {showToast1 && <Toast message="Đăng xuất thành công" type="success" />}
+      {showToast && <Toast message="Đăng nhập thất bại!" type="error" />}
     </div>
   );
 }
