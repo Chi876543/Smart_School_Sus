@@ -111,7 +111,7 @@ export class AssignScheduleService {
         'Phải cung cấp ít nhất 1 trường để cập nhật',
       );
     }
-
+    
     if (driverId) {
       const driver = await this.driverRepo.findDriverById(driverId);
       if (!driver) throw new BadRequestException('Tài xế không tồn tại');
@@ -122,7 +122,7 @@ export class AssignScheduleService {
       if (!bus) throw new BadRequestException('Xe buýt không tồn tại');
     }
 
-    // Kiểm tra trùng lịch (nếu muốn hạn chế driver/bus đang active)
+    // Kiểm tra trùng lịch
     const existing = await this.scheduleRepo.findActiveByDriverOrBus(
       driverId,
       busId,

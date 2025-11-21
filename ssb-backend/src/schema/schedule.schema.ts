@@ -15,7 +15,6 @@ export class Schedule extends Document {
   // planned	Đã phân công đủ, chờ ngày bắt đầu	Khi busId, driverId đã có
   // active	Đang hoạt động	Trong khoảng ngày
   // completed	Đã hoàn thành	Sau ngày kết thúc
-  // suspended	Tạm dừng	Do lỗi kỹ thuật, bảo trì
   // cancelled	Hủy bỏ	Khi admin hủy
 
   @Prop({ required: true })
