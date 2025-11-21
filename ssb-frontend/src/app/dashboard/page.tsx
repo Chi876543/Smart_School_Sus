@@ -6,12 +6,16 @@ import LeftSidebar from "../../components/leftSideBar/LeftSideBar";
 import TrackingSection from "@/components/map/TrackingSection";
 import ScheduleManagement from "@/components/ScheduleManagement";
 import Assignment from "../../components/assignment/DriverAssignment";
+import LogoutConfirmModal from "./pageConfirm";
 import Toast from "@/components/toast/toast";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<any>(null);
   const [username, setUsername] = useState("");
   const [activeMenu, setActiveMenu] = useState<string>("overview");
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  // Toast
   const [showToast, setShowToast] = useState(false);
 
   // // ←←← THÊM CHỈ 1 DÒNG NÀY: Đọc trang hiện tại từ URL
@@ -98,7 +102,7 @@ export default function DashboardPage() {
   return (
     
     <div className="flex flex-col h-screen bg-gray-100">
-      <TopBar username={username} onLogout={handleLogout} />
+      <TopBar username={username} onLogout={() => setShowLogoutConfirm(true)} />
       <div className="flex flex-1">
         <LeftSidebar items={menuItems} onSelect={(key) => setActiveMenu(key)} />
         <div className="flex-1 p-6 overflow-auto">
@@ -135,6 +139,13 @@ export default function DashboardPage() {
           {activeMenu === "assign" && <Assignment />}
         </div>
       </div>
+
+      {showLogoutConfirm && (
+        <LogoutConfirmModal
+          onCancel={() => setShowLogoutConfirm(false)}
+          onConfirm={handleLogout}
+        />
+      )}
       {/* Hiện thị toast login success */}
       {showToast && <Toast message="Đăng nhập thành công!" type="success" />}
     </div>
