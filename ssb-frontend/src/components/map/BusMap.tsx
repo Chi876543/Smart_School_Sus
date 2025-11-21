@@ -221,13 +221,13 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
             { label: "Tuyến", value: busDetailsStatic[selectedBus.busId].routeName },
             {
               label: "Trạm kế tiếp",
-              value: busRealtime[selectedBus.busId]
+              value: busRealtime[selectedBus.busId] && busRealtime[selectedBus.busId].distance !== -1 // nếu có lỗi ở backend --> Đang tính
               ? `${busRealtime[selectedBus.busId].nextStop} (${(busRealtime[selectedBus.busId].distance/1000).toFixed(2)} km)`
               : "Đang tính...",
             },
             {
               label: "Thời gian dự kiến",
-              value: busRealtime[selectedBus.busId]
+              value: busRealtime[selectedBus.busId] && busRealtime[selectedBus.busId].eta !== -1 // nếu có lỗi ở backend --> Đang tính
               ? (busRealtime[selectedBus.busId].eta < 60 
                 ? `${busRealtime[selectedBus.busId].eta} giây`
                 : `${Math.ceil(busRealtime[selectedBus.busId].eta / 60)} phút`)

@@ -23,8 +23,5 @@ export class TripService{
             message: 'Student status updated successfully',
             trip,
         };
-    }
-
-    
-    
+    } 
 }

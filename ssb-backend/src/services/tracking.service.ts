@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TrackingLocationDto } from '../dtos/tracking-location.dto';
-import { TrackingDetailDto } from 'src/dtos/tracking-detail.dto';
+import { TrackingDetailDto, TripStudentDto } from 'src/dtos/tracking-detail.dto';
 import { ScheduleRepository } from '../repositories/schedule.repository';
 import { BusRepository } from '../repositories/bus.repository';
 import { DriverRepository } from '../repositories/driver.repository';
@@ -27,7 +27,7 @@ export class TrackingService {
     private readonly busRepo: BusRepository,
     private readonly driverRepo: DriverRepository,
     private readonly routeRepo: RouteRepository,
-    private readonly tripRepo: TripRepository
+    private readonly tripRepo: TripRepository,
   ) {}
 
   private polylines: Record<string, [number, number][]> = {}; 
@@ -73,7 +73,7 @@ export class TrackingService {
     if (!bus || !driver || !route) {
       throw new Error('Thiếu dữ liệu (bus/driver/route)');
     }
-
+    
     // Lấy danh sách các điểm dừng
     const stops = await this.routeRepo.findStopsByRouteId(schedule.routeId.toString());
     if (stops.length === 0) throw new Error('Tuyến không có điểm dừng');
@@ -114,21 +114,35 @@ export class TrackingService {
     return stops;
   }
 
-  async initRoutes(){ // setup route cho toàn bộ xe buýt đang hoạt động
+  // setup route cho toàn bộ xe buýt đang hoạt động
+  async initRoutes(){ 
     const Buses = await this.getAllBusLocations(); 
     for(const bus of Buses){ 
       const busId: string = bus.busId;
       const busCoord: [number, number] = [bus.lat, bus.lng]; 
-      const stops = (await this.getBusStaticDetail(bus.scheduleId.toString())).stops; 
+      if (!busCoord[0] || !busCoord[1]) continue;
 
+      const stops = (await this.getBusStaticDetail(bus.scheduleId.toString())).stops; 
       console.log(`Bus ${busId} stops:`, stops); 
       if(stops.length === 0) continue;
 
       const coords = [busCoord, ...stops.map((s): [number, number] => [s.lat, s.lng])]; 
-      const polyline = await this.getRouteFromOSRM(coords); 
-      this.polylines[busId] = polyline; 
+      try{
+        const polyline = await this.getRouteFromOSRM(coords); 
+        if (!polyline || polyline.length === 0) {
+          throw new Error("Empty polyline from OSRM");
+        }
+        this.polylines[busId] = polyline; 
+        console.log(`Bus ${busId} polyline:`, polyline.length, 'points'); 
+      }catch(err: any){
+        console.error(`Failed to init polyline for bus ${busId}:`, err?.message || err);
 
-      console.log(`Bus ${busId} polyline:`, polyline.length, 'points'); 
+        // FALLBACK
+        const fallback = coords;
+        this.polylines[busId] = fallback;
+
+        console.warn(`Using fallback (straight-line) polyline for bus ${busId}`);
+      }
     } 
   }
 
@@ -138,33 +152,66 @@ export class TrackingService {
 
   async getRouteInfo(busCoord: [number, number], stopCoord: [number, number]) {
     const url = `https://router.project-osrm.org/route/v1/driving/${busCoord[1]},${busCoord[0]};${stopCoord[1]},${stopCoord[0]}?overview=false`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.routes && data.routes.length > 0) {
-      return {
-        distance: data.routes[0].distance, // meters
-        duration: data.routes[0].duration, // seconds
-      };
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`OSRM returned status ${res.status}`);
+
+      const data = await res.json();
+
+      if (data.routes && data.routes.length > 0) {
+        return {
+          distance: data.routes[0].distance, // meters
+          duration: data.routes[0].duration, // seconds
+        };
+      } else {
+        console.warn("OSRM returned no routes, using fallback");
+        return { distance: -1, duration: -1 }; // fallback
+      }
+    } catch (err: any) {
+      console.error("OSRM request failed:", err?.message || err);
+      return { distance: -1, duration: -1 }; // fallback
     }
-    return { distance: 0, duration: 0 };
   }
 
   //mockGPS 
   async simulateBus(busId: string, callback: (data: any) => void){ 
     const Buses = await this.getAllBusLocations(); 
     const bus = Buses.find((b) => b.busId.toString() === busId) 
-    if(!bus) return; 
+    if(!bus) 
+      throw new NotFoundException(`Cannot find bus of ${busId}`); 
 
     const stops = (await this.getBusStaticDetail(bus.scheduleId.toString())).stops; 
-    if(stops.length === 0) return; 
+    if(stops.length === 0) 
+      throw new NotFoundException(`Cannot find stops of ${busId}`);
 
+    // const studentsAtStops = (await this.studentRepo.findAll())
+    // .filter(stu => stops.map(s => s.id).includes(stu.stopId._id.toString()));
+    
+    // const scheduleId = (await this.getBusStaticDetail(bus.scheduleId.toString())).scheduleId;
+    // if(!scheduleId) 
+    //   throw new NotFoundException(`Cannot find schedule of ${busId}`);
+
+    // let tripStudents = await this.tripRepo.findTripStudents(scheduleId);
+    // if(tripStudents.length === 0) 
+    //   throw new NotFoundException(`Cannot find stops of ${busId}`);
+
+    // const trip = (await this.tripRepo.findByScheduleId(scheduleId)).at(0);
+    // if(!trip)
+    //   throw new NotFoundException(`Cannot find trip of ${busId}`);
+    
     const routeLine = this.polylines[busId]; 
-    if(!routeLine) return; 
+    if(!routeLine) 
+      throw new NotFoundException(`Cannot find routeLine of ${busId}`);
 
     let index = 0; 
     let currentStopIndex = 0;
+    let isPaused = false;
+    const threshold = 5; // 5m coi như tới trạm
 
     const interval = setInterval(async () =>{ 
+
+      if(isPaused) return;
+
       if (index >= routeLine.length || currentStopIndex >= stops.length) { 
         clearInterval(interval); 
         return; 
@@ -172,19 +219,54 @@ export class TrackingService {
       
       const currentPosition = routeLine[index];
       let nextStop = stops[currentStopIndex];
+      let distance = -1;
+      let duration = -1;
 
-      // Lấy distance + eta từ OSRM
-      const { distance, duration } = await this.getRouteInfo([currentPosition[0], currentPosition[1]], [nextStop.lat, nextStop.lng]);
-      if(distance <= 0 || duration <= 0) 
-        currentStopIndex++;
+      try{
+        const routeInfo = await this.getRouteInfo(
+          [currentPosition[0], currentPosition[1]],
+          [nextStop.lat, nextStop.lng]
+        );
+        
+
+        distance = routeInfo.distance;
+        duration = routeInfo.duration;
+      }catch(err){
+        console.error(`OSRM request failed for bus ${bus.busId}:`, err);
+        // fallback values remain -1
+      }
       
+      if(distance <= threshold && distance !== -1) {
+        // bus arrives at stop
+        callback({ 
+          busId: bus.busId, 
+          lat: currentPosition[0], 
+          lng: currentPosition[1], 
+          nextStop: nextStop.name,
+          remainingDistance: 0, 
+          eta: 0,
+        });
+
+        isPaused = true;
+
+        // Pause random từ 10–15 giây
+        const pauseTime = 10000 + Math.random() * 5000;
+
+        setTimeout(() => {
+          currentStopIndex++;
+          isPaused = false;
+        }, pauseTime);
+
+        return;
+      }
+
       callback({ 
         busId: bus.busId, 
         lat: currentPosition[0], 
         lng: currentPosition[1], 
         nextStop: nextStop.name,
         remainingDistance: distance, 
-        eta: duration
+        eta: duration,
       }); 
 
       index++; 
@@ -194,7 +276,15 @@ export class TrackingService {
   private async getRouteFromOSRM(coords: [number, number][]): Promise<[number, number][]> { 
     const coordStr = coords.map((c) => `${c[1]},${c[0]}`).join(';');
     const url = `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`; 
-    const res = await axios.get<OSRMRouteResponse>(url); 
-    return res.data.routes[0].geometry.coordinates.map((c) => [c[1], c[0]]); 
+    try {
+      const res = await axios.get<OSRMRouteResponse>(url); 
+      if (!res.data?.routes?.[0]) {
+        throw new Error("OSRM returned no routes");
+      }
+      return res.data.routes[0].geometry.coordinates.map((c) => [c[1], c[0]]); 
+    }catch(err: any){
+      console.error("OSRM routing error:", err?.message || err);
+      throw new Error(`Failed to fetch OSRM route: ${err?.message}`);
+    } 
   }
 }
