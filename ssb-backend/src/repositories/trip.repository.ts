@@ -42,6 +42,13 @@ export class TripRepository {
     return this.tripModel.findById(new Types.ObjectId(id)).lean();
   }
 
+  async findstudentInTrip(tripId: string, studentId: string) {
+    return this.tripModel.findOne({
+      _id: new Types.ObjectId(tripId),
+      'students.studentId': new Types.ObjectId(studentId),
+    });
+  }
+
   async insertMany(trips: Partial<Trip>[]) {
     return this.tripModel.insertMany(trips);
   }
