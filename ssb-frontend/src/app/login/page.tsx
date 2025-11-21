@@ -21,6 +21,7 @@ export default function LoginPage() {
       const res = await api.post("/auth/login", { username, password }); // Gọi API đăng nhập
       document.cookie = `token=${res.data.token}; path=/;`; // Lưu token vào cookie
       localStorage.setItem("username", res.data.username); // Lưu username vào localStorage
+      localStorage.setItem("loginSuccess", "true");
       window.location.href = "/dashboard"; // Chuyển hướng sang dashboard
     } catch {
       setLoginFail(true);

@@ -11,6 +11,7 @@ export default function DashboardPage() {
   const [summary, setSummary] = useState<any>(null);
   const [username, setUsername] = useState("");
   const [activeMenu, setActiveMenu] = useState<string>("overview");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // // ←←← THÊM CHỈ 1 DÒNG NÀY: Đọc trang hiện tại từ URL
   // const [currentPage, setCurrentPage] = useState("overview");
@@ -53,6 +54,12 @@ export default function DashboardPage() {
       window.location.href = "/login";
       return;
     }
+    // Hiển thị thông báo đăng nhập thành công nếu có
+    if (localStorage.getItem("loginSuccess") === "true") {
+      setShowSuccess(true);
+      localStorage.removeItem("loginSuccess");
+      setTimeout(() => setShowSuccess(false), 3000);
+    }
     // Lấy username từ localStorage  
     const username = typeof window !== "undefined"
     ? localStorage.getItem("username")
@@ -88,6 +95,7 @@ export default function DashboardPage() {
 
   // Giao diện trang dashboard
   return (
+    
     <div className="flex flex-col h-screen bg-gray-100">
       <TopBar username={username} onLogout={handleLogout} />
       <div className="flex flex-1">
@@ -126,6 +134,14 @@ export default function DashboardPage() {
           {activeMenu === "assign" && <Assignment />}
         </div>
       </div>
+          {/* Hiện thị toast đăng nhập thành công */}
+          {showSuccess && (
+            <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg">
+              ✔️ Đăng nhập thành công!
+            </div>
+          )}
+
     </div>
+    
   );
 }
