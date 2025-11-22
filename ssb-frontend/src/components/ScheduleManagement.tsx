@@ -279,10 +279,10 @@ export default function ScheduleManagement() {
         
 
         <div className="flex gap-3">
-          <button onClick={() => setIsAddModalOpen(true)} className="bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-3 rounded-lg font-medium hover:from-green-500 hover:to-green-600 shadow-md transition">
+          <button onClick={() => setIsAddModalOpen(true)} className="bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-3 rounded-lg font-medium hover:from-green-500 hover:to-green-600 shadow-md transition cursor-pointer">
             Thêm
           </button>
-          <button onClick={handleEdit} className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-6 py-3 rounded-lg font-medium hover:from-yellow-500 hover:to-yellow-600 shadow-md transition">
+          <button onClick={handleEdit} className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-6 py-3 rounded-lg font-medium hover:from-yellow-500 hover:to-yellow-600 shadow-md transition cursor-pointer">
             Sửa
           </button>
           <button
@@ -293,7 +293,7 @@ export default function ScheduleManagement() {
               }
               handleDelete(selectedSchedule.id);
             }}
-            className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg font-medium hover:from-red-600 hover:to-red-700 shadow-md transition"
+            className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg font-medium hover:from-red-600 hover:to-red-700 shadow-md transition cursor-pointer"
           >
             Xóa
           </button>
@@ -326,8 +326,15 @@ export default function ScheduleManagement() {
                 filtered.map((s) => (
                   <tr
                     key={s.id}
-                    onClick={() => handleRowClick(s.id)}
-                    className={`cursor-pointer transition ${selectedSchedule?.id === s.id ? "bg-green-100" : "hover:bg-gray-50"}`}
+                    onClick={() => {
+                      if (s.status !== "active") handleRowClick(s.id);
+                    }}
+                    className={`
+                      transition
+                      ${s.status === "active" ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      : selectedSchedule?.id === s.id ? "bg-green-100 cursor-pointer"
+                      : "hover:bg-gray-50 cursor-pointer"}
+                    `}
                   >
                     <td className="px-6 py-5 font-medium text-gray-800">{s.name}</td>
                     <td className="px-6 py-5 text-gray-700">{s.routeName}</td>
@@ -335,7 +342,7 @@ export default function ScheduleManagement() {
                       {new Date(s.dateStart).toLocaleDateString("vi-VN")} → {new Date(s.dateEnd).toLocaleDateString("vi-VN")}
                     </td>
                     <td className="px-6 py-5 text-center">
-                      <button onClick={(e) => { e.stopPropagation(); openDetail(s); }} className="text-green-600 hover:text-green-800 font-semibold underline transition">
+                      <button onClick={(e) => { e.stopPropagation(); openDetail(s); }} className="text-green-600 hover:text-red-800 font-semibold underline transition cursor-pointer">
                         Xem
                       </button>
                     </td>

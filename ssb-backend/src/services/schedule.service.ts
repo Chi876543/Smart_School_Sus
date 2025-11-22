@@ -29,14 +29,17 @@ export class ScheduleService {
     private readonly busRepo: BusRepository,
   ) {}
 
+  // Get all routes
   async findAllRoute() {
     return this.routeRepo.findAllRoute();
   }
 
+  // Get all timetables
   async findAllTimetable() {
     return this.timetableRepo.findAll();
   }
 
+  // Create new schedule
   async create(data: CreateScheduleDTO) {
     const { name, dateStart, dateEnd, routeId, students, timeTables } = data;
 
@@ -120,10 +123,11 @@ export class ScheduleService {
         pickupTime: t.pickupTime,
         dropoffTime: t.dropoffTime,
       })),
-      students, // danh sách học sinh lấy từ Trip
+      students, // students of Trip
     };
   }
 
+  // Get all schedules for table view
   async findAll(): Promise<ScheduleResponseDTO[]> {
     const schedules = await this.scheduleRepo.findAlls();
 
@@ -142,11 +146,26 @@ export class ScheduleService {
     }) as ScheduleResponseDTO[];
   }
 
-
+  // Update schedule
   async update(id: string, updateDto: UpdateScheduleDTO) {
     const updated = await this.scheduleRepo.findByIdAndUpdate(id, updateDto);
 
     if (!updated) throw new NotFoundException(`Schedule ${id} not found`);
+
+    // Cannot update cancelled schedule
+    if (updated.status === 'cancelled') {
+      throw new BadRequestException(`Cannot update cancelled schedule ${id}`);
+    }
+    
+    // Cannot update completed schedule
+    if (updated.status === 'completed') {
+      throw new BadRequestException(`Cannot update completed schedule ${id}`);
+    }
+
+    // Cannot update active schedule
+    if (updated.status === 'active') {
+      throw new BadRequestException(`Cannot update active schedule ${id}`);
+    }
 
     // Get trips from schedule
     const trips = await this.tripRepo.findByScheduleId(id);
@@ -195,6 +214,7 @@ export class ScheduleService {
     };
   }
 
+  // Cancel schedule
   async remove(id: string): Promise<void> {
     const schedule = await this.scheduleRepo.findById(id);
 
@@ -206,6 +226,7 @@ export class ScheduleService {
     await schedule.save();
   }
 
+  // Create trips for schedule
   async createTrip(schedule: Schedule, students: string[]): Promise<any[]> {
     // Tạo Trip tự động dựa vào timetable và ngày
     const trips: any[] = [];
@@ -219,6 +240,7 @@ export class ScheduleService {
       'Saturday',
     ];
 
+    // Lặp từ dateStart đến dateEnd
     for ( let d = new Date(schedule.dateStart); d <= new Date(schedule.dateEnd); d.setDate(d.getDate() + 1) ) {
       const dayName = dayNames[d.getDay()]; // ví dụ: "Monday"
       const timetable = await this.timetableRepo.findDayOfWeekTrips(dayName);
@@ -242,6 +264,7 @@ export class ScheduleService {
   return trips;
   }
 
+  // Validate schedule data
   async validate(
     name: string,
     dateStart: Date,
@@ -283,7 +306,6 @@ export class ScheduleService {
       }
       timetableDocs = found.map((t) => (t._id as Types.ObjectId).toString());
     }
-    console.log(timetableDocs);
 
     return {
       foundStudents,
