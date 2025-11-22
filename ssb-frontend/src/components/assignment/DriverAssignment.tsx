@@ -43,7 +43,8 @@ export default function DriverAssignment() {
   const [panelError, setPanelError] = useState<string | null>(null);
   const [initialDriverId, setInitialDriverId] = useState<string | null>(null);
   const [initialBusId, setInitialBusId] = useState<string | null>(null);
-  // 🔒 KHÓA SCROLL KHI PANEL MỞ
+
+  // KHÓA SCROLL KHI PANEL MỞ
   useEffect(() => {
     if (isPanelOpen) {
       const prevOverflow = document.body.style.overflow;

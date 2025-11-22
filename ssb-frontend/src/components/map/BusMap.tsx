@@ -75,12 +75,9 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const mapRef = useRef<any>(null);
   const markerRefs = useRef<Record<string, L.Marker>>({});
+  const lastPositions = useRef<Record<string, [number, number]>>({}); // lưu vị trí cũ của xe để animate marker
 
-  const lastPositions = useRef<Record<string, [number, number]>>({});
-
-
-
-
+  // Lấy busBasic cho toàn bộ xe
   const fetchBusData = async () => {
     try {
       const res = await api.get("/tracking/buses");
@@ -95,6 +92,7 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
   }, []);
 
 
+  // Lấy static detail cho xe
   const fetchBusDetail = async (bus: BusBasic) =>{
     if(busDetailsStatic[bus.busId]) return;
 
@@ -119,6 +117,7 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
     }
   }
 
+  // Animation cho marker mượt hơn
   function animateMarker(
     marker: LeafletMarker,
     from: [number, number],
@@ -142,13 +141,12 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
     requestAnimationFrame(frame);
   }
 
-
+  // Lấy route của các xe
   useEffect(() => {
     const socketIo = io("http://localhost:8080");
     setSocket(socketIo);
 
     socketIo.on('busRoute', (data: BusRoute) => {
-      console.log("WS polyline:", data);
       setBusRoutes((prev) => ({
         ...prev,
         [data.busId]: data
@@ -160,6 +158,7 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
     };
   }, []);
 
+  // Lấy realtime Detail và tọa độ của xe buýt
   useEffect(() =>{
     if(!socket) return;
 
@@ -181,6 +180,8 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
     };
   }, [socket])
   
+
+  //center của map
   const center: [number, number] =
     buses.length > 0 && busPositions[buses[0].busId]
     ? [busPositions[buses[0].busId].lat, busPositions[buses[0].busId].lng] 
@@ -211,6 +212,7 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
 
   return (
     <div style={{ height: "80vh", width: "100%", borderRadius: "1rem", position: "relative" }}>
+      {/* Bảng thông tin chi tiết, hiển thị khi chọn marker */}
       {selectedBus && busDetailsStatic[selectedBus.busId] && (
         <InfoBox
           title="Thông tin"
@@ -243,6 +245,7 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
         /> 
       )}
 
+      {/* Bảng danh sách học sinh, hiển thị khi bấm 'Danh sách học sinh' trong InfoBox */}
       {selectedBus && busDetailsStatic[selectedBus.busId] && (
         <StudentPopup
           open={studentPopupOpen}
@@ -251,6 +254,7 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
         />
       )}
 
+      {/* Map */}
       <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }} zoomControl={false} ref={mapRef}>
         <TileLayer
           attribution='© <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
@@ -258,6 +262,7 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
         />
         <ZoomControl position="bottomright" />
 
+        {/* Hiển thị tuyến đường cho xe được chọn */}
         {selectedBus && busRoutes[selectedBus.busId]?.polyline?.length > 0 && (
           <Polyline
             positions={busRoutes[selectedBus.busId].polyline}
@@ -265,6 +270,7 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
           />
         )}
 
+        {/* Hiển thị marker của các trạm dừng cho xe được chọn */}
         {selectedBus && busRoutes[selectedBus.busId]?.stops?.map((stop, idx) => (
           <Marker
             key={idx}
@@ -287,11 +293,13 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
           </Marker>
         ))}
 
+        
         {buses.map((bus) => {
           const pos = busPositions[bus.busId];
           if (!pos) return null;
 
           return (
+            // Với mọi xe đang hoạt động, hiển thị marker của chúng khi đã nhận được tọa đồ từ WebSocket 
             <Marker
               key={bus.busId}
               position={[pos.lat, pos.lng]} // initial only
@@ -314,11 +322,13 @@ const BusMap = forwardRef<BusMapRef>((props, ref) => {
                   markerRefs.current[bus.busId] = marker;
                 }
               }}
+
+              // handle event click vào busMarker
               eventHandlers={{
                 click: () => {
                   setSelectedBus(bus);
                   fetchBusDetail(bus);
-                  markerRefs.current[bus.busId]?.openTooltip();
+                  markerRefs.current[bus.busId]?.openTooltip(); // hiển thị tooltip
                 },
               }}
             >

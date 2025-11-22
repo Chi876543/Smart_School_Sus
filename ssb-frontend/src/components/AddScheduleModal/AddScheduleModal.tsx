@@ -1,4 +1,3 @@
-// src/components/AddScheduleModal/AddScheduleModal.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -135,11 +134,7 @@ export default function AddScheduleModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
-      onClick={() => {
-        onClose();
-        resetForm();
-      }}
+      className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
     >
       <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"

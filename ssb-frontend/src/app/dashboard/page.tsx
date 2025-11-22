@@ -14,38 +14,7 @@ export default function DashboardPage() {
   const [username, setUsername] = useState("");
   const [activeMenu, setActiveMenu] = useState<string>("overview");
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
-  // Toast
   const [showToast, setShowToast] = useState(false);
-
-  // // ←←← THÊM CHỈ 1 DÒNG NÀY: Đọc trang hiện tại từ URL
-  // const [currentPage, setCurrentPage] = useState("overview");
-
-  // useEffect(() => {
-  //   const page = new URLSearchParams(location.search).get("page");
-  //   if (page === "schedules") setCurrentPage("schedules");
-  //   else setCurrentPage("overview");
-  // }, []);
-
-  // // ←←← Khi bấm menu → thay đổi URL (không reload trang)
-  // useEffect(() => {
-  //   const handleClick = (e: MouseEvent) => {
-  //     const target = e.target as HTMLElement;
-  //     if (target.textContent?.includes("Quản lý lịch trình")) {
-  //       e.preventDefault();
-  //       setCurrentPage("schedules");
-  //       window.history.replaceState(null, "", "?page=schedules");
-  //     }
-  //     if (target.textContent?.includes("Tổng quan")) {
-  //       e.preventDefault();
-  //       setCurrentPage("overview");
-  //       window.history.replaceState(null, "", "/dashboard");
-  //     }
-  //   };
-  //   document.addEventListener("click", handleClick);
-  //   return () => document.removeEventListener("click", handleClick);
-  // }, []);
-
 
   useEffect(() => {
     // Lấy token từ cookie
@@ -100,7 +69,6 @@ export default function DashboardPage() {
 
   // Giao diện trang dashboard
   return (
-    
     <div className="flex flex-col h-screen bg-gray-100">
       <TopBar username={username} onLogout={() => setShowLogoutConfirm(true)} />
       <div className="flex flex-1">

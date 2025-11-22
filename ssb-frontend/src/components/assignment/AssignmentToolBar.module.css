@@ -29,8 +29,8 @@
 }
 
 .icon {
-  width: 18px;
-  height: 18px;
+  width: 30px;
+  height: 30px;
   cursor: pointer;
 }
 
@@ -43,31 +43,28 @@
 
 .btn {
   width: 160px;
+  height: 40px;
   padding: 6px 14px;
   border-radius: 6px;
   border: none;
   font-size: 14px;
   font-weight: 600;
+  background-color: #2ebde8;
   color: #ffffff;
   cursor: pointer;
 }
 
-/* màu giống hình */
-
-.btnEdit {
-  background-color: #2ebde8; /* xanh dương "Sửa" */
-}
 
 .btnEdit:hover {
   opacity: 0.9;
 }
 .left input {
   width: 100%;
-  height: 30px;
+  height: 40px;
 }
 .toolbar {
   background-color: #f3f3f3;
-  padding: 5px 12px;
+  padding: 5px 0px;
   position: relative;
   height: 50px;
 }
@@ -75,10 +72,10 @@
 /* Bên trái */
 .toolbar .left {
   position: absolute;
-  left: 0px; /* cách mép trái */
+  left: 0px;
   top: 50%;
-  transform: translateY(-50%); /* căn giữa theo chiều dọc */
-  display: flex; /* nếu muốn các item bên trái vẫn nằm ngang */
+  transform: translateY(-50%);
+  display: flex;
   gap: 8px;
   width: 500px;
 }
@@ -86,11 +83,11 @@
 /* Bên phải */
 .toolbar .actions {
   position: absolute;
-  right: 12px; /* cách mép phải */
+  right: 0px;
   top: 50%;
   transform: translateY(-50%);
 }
-/* Dropdown giữ nguyên */
+
 .filterDropdown {
   position: absolute;
   top: calc(100% + 4px);
@@ -103,6 +100,7 @@
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
   z-index: 20;
 }
+
 /* item dropdown */
 .filterItem {
   padding: 8px 12px;

@@ -6,7 +6,7 @@
     sans-serif;
 }
 
-/* Nếu muốn dùng title */
+
 .title {
   font-size: 20px;
   font-weight: 600;
@@ -30,14 +30,15 @@
   color: black;
 }
 
-/* Header màu xanh giống hình */
+
 .table th {
   background-color: #41bd79;
   color: #ffffff;
   font-weight: 600;
+  font-size: 16px;
 }
 
-/* Căn chiều rộng cột (gần giống hình) */
+
 .colRoute {
   width: 50%;
 }
@@ -82,17 +83,17 @@
   color: #ffffff;
 }
 
-/* Đã hoàn thành – xanh lá */
+/* Đã hoàn thành */
 .statusCompleted {
   background-color: #00b050;
 }
 
-/* Chưa phân công – đỏ cam */
+/* Chưa phân công  */
 .statusUnassigned {
   background-color: #ff5a36;
 }
 
-/* Đang thực thi – vàng cam */
+/* Đang thực thi  */
 .statusInProgress {
   background-color: #f0ad0b;
 }
@@ -144,16 +145,19 @@
   text-align: center;
 }
 .table {
-  border-collapse: separate; /* cần để border-radius hoạt động */
+  border-collapse: separate;
   border-spacing: 0;
-  border-radius: 8px; /* bo góc */
-  overflow: hidden; /* giúp bo góc hiển thị đúng */
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
 }
-.table {
-  width: 100%; /* bảng chiếm hết chiều ngang container */
-}
+
 .table thead tr {
-  height: 50px; /* chỉnh chiều cao hàng đầu tiên */
+  height: 50px;
+}
+
+.table tbody tr {
+  height: 40px;
 }
 .rowDisabled {
   opacity: 0.6;

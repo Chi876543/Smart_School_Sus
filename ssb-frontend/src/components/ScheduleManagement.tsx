@@ -1,10 +1,11 @@
-// src/components/ScheduleManagement.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import AddScheduleModal from "./AddScheduleModal/AddScheduleModal";
 import DetailScheduleModal from "./DetailScheduleModal";
 import api from "@/services/api";
+import SearchBar from "./searchBar/searchBar";
+import Toast from "./toast/toast";
 
 interface Schedule {
   id: string;
@@ -29,17 +30,12 @@ export default function ScheduleManagement() {
   const [editData, setEditData] = useState<any>(null);
 
   // Toast states
-  const [showSelectScheduleToast, setShowSelectScheduleToast] = useState(false);
-  const [showNoScheduleSelectedToast, setShowNoScheduleSelectedToast] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [showDeleteSuccessToast, setShowDeleteSuccessToast] = useState(false);
-  const [showDeleteErrorToast, setShowDeleteErrorToast] = useState(false);
   const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
 
-  // Toast thành công mới
-  const [showCreateSuccessToast, setShowCreateSuccessToast] = useState(false);
-  const [showUpdateSuccessToast, setShowUpdateSuccessToast] = useState(false);
+  type ToastType = "success" | "error";
+  const [toast, setToast] = useState<{msg:string;type:ToastType} | null>(null);
 
   // Lấy danh sách lịch trình
   const fetchSchedules = async () => {
@@ -57,6 +53,11 @@ export default function ScheduleManagement() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const showToast = (msg: string, type: ToastType = "success", duration = 4000) => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), duration);
   };
 
   // Lấy chi tiết lịch trình
@@ -92,6 +93,8 @@ export default function ScheduleManagement() {
       return;
     }
     const term = searchTerm.toLowerCase();
+    
+    // Tìm theo tên và tuyến đường
     const result = schedules.filter(
       (s) =>
         s.name.toLowerCase().includes(term) ||
@@ -112,8 +115,7 @@ export default function ScheduleManagement() {
   // Sửa lịch trình
   const handleEdit = async () => {
     if (!selectedSchedule) {
-      setShowSelectScheduleToast(true);
-      setTimeout(() => setShowSelectScheduleToast(false), 4500);
+      showToast("Vui lòng chọn 1 lịch trình để sửa!", "error")
       return;
     }
 
@@ -129,8 +131,7 @@ export default function ScheduleManagement() {
   const handleDelete = (id: string) => {
     if (!id) {
       setDeleteErrorMessage("Không tìm thấy ID lịch trình");
-      setShowDeleteErrorToast(true);
-      setTimeout(() => setShowDeleteErrorToast(false), 4500);
+      showToast(deleteErrorMessage, "error")
       return;
     }
     setShowDeleteConfirm(id);
@@ -140,18 +141,14 @@ export default function ScheduleManagement() {
     if (!showDeleteConfirm) return;
     setDeleteLoading(true);
     try {
-      const res = await fetch(`http://localhost:8080/schedules/${showDeleteConfirm}/delete`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error(await res.text() || "Xóa thất bại!");
+      const res = await api.delete(`/schedules/${showDeleteConfirm}`);
+      if (res.status != 200) throw new Error(await res.statusText || "Xóa thất bại!");
 
-      setShowDeleteSuccessToast(true);
-      setTimeout(() => setShowDeleteSuccessToast(false), 4000);
+      showToast("Xóa lịch trình thành công!", "error")
       fetchSchedules();
     } catch (err: any) {
       setDeleteErrorMessage(err.message || "Có lỗi xảy ra");
-      setShowDeleteErrorToast(true);
-      setTimeout(() => setShowDeleteErrorToast(false), 5000);
+      showToast(deleteErrorMessage, "error")
     } finally {
       setDeleteLoading(false);
       setShowDeleteConfirm(null);
@@ -160,15 +157,13 @@ export default function ScheduleManagement() {
 
   // Gọi khi tạo thành công (bạn có thể gọi từ AddScheduleModal nếu muốn)
   const handleCreateSuccess = () => {
-    setShowCreateSuccessToast(true);
-    setTimeout(() => setShowCreateSuccessToast(false), 4000);
+    showToast("Tạo lịch trình thành công!", "success")
     fetchSchedules();
   };
 
   // Gọi khi cập nhật thành công
   const handleUpdateSuccess = () => {
-    setShowUpdateSuccessToast(true);
-    setTimeout(() => setShowUpdateSuccessToast(false), 4000);
+    showToast("Cập nhật lịch trình thành công!", "success")
     fetchSchedules();
   };
 
@@ -183,21 +178,16 @@ export default function ScheduleManagement() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-white shadow-md px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Tìm kiếm..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg w-80 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-            <svg className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+
+        <div>
+          <SearchBar 
+            value={searchTerm}
+            placeholder="Tìm kiếm..."
+            onChange={(value) => setSearchTerm(value)}
+          />
         </div>
+        
 
         <div className="flex gap-3">
           <button onClick={() => setIsAddModalOpen(true)} className="bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-3 rounded-lg font-medium hover:from-green-500 hover:to-green-600 shadow-md transition">
@@ -209,8 +199,7 @@ export default function ScheduleManagement() {
           <button
             onClick={() => {
               if (!selectedSchedule) {
-                setShowNoScheduleSelectedToast(true);
-                setTimeout(() => setShowNoScheduleSelectedToast(false), 4500);
+                showToast("Vui lòng chọn 1 lịch trình để xóa!", "error")
                 return;
               }
               handleDelete(selectedSchedule.id);
@@ -223,7 +212,10 @@ export default function ScheduleManagement() {
       </div>
 
       {/* Bảng */}
-      <div className="p-6">
+      <div 
+        style={{
+          marginTop: "5px"
+        }}>
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <table className="w-full">
             <thead className="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
@@ -266,64 +258,11 @@ export default function ScheduleManagement() {
         </div>
       </div>
 
-      {/* Tất cả Toast */}
-      {/* Chưa chọn để sửa */}
-      {showSelectScheduleToast && (
-        <div className="fixed top-4 right-4 z-50 animate-slide-in bg-red-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 border border-red-600">
-          <span className="text-3xl">⚠️</span>
-          <div>
-            <p className="font-semibold text-lg">Chưa chọn lịch trình</p>
-            <p className="text-sm opacity-90">Vui lòng chọn một lịch trình để chỉnh sửa.</p>
-          </div>
-          <button onClick={() => setShowSelectScheduleToast(false)} className="ml-4 text-2xl font-bold hover:opacity-70">×</button>
-        </div>
-      )}
-
-      {/* Chưa chọn để xóa */}
-      {showNoScheduleSelectedToast && (
-        <div className="fixed top-4 right-4 z-50 animate-slide-in bg-red-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 border border-red-600">
-          <span className="text-3xl">⚠️</span>
-          <div>
-            <p className="font-semibold text-lg">Chưa chọn lịch trình</p>
-            <p className="text-sm opacity-90">Vui lòng chọn một lịch trình để xóa.</p>
-          </div>
-          <button onClick={() => setShowNoScheduleSelectedToast(false)} className="ml-4 text-2xl font-bold hover:opacity-70">×</button>
-        </div>
-      )}
-
-      {/* Tạo thành công */}
-      {showCreateSuccessToast && (
-        <div className="fixed top-4 right-4 z-50 animate-slide-in bg-green-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3">
-         
-          <span className="font-semibold text-lg">Tạo lịch trình thành công!</span>
-          <button onClick={() => setShowCreateSuccessToast(false)} className="ml-4 text-xl hover:opacity-70">×</button>
-        </div>
-      )}
-
-      {/* CẬP NHẬT THÀNH CÔNG - MỚI THÊM */}
-      {showUpdateSuccessToast && (
-        <div className="fixed top-4 right-4 z-50 animate-slide-in bg-green-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3">
-          
-          <div>
-            <p className="font-semibold text-lg">Cập nhật thành công!</p>
-            <p className="text-sm opacity-90">Lịch trình đã được lưu thay đổi.</p>
-          </div>
-          <button onClick={() => setShowUpdateSuccessToast(false)} className="ml-4 text-2xl font-bold hover:opacity-70">×</button>
-        </div>
-      )}
-
-      {/* Xóa thành công */}
-      {showDeleteSuccessToast && (
-        <div className="fixed top-4 right-4 z-50 animate-slide-in bg-green-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3">
-         
-          <span className="font-semibold text-lg">Xóa lịch trình thành công!</span>
-          <button onClick={() => setShowDeleteSuccessToast(false)} className="ml-4 text-xl hover:opacity-70">×</button>
-        </div>
-      )}
+      {toast && <Toast message={toast.msg} type={toast.type} />}
 
       {/* Modal xác nhận xóa */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl p-8 max-w-sm w-full mx-4 shadow-2xl animate-scale-in">
             <div className="text-center">
               <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">

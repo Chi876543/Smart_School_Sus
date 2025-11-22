@@ -183,21 +183,6 @@ export class TrackingService {
     const stops = (await this.getBusStaticDetail(bus.scheduleId.toString())).stops; 
     if(stops.length === 0) 
       throw new NotFoundException(`Cannot find stops of ${busId}`);
-
-    // const studentsAtStops = (await this.studentRepo.findAll())
-    // .filter(stu => stops.map(s => s.id).includes(stu.stopId._id.toString()));
-    
-    // const scheduleId = (await this.getBusStaticDetail(bus.scheduleId.toString())).scheduleId;
-    // if(!scheduleId) 
-    //   throw new NotFoundException(`Cannot find schedule of ${busId}`);
-
-    // let tripStudents = await this.tripRepo.findTripStudents(scheduleId);
-    // if(tripStudents.length === 0) 
-    //   throw new NotFoundException(`Cannot find stops of ${busId}`);
-
-    // const trip = (await this.tripRepo.findByScheduleId(scheduleId)).at(0);
-    // if(!trip)
-    //   throw new NotFoundException(`Cannot find trip of ${busId}`);
     
     const routeLine = this.polylines[busId]; 
     if(!routeLine) 

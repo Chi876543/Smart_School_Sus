@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import SearchBar from "../searchBar/searchBar"; // chỉnh path đúng với project của bạn
+import SearchBar from "../searchBar/searchBar";
 import styles from "./AssignmentToolBar.module.css";
 
 export interface AssignmentToolbarProps {
@@ -9,7 +9,7 @@ export interface AssignmentToolbarProps {
   onSearch?: (value: string) => void;
   onSearchChange?: (value: string) => void;
   onEdit?: () => void;
-  filterStatus: string; // ví dụ: "ALL" | "Chưa phân công" | "Đã phân công" | ...
+  filterStatus: string;
   onFilterStatusChange: (status: string) => void;
   onFilterClick?: () => void;
 }
@@ -32,7 +32,6 @@ export default function AssignmentToolbar({
     { label: "Đang hoạt động", value: "Đang hoạt động" },
     { label: "Đã hoàn thành", value: "Đã hoàn thành" },
     { label: "Tạm dừng", value: "Tạm dừng" },
-    { label: "Hủy bỏ", value: "Hủy bỏ" },
   ];
 
   return (
@@ -55,7 +54,7 @@ export default function AssignmentToolbar({
               setOpen((v) => !v);
             }}
           >
-            <img src="/filter.png" className={styles.icon} />
+            <img src="/filter.svg" className={styles.icon} />
           </button>
 
           {open && (
@@ -84,7 +83,7 @@ export default function AssignmentToolbar({
       <div className={styles.actions}>
         <button
           type="button"
-          className={`${styles.btn} ${styles.btnEdit}`}
+          className={`${styles.btn}`}
           onClick={onEdit}
         >
           Sửa phân công
