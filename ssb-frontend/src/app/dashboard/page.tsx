@@ -8,11 +8,40 @@ import ScheduleManagement from "@/components/ScheduleManagement";
 import Assignment from "../../components/assignment/DriverAssignment";
 import LogoutConfirmModal from "./pageConfirm";
 import Toast from "@/components/toast/toast";
+import StudentTable from "@/components/overviewTable/studentOverview";
+import DriverTable from "@/components/overviewTable/driverOverview";
+import BusTable from "@/components/overviewTable/busOverview";
+import RouteTable from "@/components/overviewTable/routeOverview";
+
+const menuItems = [
+    { 
+      label: "Tổng quan", 
+      key: "overview" ,
+      children: [
+        { label: "Học sinh", key: "overview-students" },
+        { label: "Tài xế", key: "overview-drivers" },
+        { label: "Xe buýt", key: "overview-buses" },
+        { label: "Tuyến đường", key: "overview-routes" },
+      ],
+    },
+    { 
+      label: "Theo dõi xe buýt",
+      key: "tracking" 
+    },
+    { 
+      label: "Quản lý lịch trình", 
+      key: "schedules" 
+    },
+    { 
+      label: "Phân công lịch trình", 
+      key: "assign" 
+    },
+  ];
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<any>(null);
   const [username, setUsername] = useState("");
-  const [activeMenu, setActiveMenu] = useState<string>("overview");
+  const [activeMenu, setActiveMenu] = useState<string>(menuItems[0].children?.[0]?.key || menuItems[0].key);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
@@ -60,51 +89,85 @@ export default function DashboardPage() {
     window.location.href = "/login";
   };
 
-  const menuItems = [
-    { label: "Tổng quan", key: "overview" },
-    { label: "Theo dõi xe buýt", key: "tracking" },
-    { label: "Quản lý lịch trình", key: "schedules" },
-    { label: "Phân công lịch trình", key: "assign" },
-  ];
-
   // Giao diện trang dashboard
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100 overflow-hidden">
       <TopBar username={username} onLogout={() => setShowLogoutConfirm(true)} />
       <div className="flex flex-1">
         <LeftSidebar items={menuItems} onSelect={(key) => setActiveMenu(key)} />
-        <div className="flex-1 p-6 overflow-auto">
-          {activeMenu === "overview" && (
-            <>
-              <h1 className="text-2xl font-semibold mb-4">
-                Tổng quan hệ thống
-              </h1>
-              {summary ? (
-                <ul className="grid grid-cols-3 gap-4">
-                  <li className="bg-white p-4 rounded-xl shadow">
-                    Xe buýt: {summary.buses}
-                  </li>
-                  <li className="bg-white p-4 rounded-xl shadow">
-                    Tài xế: {summary.drivers}
-                  </li>
-                  <li className="bg-white p-4 rounded-xl shadow">
-                    Học sinh: {summary.students}
-                  </li>
-                </ul>
-              ) : (
-                <p>Đang tải dữ liệu...</p>
-              )}
-            </>
-          )}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="p-6">
+            {/* {activeMenu === "overview" && (
+              <>
+                <h1 className="text-2xl font-semibold mb-4">
+                  Tổng quan hệ thống
+                </h1>
+                {summary ? (
+                  <ul className="grid grid-cols-3 gap-4 w-full">
+                    <li className="bg-white p-4 rounded-xl shadow">
+                      Xe buýt: {summary.buses}
+                    </li>
+                    <li className="bg-white p-4 rounded-xl shadow">
+                      Tài xế: {summary.drivers}
+                    </li>
+                    <li className="bg-white p-4 rounded-xl shadow">
+                      Học sinh: {summary.students}
+                    </li>
+                  </ul>
+                ) : (
+                  <p>Đang tải dữ liệu...</p>
+                )}
+              </>
+            )} */}
+            
+            {activeMenu === "overview-students" && (
+              <>
+                <h1 className="text-2xl font-semibold mb-4">
+                  Danh sách học sinh
+                </h1>
+                <StudentTable />
+              </>
+            )}
 
-          {activeMenu === "tracking" && (
-            <>
-              <TrackingSection />
-            </>
-          )}
+            {activeMenu === "overview-drivers" && (
+              <>
+                <h1 className="text-2xl font-semibold mb-4">
+                  Danh sách tài xế
+                </h1>
+                <DriverTable />
+              </>
+            )}
 
-          {activeMenu === "schedules" && <ScheduleManagement />}
-          {activeMenu === "assign" && <Assignment />}
+            {activeMenu === "overview-buses" && (
+              <>
+                <h1 className="text-2xl font-semibold mb-4">
+                  Danh sách xe buýt
+                </h1>
+                <BusTable />
+              </>
+            )}
+
+            {activeMenu === "overview-routes" && (
+              <>
+                <h1 className="text-2xl font-semibold mb-4">
+                  Danh sách tuyến xe
+                </h1>
+                <RouteTable />
+              </>
+            )}
+            {/* Giao diện theo dõi xe */}
+            {activeMenu === "tracking" && (
+              <div className="h-full overflow-hidden">
+                <TrackingSection />
+              </div>
+            )}
+
+            {/* Giao diện quản lý lịch trình */}
+            {activeMenu === "schedules" && <ScheduleManagement/>}
+
+            {/* Giao diện phân công */}
+            {activeMenu === "assign" && <Assignment/>}
+          </div>
         </div>
       </div>
 

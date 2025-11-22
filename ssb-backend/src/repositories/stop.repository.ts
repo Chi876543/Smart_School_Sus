@@ -15,9 +15,9 @@ export class StopRepository {
   //   return this.stopModel.find().lean();
   // }
 
-  // async findById(id: string) {
-  //   return this.stopModel.findById(new Types.ObjectId(id)).lean();
-  // }
+  async findById(id: string) {
+    return this.stopModel.findById(new Types.ObjectId(id)).lean();
+  }
 
   // async update(id: string, data: Partial<Stop>) {
   //   return this.stopModel.findByIdAndUpdate(id, data, { new: true }).lean();

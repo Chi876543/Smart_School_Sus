@@ -6,6 +6,7 @@ import DetailScheduleModal from "./DetailScheduleModal";
 import api from "@/services/api";
 import SearchBar from "./searchBar/searchBar";
 import Toast from "./toast/toast";
+import styles from "./ScheduleManagement.module.css";
 
 interface Schedule {
   id: string;
@@ -221,39 +222,32 @@ export default function ScheduleManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className={styles.page_container}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className={styles.header_bar}>
 
-        <div className="flex items-center gap-2">
-          <SearchBar 
-            value={searchTerm}
-            placeholder="Tìm kiếm..."
-            onChange={(value) => setSearchTerm(value)}
-          />
+        <div className={styles.header_left}>
+          <div className={styles.search_wrapper}>
+            <SearchBar 
+              value={searchTerm}
+              placeholder="Tìm kiếm..."
+              onChange={(value) => setSearchTerm(value)}
+            />
+          </div>
+          
           {/* Filter */}
-          <div className="relative">
+          <div className={styles.filter_container}>
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
-              className="
-                w-[34px] h-[34px]
-                rounded-md border border-gray-300 
-                bg-white flex items-center justify-center 
-                hover:bg-gray-200 cursor-pointer
-              "
+              className={styles.filter_button}
             >
               <img src="/filter.svg" className="w-[28px] h-[28px]" />
             </button>
 
             {open && (
               <div
-                className="
-                  absolute top-[42px] left-0 
-                  min-w-[180px]
-                  bg-white border border-gray-300 rounded-lg 
-                  shadow-lg py-1 z-20
-                "
+                className={styles.filter_dropdown}
               >
                 {periodFilters.map((p) => (
                   <div
@@ -278,11 +272,11 @@ export default function ScheduleManagement() {
         </div>
         
 
-        <div className="flex gap-3">
-          <button onClick={() => setIsAddModalOpen(true)} className="bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-3 rounded-lg font-medium hover:from-green-500 hover:to-green-600 shadow-md transition cursor-pointer">
+        <div className={styles.action_buttons}>
+          <button onClick={() => setIsAddModalOpen(true)} className={styles.btn_add}>
             Thêm
           </button>
-          <button onClick={handleEdit} className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-6 py-3 rounded-lg font-medium hover:from-yellow-500 hover:to-yellow-600 shadow-md transition cursor-pointer">
+          <button onClick={handleEdit} className={styles.btn_edit}>
             Sửa
           </button>
           <button
@@ -293,7 +287,7 @@ export default function ScheduleManagement() {
               }
               handleDelete(selectedSchedule.id);
             }}
-            className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg font-medium hover:from-red-600 hover:to-red-700 shadow-md transition cursor-pointer"
+            className={styles.btn_delete}
           >
             Xóa
           </button>
@@ -301,24 +295,21 @@ export default function ScheduleManagement() {
       </div>
 
       {/* Bảng */}
-      <div 
-        style={{
-          marginTop: "5px"
-        }}>
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className={styles.table_container}>
+        <div className={styles.table_wrapper}>
           <table className="w-full">
-            <thead className="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
+            <thead className={styles.table_header}>
               <tr>
-                <th className="px-6 py-4 text-left font-medium">Tên lịch trình</th>
-                <th className="px-6 py-4 text-left font-medium">Tuyến đường</th>
-                <th className="px-6 py-4 text-left font-medium">Kỳ hoạt động</th>
-                <th className="px-6 py-4 text-center font-medium">Đón - Trả học sinh</th>
+                <th>Tên lịch trình</th>
+                <th>Tuyến đường</th>
+                <th>Kỳ hoạt động</th>
+                <th>Đón - Trả học sinh</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-20 text-gray-500 text-lg">
+                  <td colSpan={4} className={styles.table_empty}>
                     Chưa có lịch trình nào
                   </td>
                 </tr>
@@ -327,22 +318,24 @@ export default function ScheduleManagement() {
                   <tr
                     key={s.id}
                     onClick={() => {
-                      if (s.status !== "active") handleRowClick(s.id);
+                      if (s.status !== "active"){
+                        handleRowClick(s.id);
+                      } else {
+                        showToast("Xe đang thực hiện chuyến đi, không thể thao tác", "error")
+                      }
                     }}
-                    className={`
-                      transition
-                      ${s.status === "active" ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                      : selectedSchedule?.id === s.id ? "bg-green-100 cursor-pointer"
-                      : "hover:bg-gray-50 cursor-pointer"}
+                    className={`${styles.table_row}
+                      ${s.status === "active" ? styles.table_row_disabled : ""}
+                      ${selectedSchedule?.id === s.id ? styles.table_row_selected : ""}
                     `}
                   >
-                    <td className="px-6 py-5 font-medium text-gray-800">{s.name}</td>
-                    <td className="px-6 py-5 text-gray-700">{s.routeName}</td>
-                    <td className="px-6 py-5 text-gray-600">
+                    <td className={styles.table_cell}>{s.name}</td>
+                    <td className={styles.table_cell}>{s.routeName}</td>
+                    <td className={styles.table_cell}>
                       {new Date(s.dateStart).toLocaleDateString("vi-VN")} → {new Date(s.dateEnd).toLocaleDateString("vi-VN")}
                     </td>
-                    <td className="px-6 py-5 text-center">
-                      <button onClick={(e) => { e.stopPropagation(); openDetail(s); }} className="text-green-600 hover:text-red-800 font-semibold underline transition cursor-pointer">
+                    <td className={styles.table_cell}>
+                      <button onClick={(e) => { e.stopPropagation(); openDetail(s); }} className={styles.view_button}>
                         Xem
                       </button>
                     </td>

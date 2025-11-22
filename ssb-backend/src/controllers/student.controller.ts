@@ -7,8 +7,13 @@ export class StudentController{
     constructor(private readonly studentService: StudentService){}
 
     @Get(':routeId')
-    getStudentsByRouteId(@Param('routeId') routeId: string){
-        return this.studentService.getStudentsFromRoute(routeId);
+    async getStudentsByRouteId(@Param('routeId') routeId: string){
+      return this.studentService.getStudentsFromRoute(routeId);
+    }
+
+    @Get()
+    async getAllStudent(){
+      return this.studentService.getAllStudent();
     }
 
 

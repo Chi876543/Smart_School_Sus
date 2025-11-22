@@ -10,6 +10,9 @@ import { TripModule } from './modules/trip.module';
 import { DatabaseModule } from './modules/database.module';
 import { StudentModule } from './modules/student.module';
 import { Trip } from './schema';
+import { DriverModule } from './modules/driver.module';
+import { BusModule } from './modules/bus.module';
+import { RouteModule } from './modules/route.module';
 
 @Module({
   imports: [
@@ -24,6 +27,9 @@ import { Trip } from './schema';
     AuthModule,
     TrackingModule,
     TripModule,
+    DriverModule,
+    BusModule,
+    RouteModule,
 
   ],
 })

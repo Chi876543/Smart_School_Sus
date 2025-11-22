@@ -7,3 +7,14 @@
 .animate-slide-in {
   animation: slideIn 0.4s ease-out;
 }
+
+/* .leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+} */
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
