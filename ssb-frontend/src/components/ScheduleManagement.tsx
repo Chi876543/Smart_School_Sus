@@ -22,6 +22,8 @@ export default function ScheduleManagement() {
   const [filtered, setFiltered] = useState<Schedule[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [open, setOpen] = useState(false);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -36,6 +38,14 @@ export default function ScheduleManagement() {
 
   type ToastType = "success" | "error";
   const [toast, setToast] = useState<{msg:string;type:ToastType} | null>(null);
+
+  // Các bộ lọc trạng thái
+  const periodFilters = [
+    { label: "Tất cả", value: "all" },
+    { label: "Đang diễn ra", value: "active" },
+    { label: "Sắp diễn ra", value: "upcoming" },
+    { label: "Đã kết thúc", value: "ended" }
+  ];
 
   // Lấy danh sách lịch trình
   const fetchSchedules = async () => {
@@ -55,6 +65,7 @@ export default function ScheduleManagement() {
     }
   };
 
+  // Hiển thị toast
   const showToast = (msg: string, type: ToastType = "success", duration = 4000) => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), duration);
@@ -71,6 +82,12 @@ export default function ScheduleManagement() {
     }
   };
 
+  // Xử lý thay đổi bộ lọc trạng thái
+  const onFilterStatusChange = (value: string) => {
+    setFilterStatus(value);
+  };
+
+
   // Lấy tuyến đường
   const fetchRoutes = async () => {
     try {
@@ -85,6 +102,33 @@ export default function ScheduleManagement() {
     fetchSchedules();
     fetchRoutes();
   }, []);
+
+  // Lọc theo trạng thái
+  useEffect(() => {
+    const now = new Date();
+
+    let result = [...schedules];
+
+    result = result.filter((s) => {
+      const start = new Date(s.dateStart);
+      const end = new Date(s.dateEnd);
+
+      if (filterStatus === "active") {
+        return start <= now && now <= end;
+      }
+      if (filterStatus === "upcoming") {
+        return start > now;
+      }
+      if (filterStatus === "ended") {
+        return end < now;
+      }
+
+      return true; // all
+    });
+
+    setFiltered(result);
+  }, [filterStatus, schedules]);
+
 
   // Tìm kiếm
   useEffect(() => {
@@ -137,6 +181,7 @@ export default function ScheduleManagement() {
     setShowDeleteConfirm(id);
   };
 
+  // Xác nhận xóa
   const confirmDelete = async () => {
     if (!showDeleteConfirm) return;
     setDeleteLoading(true);
@@ -180,12 +225,56 @@ export default function ScheduleManagement() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
 
-        <div>
+        <div className="flex items-center gap-2">
           <SearchBar 
             value={searchTerm}
             placeholder="Tìm kiếm..."
             onChange={(value) => setSearchTerm(value)}
           />
+          {/* Filter */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              className="
+                w-[34px] h-[34px]
+                rounded-md border border-gray-300 
+                bg-white flex items-center justify-center 
+                hover:bg-gray-200 cursor-pointer
+              "
+            >
+              <img src="/filter.svg" className="w-[28px] h-[28px]" />
+            </button>
+
+            {open && (
+              <div
+                className="
+                  absolute top-[42px] left-0 
+                  min-w-[180px]
+                  bg-white border border-gray-300 rounded-lg 
+                  shadow-lg py-1 z-20
+                "
+              >
+                {periodFilters.map((p) => (
+                  <div
+                    key={p.value}
+                    onClick={() => {
+                      onFilterStatusChange(p.value);
+                      setOpen(false);
+                    }}
+                    className={`
+                      px-3 py-2 text-sm cursor-pointer
+                      hover:bg-gray-100
+                      ${filterStatus === p.value ? "bg-blue-100 text-blue-600 font-semibold" : ""}
+                    `}
+                  >
+                    {p.label}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
         </div>
         
 
