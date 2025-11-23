@@ -54,7 +54,11 @@ export default function BusTable() {
 
   const columns: Column<Bus>[] = [
     { key: "plateNum", label: "Biển số xe" },
-    { key: "assignedRoutes", label: "Tuyến được phân công" },
+    { 
+      key: "assignedRoutes", 
+      label: "Tuyến được phân công",
+      render: (row: Bus) => row.assignedRoutes?.join(", ") || "Chưa có"
+    },
     {
       key: "status",
       label: "Trạng thái",

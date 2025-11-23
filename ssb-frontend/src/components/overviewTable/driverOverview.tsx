@@ -63,7 +63,11 @@ export default function DriverTable() {
 
   const columns: Column<Driver>[] = [
     { key: "fullName", label: "Họ và tên" },
-    { key: "assignedRoutes", label: "Tuyến được phân công" },
+    { 
+      key: "assignedRoutes", 
+      label: "Tuyến được phân công",
+      render: (row: Driver) => row.assignedRoutes?.join(", ") || "Chưa có"
+    },
     {
       key: "status",
       label: "Trạng thái",
