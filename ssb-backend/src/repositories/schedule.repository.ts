@@ -57,6 +57,15 @@ export class ScheduleRepository {
       dateEnd: { $gte: now },
     });
   }
+  // Lấy tất cả schedule đang hoạt động
+  async findActiveSchedules1() {
+    const now = new Date();
+    return this.scheduleModel.find({
+      status: { $in: ['active'] },
+      dateStart: { $lte: now },
+      dateEnd: { $gte: now },
+    });
+  }
 
   async findOne(scheduleId: string) {
     return this.scheduleModel

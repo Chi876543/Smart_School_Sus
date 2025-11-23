@@ -34,7 +34,7 @@ export class TrackingService {
 
   // Lấy danh sách xe đang hoạt động (Schedule active/planned)
   async getAllBusLocations() {
-    const schedules = await this.scheduleRepo.findActiveSchedules();
+    const schedules = await this.scheduleRepo.findActiveSchedules1();
     const results: any[] = [];
 
     for (const s of schedules) {

@@ -187,7 +187,7 @@ export default function ScheduleManagement() {
     if (!showDeleteConfirm) return;
     setDeleteLoading(true);
     try {
-      const res = await api.delete(`/schedules/${showDeleteConfirm}`);
+      const res = await api.delete(`/schedules/${showDeleteConfirm}/delete`);
       if (res.status != 200) throw new Error(await res.statusText || "Xóa thất bại!");
 
       showToast("Xóa lịch trình thành công!", "error")

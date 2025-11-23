@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Step1ScheduleInfo from "./Step1ScheduleInfo";
 import Step2StudentSelection from "./Step2StudentSelection";
+import Toast from "../toast/toast";
 
 interface AddScheduleModalProps {
   isOpen: boolean;
@@ -114,8 +115,8 @@ export default function AddScheduleModal({
       });
 
       if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err || "Lỗi server");
+        <Toast type="error" message="Đã có lỗi xảy ra khi lưu lịch trình." />;
+        return;
       }
 
       // Thành công → gọi callback và đóng
