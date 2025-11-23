@@ -110,24 +110,26 @@ export default function RouteTable() {
                     <p><strong>Tên tuyến đường:</strong> {selectedRoute.name}</p>
                     <p><strong>Độ dài ước tính:</strong> {selectedRoute.distance} km</p>
                     <h3 className="mt-4 mb-2 font-semibold">Các trạm trên Tuyến</h3>
-                    <table className={styles.table}>
-                    <thead>
-                        <tr>
-                        <th>Thứ tự</th>
-                        <th>Trạm</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {selectedRoute.stops
-                        .sort((a, b) => a.order - b.order)
-                        .map((stop) => (
-                            <tr key={stop.order}>
-                            <td className="text-center">{stop.order}</td>
-                            <td>{stop.name}</td>
+                    <div className={styles.tablePopup}>
+                      <table className={styles.table}>
+                        <thead>
+                            <tr>
+                            <th>Thứ tự</th>
+                            <th>Trạm</th>
                             </tr>
-                        ))}
-                    </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                            {selectedRoute.stops
+                            .sort((a, b) => a.order - b.order)
+                            .map((stop) => (
+                                <tr key={stop.order}>
+                                <td className="text-center">{stop.order}</td>
+                                <td>{stop.name}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
                     <p><strong>Trạng thái:</strong> Đang hoạt động</p>
                 </div>
             </div>

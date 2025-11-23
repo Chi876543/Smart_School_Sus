@@ -54,7 +54,7 @@ export class TrackingService {
 
     return results;
   }
-
+  
   // Xem chi tiết 1 xe theo schedule
   async getBusStaticDetail(scheduleId: string): Promise<TrackingDetailDto> {
     const schedule = await this.scheduleRepo.findScheduleById(scheduleId);
