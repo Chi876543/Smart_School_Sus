@@ -49,7 +49,7 @@ async function seed() {
   // console.log('✅ Admin created:', admin.username);
 
   // Điểm dừng mẫu
-  const [stop1, stop2, stop3, stop4, stop5, stop6, stop7, stop8, stop9, stop10, stop11, stop12, stop13, stop14, stop15, stop16, stop17, stop18] = await StopModel.create([
+  const [stop1, stop2, stop3, stop4, stop5, stop6, stop7, stop8, stop9, stop10, stop11, stop12, stop13, stop14, stop15, stop16, stop17, stop18, stop19, stop20, stop21, stop22, stop23, stop24, stop25] = await StopModel.create([
     // { name: 'Trường THPT Lê Lợi', lat: 13.978128, lng: 108.006235, active: true }, // 1
 
     // { name: 'Viết Xuân - Hùng Vương', lat: 13.974154, lng: 108.009851, active: true }, // 2
@@ -75,7 +75,7 @@ async function seed() {
     // { name: 'Lê Duẫn - Ngô Thị Nhậm', lat: 13.9712035, lng: 108.0242909, active: true },// 17
     // { name: 'Điểm gửi 4', lat: 13.9718935, lng: 108.0330364, active: true },// 18
 
-  { name: 'Bến xe buýt Công viên 23/9 (Điểm cuối)', lat: 10.770662, lng: 106.693445, active: true }, // stop1
+  { name: 'Bến xe buýt Công viên 23/9', lat: 10.770662, lng: 106.693445, active: true }, // stop1
 
   //============= CÁC ĐIỂM ĐÓN DỌC TUYẾN (TPHCM) =============//
   { name: 'Ngã sáu Phù Đổng', lat: 10.771817, lng: 106.696743, active: true }, // 2
@@ -103,6 +103,15 @@ async function seed() {
   { name: 'Nhà thi đấu Quân khu 7', lat: 10.800527, lng: 106.666942, active: true }, // 16
   { name: 'Etown Cộng Hoà', lat: 10.801971, lng: 106.630581, active: true }, // 17
   { name: 'Aeon Mall Tân Bình (Maximark Cộng Hoà)', lat: 10.800090, lng: 106.638265, active: true }, // 18
+
+  { _id: "670f1a1a1f9c01a1b1a00112", name: 'Công viên Văn Lang', lat: 10.754178, lng: 106.664507, active: true }, // 19
+  { _id: "670f1a1a1f9c01a1b1a00113", name: 'Chợ Kim Biên', lat: 10.753879, lng: 106.662123, active: true }, // 20
+  { _id: "670f1a1a1f9c01a1b1a00114", name: 'Đại học Y Dược TPHCM', lat: 10.757233, lng: 106.660252, active: true }, // 21
+
+  { _id: "670f1a1a1f9c01a1b1a00115", name: 'Công viên Hoàng Văn Thụ', lat: 10.800984, lng: 106.663451, active: true }, // 22
+  { _id: "670f1a1a1f9c01a1b1a00116", name: 'Nhà thi đấu Quân khu 7', lat: 10.800527, lng: 106.666942, active: true }, // 23
+  { _id: "670f1a1a1f9c01a1b1a00117", name: 'Etown Cộng Hòa', lat: 10.801971, lng: 106.630581, active: true }, // 24
+  { _id: "670f1a1a1f9c01a1b1a00118", name: 'Aeon Mall Tân Bình', lat: 10.800090, lng: 106.638265, active: true }, // 25
 
   ]);
 
@@ -136,7 +145,7 @@ async function seed() {
     {
       name: 'Tuyến 3',
       active: true,
-      length: 6.1,
+      length: 7.3,
       stops: [
         { stopId: stop14._id, order: 1 },
         { stopId: stop13._id, order: 2 },
@@ -154,6 +163,29 @@ async function seed() {
         { stopId: stop17._id, order: 2 },
         { stopId: stop16._id, order: 3 },
         { stopId: stop15._id, order: 4 },
+        { stopId: stop1._id, order: 5 },
+      ],
+    },
+    {
+      name: 'Tuyến 5',
+      active: true,
+      length: 9.4,
+      stops: [
+        { stopId: stop21._id, order: 1 },
+        { stopId: stop20._id, order: 2 },
+        { stopId: stop19._id, order: 3 },
+        { stopId: stop1._id, order: 4 },
+      ],
+    },
+    {
+      name: 'Tuyến 6',
+      active: true,
+      length: 10.4,
+      stops: [
+        { stopId: stop25._id, order: 1 },
+        { stopId: stop24._id, order: 2 },
+        { stopId: stop23._id, order: 3 },
+        { stopId: stop22._id, order: 4 },
         { stopId: stop1._id, order: 5 },
       ],
     },
@@ -220,6 +252,7 @@ async function seed() {
   const createTimeTable = await TimetableModel.insertMany(timetables);
 
   // Học sinh mẫu
+  // route 1
   const [stu1, stu2, stu3, stu4, stu5, stu6, stu7, stu8, stu9, stu10, stu11, stu12, stu13, stu14, stu15, stu16, stu17, stu18, stu19, stu20, stu21, stu22, stu23, stu24, stu25, stu26, stu27, stu28, stu29, stu30] = await StudentModel.create([
     { fullName: 'Trần Gia Hân', stopId: stop5._id },
     { fullName: 'Lê Minh Tuấn', stopId: stop2._id },
@@ -253,16 +286,17 @@ async function seed() {
     { fullName: 'Vũ Mai Sang', stopId: stop3._id },
   ]);
 
+  // route 2
   const [stu1c, stu2c, stu3c, stu4c, stu5c, stu6c, stu7c, stu8c, stu9c, stu10c, stu11c, stu12c, stu13c, stu14c, stu15c, stu16c, stu17c, stu18c, stu19c, stu20c, stu21c, stu22c, stu23c, stu24c, stu25c, stu26c, stu27c, stu28c, stu29c, stu30c] = await StudentModel.create([
     { fullName: 'Trần Gia Hân', stopId: stop6._id },
     { fullName: 'Lê Minh Tuấn', stopId: stop6._id },
-    { fullName: 'Nguyễn Hoàng Nam', stopId: stop6._id },
-    { fullName: 'Phạm Nhật Vy', stopId: stop6._id },
-    { fullName: 'Đỗ Bảo An', stopId: stop6._id },
-    { fullName: 'Vũ Quang Huy', stopId: stop6._id },
-    { fullName: 'Nguyễn Gia Hân', stopId: stop7._id },
-    { fullName: 'Trần Minh Tuấn', stopId: stop7._id },
-    { fullName: 'Phạm Hoàng Nam', stopId: stop7._id },
+    { fullName: 'Nguyễn Hoàng N', stopId: stop6._id },
+    { fullName: 'Phạm Nhật V', stopId: stop6._id },
+    { fullName: 'Đỗ Bảo A', stopId: stop6._id },
+    { fullName: 'Vũ Quang H', stopId: stop6._id },
+    { fullName: 'Nguyễn Gia H', stopId: stop7._id },
+    { fullName: 'Trần Minh C', stopId: stop7._id },
+    { fullName: 'Phạm Hoàng B', stopId: stop7._id },
     { fullName: 'Đỗ Nhật Vy', stopId: stop7._id },
     { fullName: 'Vũ Bảo An', stopId: stop7._id },
     { fullName: 'Trần Quang Huy', stopId: stop8._id },
@@ -273,19 +307,20 @@ async function seed() {
     { fullName: 'Nguyễn Bảo An', stopId: stop9._id },
     { fullName: 'Lý Quang Huy', stopId: stop9._id },
     { fullName: 'Phùng Gia Hân', stopId: stop9._id },
-    { fullName: 'Đinh Minh Tuấn', stopId: stop9._id },
-    { fullName: 'Phạm Hoàng Nam', stopId: stop9._id },
-    { fullName: 'Trần Thùy Vy', stopId: stop9._id },
+    { fullName: 'Đinh Minh T', stopId: stop9._id },
+    { fullName: 'Phạm Hoàng M', stopId: stop9._id },
+    { fullName: 'Trần Thùy T', stopId: stop9._id },
     { fullName: 'Đỗ Bảo Đại', stopId: stop9._id },
     { fullName: 'Vũ Quang Nam', stopId: stop9._id },
-    { fullName: 'Trần Gia Cát Lượng', stopId: stop8._id },
-    { fullName: 'Kiều Minh Tuấn', stopId: stop7._id },
-    { fullName: 'Nguyễn Nam', stopId: stop8._id },
-    { fullName: 'Phạm Yến Vy', stopId: stop10._id },
+    { fullName: 'Gia Cát Lượng', stopId: stop8._id },
+    { fullName: 'Kiều Minh A', stopId: stop7._id },
+    { fullName: 'Nguyễn N', stopId: stop8._id },
+    { fullName: 'Phạm Yến V', stopId: stop10._id },
     { fullName: 'Đỗ Đại Học', stopId: stop9._id },
-    { fullName: 'Vũ Mai Sang', stopId: stop8._id },
+    { fullName: 'Vũ Thanh Sang', stopId: stop8._id },
   ]);
 
+  // route 4
   const [stu1a, stu2a, stu3a, stu4a, stu5a, stu6a, stu7a, stu8a, stu9a, stu10a, stu11a, stu12a, stu13a, stu14a, stu15a, stu16a, stu17a, stu18a, stu19a, stu20a, stu21a, stu22a, stu23a, stu24a, stu25a, stu26a, stu27a, stu28a, stu29a, stu30a] = await StudentModel.create([
     { fullName: 'Trần Gia Hân', stopId: stop15._id },
     { fullName: 'Lê Minh Tuấn', stopId: stop16._id },
@@ -319,6 +354,7 @@ async function seed() {
     { fullName: 'Vũ Mai Sang', stopId: stop17._id },
   ]);
 
+  // route 3
   const [stu1b, stu2b, stu3b, stu4b, stu5b, stu6b, stu7b, stu8b, stu9b, stu10b, stu11b, stu12b, stu13b, stu14b, stu15b, stu16b, stu17b, stu18b, stu19b, stu20b, stu21b, stu22b, stu23b, stu24b, stu25b, stu26b, stu27b, stu28b, stu29b, stu30b] = await StudentModel.create([
     { fullName: 'Trần Gia Hân', stopId: stop13._id },
     { fullName: 'Lê Minh Tuấn', stopId: stop12._id },
@@ -352,7 +388,39 @@ async function seed() {
     { fullName: 'Vũ Mai Sang', stopId: stop11._id },
   ]);
 
-  const [schedule1, schedule2] = await ScheduleModel.create([
+  // route 5
+  const [stu1d, stu2d, stu3d, stu4d, stu5d, stu6d, stu7d, stu8d, stu9d, stu10d, stu11d, stu12d] = await StudentModel.create([
+    { fullName: 'Trần Gia Hân', stopId: stop21._id },
+    { fullName: 'Lê Minh Tuấn', stopId: stop21._id },
+    { fullName: 'Nguyễn Hoàng Nam', stopId: stop21._id },
+    { fullName: 'Phạm Nhật Vy', stopId: stop21._id },
+    { fullName: 'Đỗ Bảo An', stopId: stop21._id },
+    { fullName: 'Vũ Quang Huy', stopId: stop20._id },
+    { fullName: 'Nguyễn Gia Hân', stopId: stop20._id },
+    { fullName: 'Trần Minh Tuấn', stopId: stop20._id },
+    { fullName: 'Phạm Hoàng Nam', stopId: stop20._id },
+    { fullName: 'Đỗ Nhật Vy', stopId: stop19._id },
+    { fullName: 'Vũ Bảo An', stopId: stop19._id },
+    { fullName: 'Trần Quang Huy', stopId: stop19._id },
+  ]);
+  // route 6
+    const [stu1de, stu2de, stu3de, stu4de, stu5de, stu6de, stu7de, stu8de, stu9de, stu10de, stu11de, stu12de] = await StudentModel.create([
+    { fullName: 'Trần Gia Hân', stopId: stop25._id },
+    { fullName: 'Lê Minh Tuấn', stopId: stop25._id },
+    { fullName: 'Nguyễn Hoàng Nam', stopId: stop25._id },
+    { fullName: 'Phạm Nhật Vy', stopId: stop24._id },
+    { fullName: 'Đỗ Bảo An', stopId: stop24._id },
+    { fullName: 'Vũ Quang Huy', stopId: stop24._id },
+    { fullName: 'Nguyễn Gia Hân', stopId: stop24._id },
+    { fullName: 'Trần Minh Tuấn', stopId: stop23._id },
+    { fullName: 'Phạm Hoàng Nam', stopId: stop23._id },
+    { fullName: 'Đỗ Nhật Vy', stopId: stop23._id },
+    { fullName: 'Vũ Bảo An', stopId: stop22._id },
+    { fullName: 'Trần Quang Huy', stopId: stop22._id },
+  ]);
+
+
+  const [schedule1, schedule2, schedule3, schedule4] = await ScheduleModel.create([
     {
       name: 'Lịch trình tuyến A',
       status: 'active',
@@ -373,13 +441,34 @@ async function seed() {
       routeId: route2._id,
       timeTables: createTimeTable.map((t) => t._id)
     },
+    {
+      name: 'Lịch trình tuyến C',
+      status: 'completed',
+      dateStart: new Date('2025-01-01'),
+      dateEnd: new Date('2025-12-31'),
+      busId: bus3._id,
+      driverId: driver3._id,
+      routeId: route3._id,
+      timeTables: createTimeTable.map((t) => t._id)
+    },
+    {
+      name: 'Lịch trình tuyến D',
+      status: 'active',
+      dateStart: new Date('2025-01-01'),
+      dateEnd: new Date('2025-12-31'),
+      busId: bus4._id,
+      driverId: driver4._id,
+      routeId: route4._id,
+      timeTables: createTimeTable.map((t) => t._id)
+    },
+
   ]);
 
   await TripModel.create([
     {
       scheduleId: schedule1._id,
-      status: 'planned',
-      date: new Date(), // ✅ thêm dòng này
+      status: 'inprogress',
+      date: new Date(),   //  thêm dòng này
       timeStart: '06:00', // nếu schema có
       timeEnd: '15:00',   // nếu schema có
       students: [
@@ -395,7 +484,7 @@ async function seed() {
     },
     {
       scheduleId: schedule2._id,
-      status: 'inprogress',
+      status: 'planned',
       date: new Date(),
       timeStart: '06:00',
       timeEnd: '15:00',
@@ -408,6 +497,40 @@ async function seed() {
         { studentId: stu8c._id, status: 'pickup' },
         { studentId: stu10c._id, status: 'pickup' },
         { studentId: stu20c._id, status: 'pickup' },
+      ],
+    },
+    {
+      scheduleId: schedule3._id,
+      status: 'completed',
+      date: new Date(),
+      timeStart: '06:00',
+      timeEnd: '15:00',
+      students: [
+        { studentId: stu1b._id, status: 'pickup' },
+        { studentId: stu2b._id, status: 'pickup' },
+        { studentId: stu3b._id, status: 'pickup' },
+        { studentId: stu4b._id, status: 'pickup' },
+        { studentId: stu7b._id, status: 'pickup' },
+        { studentId: stu8b._id, status: 'pickup' },
+        { studentId: stu10b._id, status: 'pickup' },
+        { studentId: stu20b._id, status: 'pickup' },
+      ],
+    },
+    {
+      scheduleId: schedule4._id,
+      status: 'inprogress',
+      date: new Date(),
+      timeStart: '06:00',
+      timeEnd: '15:00',
+      students: [
+        { studentId: stu1a._id, status: 'not_pickup' },
+        { studentId: stu2a._id, status: 'not_pickup' },
+        { studentId: stu3a._id, status: 'not_pickup' },
+        { studentId: stu4a._id, status: 'not_pickup' },
+        { studentId: stu7a._id, status: 'not_pickup' },
+        { studentId: stu8a._id, status: 'pickup' },
+        { studentId: stu10a._id, status: 'pickup' },
+        { studentId: stu20a._id, status: 'pickup' },
       ],
     },
   ]);
