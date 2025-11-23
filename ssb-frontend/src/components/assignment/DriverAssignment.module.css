@@ -25,7 +25,6 @@
   padding: 6px 8px;
   border: 1px solid #dddddd;
   text-align: left;
-  font-size: 14px;
   color: black;
 }
 
@@ -33,7 +32,13 @@
 .table th {
   background-color: #41bd79;
   color: #ffffff;
+  height: 60px;
   font-weight: 600;
+  font-size: 18px;
+}
+
+.table td{
+  height: 50px;
   font-size: 16px;
 }
 
@@ -54,65 +59,29 @@
   width: 15%;
 }
 
-/* Dòng dữ liệu */
-.row {
-  cursor: pointer;
-}
-
-.row:nth-child(even) {
-  background-color: #fafafa;
-}
-
-/* Hover & chọn dòng */
-.row:hover {
-  background-color: #f0f7ff;
-}
-
-.rowSelected {
-  background-color: #e0f0ff;
-}
-
-/* Badge trạng thái */
-.statusBadge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-/* Đã hoàn thành */
-.statusCompleted {
-  background-color: #00b050;
-}
-
-/* Chưa phân công  */
-.statusUnassigned {
-  background-color: #ff5a36;
-}
-
-/* Đang thực thi  */
-.statusInProgress {
-  background-color: #f0ad0b;
-}
 .row {
   transition: background-color 0.15s ease;
   cursor: pointer;
 }
 
 .rowSelected {
-  background-color: #e6f4ff !important; /* màu xanh nhạt */
+  background-color: #e6f4ff !important;
 }
 
 .row:hover {
   background-color: #f2f2f2;
 }
+
+.row.rowDisabled {
+  background-color: #e2e2e2;
+  cursor: not-allowed;
+}
+
 .statusBadge {
-  padding: 6px 10px;
+  padding: 8px 12px;
   border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: #fff;
   display: inline-block;
 }
@@ -157,8 +126,4 @@
 
 .table tbody tr {
   height: 40px;
-}
-.rowDisabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }

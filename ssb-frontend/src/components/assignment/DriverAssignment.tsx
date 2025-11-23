@@ -34,6 +34,7 @@ export default function DriverAssignment() {
   const [showToastEdit, setShowToastEdit] = useState(false);
   const [showToastEditSuccess, setShowToastEditSuccess] = useState(false);
   const [showToastEditFail, setShowToastEditFail] = useState(false);
+  const [showToastActiveSelectError, setShowToastActiveSelectError] = useState(false);
   // PANEL
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [panelMode, setPanelMode] = useState<"create" | "edit">("create");
@@ -86,8 +87,7 @@ export default function DriverAssignment() {
   const canInteract = (status: string) => {
     return (
       status === "Chưa phân công" ||
-      status === "Đã phân công" ||
-      status === "Đang hoạt động"
+      status === "Đã phân công"
     );
   };
   const handleFilterStatusChange = (status: string) => {
@@ -183,18 +183,26 @@ export default function DriverAssignment() {
 
             <tbody>
               {filteredData.map((item, index) => {
-            if (item.status === "cancelled"  || item.status === "Hủy bỏ") return null;
-                const clickable = canInteract(item.status);
+              if (item.status === "cancelled"  || item.status === "Hủy bỏ") return null;
 
                 return (
                   <tr
                     key={item.id}
-                    className={`${styles.row} 
-          ${selectedIndex === index ? styles.rowSelected : ""} 
-          ${!clickable ? styles.rowDisabled : ""}`}
+                    className={
+                      `${styles.row} 
+                      ${selectedIndex === index ? styles.rowSelected : ""} 
+                      ${!canInteract(item.status) ? styles.rowDisabled : ""}`
+                    }
                     onClick={() => {
-                      if (!clickable) return; // Không làm gì nếu không được tương tác
-                      setSelectedIndex(index);
+                      if (item.status === "Đang hoạt động") {
+                        setShowToastActiveSelectError(true);
+                        setTimeout(() => setShowToastActiveSelectError(false), 2000);
+                        return;
+                      }
+
+                      // do nothing if it's disabled by other conditions
+                      if (!canInteract(item.status)) return;
+                        setSelectedIndex(index);
                     }}
                   >
                     <td>{item.routeName}</td>
@@ -261,6 +269,7 @@ export default function DriverAssignment() {
       {showToastEdit && <Toast message="Vui lòng chọn 1 dòng để sửa !" type="error" />}
       {showToastEditSuccess && <Toast message="Chỉnh sửa phân công thành công !" type="success" />}
       {showToastEditFail && <Toast message="Chỉnh sửa phân công thất bại !" type="error" />}
+      {showToastActiveSelectError && <Toast message="Xe đang thực hiện chuyến đi, không thể tao tác!" type="error" />}
     </div>
   );
 }

@@ -6,6 +6,7 @@
 .header_bar {
   display: flex;
   flex-direction: column;
+  margin-bottom: 10px;
   gap: 1rem;
 }
 
@@ -26,23 +27,28 @@
 }
 
 .header_left input {
-    height: 40px;
+  height: 50px;
 }
 
 .search_wrapper {
-    height: 40px;
-    width: 100%;
+  height: 50px;
+  width: 100%;
 }
 
 .filter_container {
-    position: relative;
-    margin-left: auto;
+  position: relative;
+  margin-left: auto;
 }
 
 .filter_button {
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   cursor: pointer;
+}
+
+.filter_icon{
+  width: 35px;
+  height: 35px;
 }
 
 .filter_dropdown {
@@ -67,7 +73,7 @@
 
 .action_buttons button {
     width: 100px;
-    height: 40px;
+    height: 50px;
     padding: 6px 14px;
     color: white;
     border-radius: 8px;
@@ -98,11 +104,6 @@
   background: #b91c1c
 }
 
-/* Table */
-.table_container {
-  margin-top: 5px;
-}
-
 .table_wrapper {
   background: white;
   border-radius: 10px;
@@ -116,9 +117,9 @@
 
 .table_header th {
   text-align: center;
-  height: 50px;
-  font-weight: 500;
-  font-size: 16px;
+  height: 60px;
+  font-weight: 600;
+  font-size: 18px;
 }
 
 .table_row {
@@ -135,16 +136,16 @@
 }
 
 .table_row_disabled {
-  background: #f9fafb !important;
+  background: #e2e2e2 !important;
   cursor: not-allowed !important;
 }
 
 .table_cell {
   padding: 6px 8px;
   color: #374151;
-  font-size: 15px;
+  font-size: 16px;
   text-align: center;
-  height: 40px;
+  height: 50px;
   border-top: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
 }

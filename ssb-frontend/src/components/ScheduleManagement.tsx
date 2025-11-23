@@ -242,7 +242,7 @@ export default function ScheduleManagement() {
               onClick={() => setOpen((v) => !v)}
               className={styles.filter_button}
             >
-              <img src="/filter.svg" className="w-[28px] h-[28px]" />
+              <img src="/filter.svg" className={styles.filter_icon} />
             </button>
 
             {open && (
