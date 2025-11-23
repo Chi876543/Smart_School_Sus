@@ -10,7 +10,8 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
     server: Server; 
     constructor(private readonly trackingService: TrackingService) {} 
 
-    async afterInit() { 
+    // Gửi dữ liệu ngay sau khi tạo
+    async afterInit() {
         try{
             await this.trackingService.initRoutes(); 
         }catch(err){
@@ -46,10 +47,11 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
     async handleConnection(client: any) {
         console.log('Client connected');
 
+        // Gửi polyLine của route cùng các trạm sau khi có client kết nối
         const buses = await this.trackingService.getAllBusLocations(); 
         for (const bus of buses) { 
             const busId = bus.busId.toString();
-            const stops = await this.trackingService.getStopsFromSchedule(bus.scheduleId.toString());
+            const stops = (await this.trackingService.getStopsFromSchedule(bus.scheduleId.toString())).stops;
             this.server.emit('busRoute', { 
                 busId: busId, 
                 polyline: this.trackingService.getPolyline(busId), 

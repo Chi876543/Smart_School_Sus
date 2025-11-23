@@ -1,8 +1,3 @@
-class stopDTO{
-  name: string;
-  lat: number;
-  lng: number;
-}
 
 export class TripStudentDto {
   fullName: string;
@@ -14,6 +9,6 @@ export class TrackingDetailDto {
   plateNumber: string;
   driverName: string;
   routeName: string;
-  stops: stopDTO[];
+  // stops: stopDTO[];
   students: TripStudentDto[];
 }

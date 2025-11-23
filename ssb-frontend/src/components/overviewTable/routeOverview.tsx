@@ -49,6 +49,7 @@ export default function RouteTable() {
   },[]);
 
   useEffect(() => {
+    // Tìm kiếm theo tên
     const filtered = routes.filter((route) =>
       route.name.toLowerCase().includes(search.toLowerCase())
     );
@@ -85,7 +86,7 @@ export default function RouteTable() {
   return (
     <>
       {loading ? (
-        <div className="text-center p-4">Loading...</div>
+        <div className="text-center p-4">Loading...</div> // Nếu đang lấy dữ liệu 
       ) : (
         <OverviewTable 
           columns={columns} 
@@ -95,6 +96,7 @@ export default function RouteTable() {
         />
       )}
 
+      {/* popup hiển thị chi tiết */}
       {selectedRoute && (
         <div className={styles.popupOverlay}>
             <div className={styles.popup}>

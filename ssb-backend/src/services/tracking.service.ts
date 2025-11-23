@@ -74,9 +74,6 @@ export class TrackingService {
       throw new Error('Thiếu dữ liệu (bus/driver/route)');
     }
     
-    // Lấy danh sách các điểm dừng
-    const stops = await this.routeRepo.findStopsByRouteId(schedule.routeId.toString());
-    if (stops.length === 0) throw new Error('Tuyến không có điểm dừng');
 
     // Lấy danh sách học sinh
     const students = await this.tripRepo.findTripStudents(scheduleId);
@@ -85,11 +82,6 @@ export class TrackingService {
       plateNumber: bus.plateNumber,
       driverName: driver.name,
       routeName: route.name,
-      stops: (stops as any[]).map((s) =>({
-        name: s.name,
-        lat: s.lat,
-        lng: s.lng
-      })),
       students,
     };
   }
@@ -110,8 +102,19 @@ export class TrackingService {
   }
   
   async getStopsFromSchedule(scheduleId: string){
-    const stops = (await this.getBusStaticDetail(scheduleId)).stops;
-    return stops;
+    const schedule = await this.scheduleRepo.findScheduleById(scheduleId);
+    if (!schedule) throw new Error('Không tìm thấy Schedule');
+
+    // Lấy danh sách các điểm dừng
+    const stops = await this.routeRepo.findStopsByRouteId(schedule.routeId.toString());
+    if (stops.length === 0) throw new Error('Tuyến không có điểm dừng');
+    return {
+      stops: (stops as any[]).map((s) =>({
+        name: s.name,
+        lat: s.lat,
+        lng: s.lng
+      })),
+    };
   }
 
   // setup route cho toàn bộ xe buýt đang hoạt động
@@ -122,7 +125,7 @@ export class TrackingService {
       const busCoord: [number, number] = [bus.lat, bus.lng]; 
       if (!busCoord[0] || !busCoord[1]) continue;
 
-      const stops = (await this.getBusStaticDetail(bus.scheduleId.toString())).stops; 
+      const stops = (await this.getStopsFromSchedule(bus.scheduleId.toString())).stops;
       console.log(`Bus ${busId} stops:`, stops); 
       if(stops.length === 0) continue;
 
@@ -180,7 +183,7 @@ export class TrackingService {
     if(!bus) 
       throw new NotFoundException(`Cannot find bus of ${busId}`); 
 
-    const stops = (await this.getBusStaticDetail(bus.scheduleId.toString())).stops; 
+    const stops = (await this.getStopsFromSchedule(bus.scheduleId.toString())).stops; 
     if(stops.length === 0) 
       throw new NotFoundException(`Cannot find stops of ${busId}`);
     

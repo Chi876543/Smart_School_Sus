@@ -53,6 +53,7 @@ export default function StudentTable() {
   },[]);
 
   useEffect(() => {
+    // Tìm kiếm theo tên
     const filtered = students.filter((student) =>
       student.fullName.toLowerCase().includes(search.toLowerCase())
     );
@@ -85,7 +86,7 @@ export default function StudentTable() {
   return (
     <>
       {loading ? (
-        <div className="text-center p-4">Loading...</div>
+        <div className="text-center p-4">Loading...</div> // Nếu đang lấy dữ liệu
       ) : (
         <OverviewTable 
           columns={columns} 
@@ -95,6 +96,7 @@ export default function StudentTable() {
         />
       )}
 
+      {/* popup hiển thị chi tiết */}
       {selectedStudent && (
         <div className={styles.popupOverlay}>
             <div className={styles.popup}>
