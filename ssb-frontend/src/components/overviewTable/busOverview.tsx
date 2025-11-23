@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "@/services/api";
 import OverviewTable, { Column } from "./overviewTable";
 import styles from "./overviewTable.module.css";
@@ -16,7 +16,10 @@ interface Bus {
 export default function BusTable() {
   const [selectedBus, setSelectedBus] = useState<Bus | null>(null);
   const [buses, setBuses] = useState<Bus[]>([]);
+  const [displayBuses, setDisplayBuses] = useState<Bus[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const fetched = useRef(false);
 
   const fetchBusesData = async () => {
     setLoading(true);
@@ -36,8 +39,17 @@ export default function BusTable() {
   };
 
   useEffect(() =>{
+    if (fetched.current) return;
+    fetched.current = true;
     fetchBusesData();
   },[]);
+
+  useEffect(() => {
+    const filtered = buses.filter((bus) =>
+      bus.plateNum.toLowerCase().includes(search.toLowerCase())
+    );
+    setDisplayBuses(filtered);
+  }, [search, buses]);
 
   const columns: Column<Bus>[] = [
     { key: "plateNum", label: "Biển số xe" },
@@ -67,7 +79,12 @@ export default function BusTable() {
       {loading ? (
         <div className="text-center p-4">Loading...</div>
       ) : (
-        <OverviewTable columns={columns} data={buses} />
+        <OverviewTable 
+          columns={columns} 
+          data={displayBuses} 
+          searchValue={search}
+          onSearchChange={(value) => setSearch(value)}
+        />
       )}
 
       {selectedBus && (

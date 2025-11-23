@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "@/services/api";
 import OverviewTable, { Column } from "./overviewTable";
 import styles from "./overviewTable.module.css";
@@ -16,7 +16,10 @@ interface Driver {
 export default function DriverTable() {
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [displayDrivers, setDisplayDrivers] = useState<Driver[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const fetched = useRef(false);
 
   const fetchDriversData = async () => {
     setLoading(true);
@@ -45,8 +48,17 @@ export default function DriverTable() {
   };
 
   useEffect(() =>{
+    if (fetched.current) return;
+    fetched.current = true;
     fetchDriversData();
   },[]);
+
+  useEffect(() => {
+    const filtered = drivers.filter((driver) =>
+      driver.fullName.toLowerCase().includes(search.toLowerCase())
+    );
+    setDisplayDrivers(filtered);
+  }, [search, drivers]);
 
   const columns: Column<Driver>[] = [
     { key: "fullName", label: "Họ và tên" },
@@ -76,7 +88,12 @@ export default function DriverTable() {
       {loading ? (
         <div className="text-center p-4">Loading...</div>
       ) : (
-        <OverviewTable columns={columns} data={drivers} />
+        <OverviewTable 
+          columns={columns} 
+          data={displayDrivers} 
+          searchValue={search}
+          onSearchChange={(value) => setSearch(value)}
+        />
       )}
 
       {selectedDriver && (

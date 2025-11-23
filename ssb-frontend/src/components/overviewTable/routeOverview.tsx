@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "@/services/api";
 import OverviewTable, { Column } from "./overviewTable";
 import styles from "./overviewTable.module.css";
@@ -19,7 +19,10 @@ interface Route {
 export default function RouteTable() {
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
   const [routes, setRoutes] = useState<Route[]>([]);
+  const [displayRoutes, setDisplayRoutes] = useState<Route[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const fetched = useRef(false);
 
   const fetchRoutesData = async () => {
     setLoading(true);
@@ -40,8 +43,17 @@ export default function RouteTable() {
   };
 
   useEffect(() =>{
+    if (fetched.current) return;
+    fetched.current = true;
     fetchRoutesData();
   },[]);
+
+  useEffect(() => {
+    const filtered = routes.filter((route) =>
+      route.name.toLowerCase().includes(search.toLowerCase())
+    );
+    setDisplayRoutes(filtered);
+  }, [search, routes]);
 
   const columns: Column<Route>[] = [
     { key: "name", label: "Tên tuyến đường" },
@@ -75,7 +87,12 @@ export default function RouteTable() {
       {loading ? (
         <div className="text-center p-4">Loading...</div>
       ) : (
-        <OverviewTable columns={columns} data={routes} />
+        <OverviewTable 
+          columns={columns} 
+          data={displayRoutes} 
+          searchValue={search}
+          onSearchChange={(value) => setSearch(value)}
+        />
       )}
 
       {selectedRoute && (

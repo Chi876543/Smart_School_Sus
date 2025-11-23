@@ -1,3 +1,17 @@
+.headerRow {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.right {
+  width: 50%;
+}
+
+.right input {
+  height: 40px;
+}
+
 .tableWrapper {
   border-radius: 10px;
   overflow: hidden;
@@ -7,7 +21,6 @@
   width: 100%;
   border-collapse: collapse;
   border-radius: 10px;
-  margin-top: 16px;
   background-color: white;
 }
 
@@ -50,8 +63,9 @@
 
 /* Action link */
 .action {
-  color: #2563eb;
+  color: #059669;
   cursor: pointer;
+  font-weight: 600;
   text-decoration: underline;
 }
 

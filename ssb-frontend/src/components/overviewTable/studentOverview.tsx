@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "@/services/api";
 import OverviewTable, { Column } from "./overviewTable";
 import styles from "./overviewTable.module.css";
@@ -16,7 +16,10 @@ interface Student {
 export default function StudentTable() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
+  const [displayStudents, setDisplayStudents] = useState<Student[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const fetched = useRef(false);
 
   const fetchStudentsData = async () => {
     setLoading(true);
@@ -44,8 +47,17 @@ export default function StudentTable() {
   };
 
   useEffect(() =>{
+    if (fetched.current) return;
+    fetched.current = true;
     fetchStudentsData();
   },[]);
+
+  useEffect(() => {
+    const filtered = students.filter((student) =>
+      student.fullName.toLowerCase().includes(search.toLowerCase())
+    );
+    setDisplayStudents(filtered);
+  }, [search, students]);
 
   const columns: Column<Student>[] = [
     { key: "fullName", label: "Họ và tên" },
@@ -75,7 +87,12 @@ export default function StudentTable() {
       {loading ? (
         <div className="text-center p-4">Loading...</div>
       ) : (
-        <OverviewTable columns={columns} data={students} />
+        <OverviewTable 
+          columns={columns} 
+          data={displayStudents}
+          searchValue={search}
+          onSearchChange={(value) => setSearch(value)} 
+        />
       )}
 
       {selectedStudent && (

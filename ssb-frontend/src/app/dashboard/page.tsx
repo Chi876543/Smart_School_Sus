@@ -97,64 +97,20 @@ export default function DashboardPage() {
         <LeftSidebar items={menuItems} onSelect={(key) => setActiveMenu(key)} />
         <div className="flex-1 overflow-y-auto overflow-x-hidden">
           <div className="p-6">
-            {/* {activeMenu === "overview" && (
-              <>
-                <h1 className="text-2xl font-semibold mb-4">
-                  Tổng quan hệ thống
-                </h1>
-                {summary ? (
-                  <ul className="grid grid-cols-3 gap-4 w-full">
-                    <li className="bg-white p-4 rounded-xl shadow">
-                      Xe buýt: {summary.buses}
-                    </li>
-                    <li className="bg-white p-4 rounded-xl shadow">
-                      Tài xế: {summary.drivers}
-                    </li>
-                    <li className="bg-white p-4 rounded-xl shadow">
-                      Học sinh: {summary.students}
-                    </li>
-                  </ul>
-                ) : (
-                  <p>Đang tải dữ liệu...</p>
-                )}
-              </>
-            )} */}
-            
-            {activeMenu === "overview-students" && (
-              <>
-                <h1 className="text-2xl font-semibold mb-4">
-                  Danh sách học sinh
-                </h1>
-                <StudentTable />
-              </>
-            )}
 
-            {activeMenu === "overview-drivers" && (
-              <>
-                <h1 className="text-2xl font-semibold mb-4">
-                  Danh sách tài xế
-                </h1>
-                <DriverTable />
-              </>
-            )}
+            <div style={{ display: activeMenu === "overview-students" ? "block" : "none" }}>
+              <StudentTable />
+            </div>
+            <div style={{ display: activeMenu === "overview-drivers" ? "block" : "none" }}>
+              <DriverTable />
+            </div>
+            <div style={{ display: activeMenu === "overview-buses" ? "block" : "none" }}>
+              <BusTable />
+            </div>
+            <div style={{ display: activeMenu === "overview-routes" ? "block" : "none" }}>
+              <RouteTable />
+            </div>
 
-            {activeMenu === "overview-buses" && (
-              <>
-                <h1 className="text-2xl font-semibold mb-4">
-                  Danh sách xe buýt
-                </h1>
-                <BusTable />
-              </>
-            )}
-
-            {activeMenu === "overview-routes" && (
-              <>
-                <h1 className="text-2xl font-semibold mb-4">
-                  Danh sách tuyến xe
-                </h1>
-                <RouteTable />
-              </>
-            )}
             {/* Giao diện theo dõi xe */}
             {activeMenu === "tracking" && (
               <div className="h-full overflow-hidden">
