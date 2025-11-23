@@ -6,19 +6,20 @@ import { NotFoundException } from '@nestjs/common';
 export class StudentController{
     constructor(private readonly studentService: StudentService){}
 
+    // Lấy học sinh theo routeId
     @Get(':routeId')
     async getStudentsByRouteId(@Param('routeId') routeId: string){
       return this.studentService.getStudentsFromRoute(routeId);
     }
 
+    // Lấy tất cả học sinh
     @Get()
     async getAllStudent(){
       return this.studentService.getAllStudent();
     }
 
-
-
     // === API MỚI: /students/by-route/:routeId ===
+  // Lấy học sinh theo routeId với format trả về đúng cho frontend
   @Get('by-route/:routeId')
   async getStudentsByRoute(@Param('routeId') routeId: string) {
     try {
