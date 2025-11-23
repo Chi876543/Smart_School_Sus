@@ -9,6 +9,7 @@ export class TripService{
         private readonly tripRepo: TripRepository
     ){}
 
+    // Cập nhật trạng thái của học sinh trong chuyến đi
     async updateStatusStudentTrip(studentId: string, tripId: string, status: TripStudentStatus){
         const trip =  await this.tripRepo.findstudentInTrip(tripId, studentId);
         if(!trip) throw new NotFoundException('Trip or Student not found in trip');

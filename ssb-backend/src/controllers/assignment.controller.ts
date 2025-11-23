@@ -8,21 +8,25 @@ import { patch } from 'axios';
 export class AssignScheduleController {
   constructor(private readonly assignService: AssignScheduleService) {}
 
+  // Lấy tất cả các assignment
   @Patch()
   async getAllAssignments() {
     return this.assignService.getAllAssignments();
   }
 
+  // Lấy tất cả tài xế
   @Patch('drivers')
   async getDrivers() {
     return this.assignService.getDrivers();
   }
 
+  // Lấy tất cả xe buýt
   @Patch('buses')
   async getBuses() {
     return this.assignService.getBuses();
   }
 
+  // Phân công lịch trình
   @Patch(':scheduleId')
   async assignSchedule(
     @Param('scheduleId') scheduleId: string,
@@ -31,6 +35,7 @@ export class AssignScheduleController {
     return this.assignService.assignSchedule(scheduleId, dto);
   }
 
+  // Cập nhật phân công lịch trình
   @Patch(':scheduleId/update')
   async updateAssignment(
     @Param('scheduleId') scheduleId: string,
