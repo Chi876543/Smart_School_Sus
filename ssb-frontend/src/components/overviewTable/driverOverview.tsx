@@ -54,6 +54,7 @@ export default function DriverTable() {
   },[]);
 
   useEffect(() => {
+    // Tìm kiếm theo tên
     const filtered = drivers.filter((driver) =>
       driver.fullName.toLowerCase().includes(search.toLowerCase())
     );
@@ -86,7 +87,7 @@ export default function DriverTable() {
   return (
     <>
       {loading ? (
-        <div className="text-center p-4">Loading...</div>
+        <div className="text-center p-4">Loading...</div> // Nếu đang lấy dữ liệu 
       ) : (
         <OverviewTable 
           columns={columns} 
@@ -96,6 +97,7 @@ export default function DriverTable() {
         />
       )}
 
+      {/* popup hiển thị chi tiết */}
       {selectedDriver && (
         <div className={styles.popupOverlay}>
             <div className={styles.popup}>

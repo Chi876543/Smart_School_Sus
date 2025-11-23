@@ -22,20 +22,19 @@ export interface BusBasic {
   scheduleId: string;
   busId: string;
   plateNumber: string;
-  // lat: number;
-  // lng: number;
 }
 
+// Các thông tin không thay đổi
 interface BusDetailStatic {
   driverName: string;
   routeName: string;
-  stops: { name: string; lat: number; lng: number }[];
   students: { 
     fullName: string; 
     status: string 
   }[];
 }
 
+// Các thông tin thay đổi liên tục
 interface BusDetailRealtime {
   nextStop: string;
   distance: number; 

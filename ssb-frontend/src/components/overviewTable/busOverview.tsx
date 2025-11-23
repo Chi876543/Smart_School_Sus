@@ -45,6 +45,7 @@ export default function BusTable() {
   },[]);
 
   useEffect(() => {
+    // Tìm kiếm theo mã số xe
     const filtered = buses.filter((bus) =>
       bus.plateNum.toLowerCase().includes(search.toLowerCase())
     );
@@ -77,7 +78,7 @@ export default function BusTable() {
   return (
     <>
       {loading ? (
-        <div className="text-center p-4">Loading...</div>
+        <div className="text-center p-4">Loading...</div>  // Nếu đang lấy dữ liệu
       ) : (
         <OverviewTable 
           columns={columns} 
@@ -87,6 +88,7 @@ export default function BusTable() {
         />
       )}
 
+      {/* popup hiển thị chi tiết */}
       {selectedBus && (
         <div className={styles.popupOverlay}>
             <div className={styles.popup}>
